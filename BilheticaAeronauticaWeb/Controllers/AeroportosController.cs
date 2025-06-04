@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using BilheticaAeronauticaWeb.Data;
+﻿using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
+using BilheticaAeronauticaWeb.Helpers;
+using BilheticaAeronauticaWeb.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
     public class AeroportosController : Controller
     {
         private readonly DataContext _context;
+        private readonly IAeroportoRepository _aeroportoRepository;
 
-        public AeroportosController(DataContext context)
+        public AeroportosController(DataContext context, IAeroportoRepository aeroportoRepository)
         {
             _context = context;
+            _aeroportoRepository = aeroportoRepository;
         }
 
         // GET: Aeroportos
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Aeroportos.ToListAsync());
+            return View(_aeroportoRepository.GetAll().OrderBy(a => a.Nome));
         }
 
         // GET: Aeroportos/Details/5
@@ -33,8 +32,9 @@ namespace BilheticaAeronauticaWeb.Controllers
                 return NotFound();
             }
 
-            var aeroporto = await _context.Aeroportos
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var aeroporto = await _aeroportoRepository.GetByIdAsync(id.Value);
+
+
             if (aeroporto == null)
             {
                 return NotFound();
@@ -54,15 +54,23 @@ namespace BilheticaAeronauticaWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Cidade,Pais")] Aeroporto aeroporto)
+        public async Task<IActionResult> Create(AeroportoViewModel model)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(aeroporto);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _aeroportoRepository.CreateAsync(model);
+
+                    return RedirectToAction(nameof(Index));
+
+                }
+                catch (Exception ex)
+                {
+                    //TODO Flashmessage"Este aeroporto já existe!"
+                }
             }
-            return View(aeroporto);
+            return View(model);
         }
 
         // GET: Aeroportos/Edit/5
@@ -70,14 +78,16 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("AeroportoNotFound");
             }
 
-            var aeroporto = await _context.Aeroportos.FindAsync(id);
+            var aeroporto = await _aeroportoRepository.GetByIdAsync(id.Value);
+
             if (aeroporto == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("AeroportoNotFound");
             }
+
             return View(aeroporto);
         }
 
@@ -86,23 +96,21 @@ namespace BilheticaAeronauticaWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Cidade,Pais")] Aeroporto aeroporto)
+        public async Task<IActionResult> Edit(AeroportoViewModel aeroporto)
         {
-            if (id != aeroporto.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(aeroporto);
-                    await _context.SaveChangesAsync();
+
+
+                await _aeroportoRepository.UpdateAsync(aeroporto);
+
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AeroportoExists(aeroporto.Id))
+                    if (!await _aeroportoRepository.ExistAsync(aeroporto.Id))
                     {
                         return NotFound();
                     }
@@ -121,11 +129,11 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("AeroportoNotFound");
             }
 
-            var aeroporto = await _context.Aeroportos
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var aeroporto = await _aeroportoRepository.GetByIdAsync(id.Value);
+
             if (aeroporto == null)
             {
                 return NotFound();
@@ -139,19 +147,31 @@ namespace BilheticaAeronauticaWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var aeroporto = await _context.Aeroportos.FindAsync(id);
-            if (aeroporto != null)
-            {
-                _context.Aeroportos.Remove(aeroporto);
-            }
+            var aeroporto = await _aeroportoRepository.GetByIdAsync(id);
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                await _aeroportoRepository.DeleteAsync(aeroporto);
+                return RedirectToAction(nameof(Index)); 
+            }
+            catch (DbUpdateException ex)
+            {
+
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                {
+                    ViewBag.ErrorTitle = $"{aeroporto.Nome} provavelmente está a ser usado!!";
+                    ViewBag.ErrorMessage = $"{aeroporto.Nome} não pode ser apagado visto haverem encomendas que o usam.</br></br>" +
+                        $"Experimente primeiro apagar todas as encomendas que o estão a usar," +
+                        $"e torne novamente a apagá-lo";
+                }
+
+                return View("Error");
+            }
         }
 
-        private bool AeroportoExists(int id)
+        public IActionResult AeroportoNotFound()
         {
-            return _context.Aeroportos.Any(e => e.Id == id);
+            return View();
         }
     }
 }

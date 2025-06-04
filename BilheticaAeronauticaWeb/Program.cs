@@ -13,6 +13,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 });
 
 builder.Services.AddScoped<SeedDb>();
+builder.Services.AddScoped<IAeroportoRepository, AeroportoRepository>();
 
 
 var app = builder.Build();

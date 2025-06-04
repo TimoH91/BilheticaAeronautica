@@ -2,7 +2,7 @@
 
 namespace BilheticaAeronauticaWeb.Entities
 {
-    public class Aeroporto
+    public class Aeroporto : IEntity
     {
         public int Id { get; set; }
 
