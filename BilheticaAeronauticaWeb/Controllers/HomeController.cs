@@ -18,17 +18,17 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View();
         }
 
-        public IActionResult Voos()
+        public IActionResult Flights()
         {
             return View();
         }
 
-        public IActionResult Aeroportos()
+        public IActionResult Airports()
         {
             return View();
         }
 
-        public IActionResult Comprar()
+        public IActionResult Tickets()
         {
             return View();
         }

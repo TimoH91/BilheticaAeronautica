@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BilheticaAeronauticaWeb.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BilheticaAeronauticaWeb.Data
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<User>
     {
-        public DbSet<Aeroporto> Aeroportos { get; set; }
+        public DbSet<Airport> Airports { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

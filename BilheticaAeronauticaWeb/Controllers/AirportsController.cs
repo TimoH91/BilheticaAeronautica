@@ -7,24 +7,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
-    public class AeroportosController : Controller
+    public class AirportsController : Controller
     {
         private readonly DataContext _context;
-        private readonly IAeroportoRepository _aeroportoRepository;
+        private readonly IAirportRepository _airportRepository;
+        private readonly IBlobHelper _blobHelper;
 
-        public AeroportosController(DataContext context, IAeroportoRepository aeroportoRepository)
+        public AirportsController(DataContext context, IAirportRepository aeroportoRepository, IBlobHelper blobHelper)
         {
             _context = context;
-            _aeroportoRepository = aeroportoRepository;
+            _airportRepository = aeroportoRepository;
+            _blobHelper = blobHelper;
         }
 
-        // GET: Aeroportos
+        // GET: Airports
         public async Task<IActionResult> Index()
         {
-            return View(_aeroportoRepository.GetAll().OrderBy(a => a.Nome));
+            return View(_airportRepository.GetAll().OrderBy(a => a.Name));
         }
 
-        // GET: Aeroportos/Details/5
+        // GET: Airports/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -32,7 +34,7 @@ namespace BilheticaAeronauticaWeb.Controllers
                 return NotFound();
             }
 
-            var aeroporto = await _aeroportoRepository.GetByIdAsync(id.Value);
+            var aeroporto = await _airportRepository.GetByIdAsync(id.Value);
 
 
             if (aeroporto == null)
@@ -43,24 +45,24 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(aeroporto);
         }
 
-        // GET: Aeroportos/Create
+        // GET: Airports/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Aeroportos/Create
+        // POST: Airports/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(AeroportoViewModel model)
+        public async Task<IActionResult> Create(AirportViewModel model)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    await _aeroportoRepository.CreateAsync(model);
+                    await _airportRepository.CreateAsync(model);
 
                     return RedirectToAction(nameof(Index));
 
@@ -73,30 +75,30 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(model);
         }
 
-        // GET: Aeroportos/Edit/5
+        // GET: Airports/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
-                return new NotFoundViewResult("AeroportoNotFound");
+                return new NotFoundViewResult("AirportNotFound");
             }
 
-            var aeroporto = await _aeroportoRepository.GetByIdAsync(id.Value);
+            var airport = await _airportRepository.GetByIdAsync(id.Value);
 
-            if (aeroporto == null)
+            if (airport == null)
             {
-                return new NotFoundViewResult("AeroportoNotFound");
+                return new NotFoundViewResult("AirportNotFound");
             }
 
-            return View(aeroporto);
+            return View(airport);
         }
 
-        // POST: Aeroportos/Edit/5
+        // POST: Airports/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(AeroportoViewModel aeroporto)
+        public async Task<IActionResult> Edit(AirportViewModel aeroporto)
         {
             if (ModelState.IsValid)
             {
@@ -104,13 +106,13 @@ namespace BilheticaAeronauticaWeb.Controllers
                 {
 
 
-                await _aeroportoRepository.UpdateAsync(aeroporto);
+                await _airportRepository.UpdateAsync(aeroporto);
 
 
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!await _aeroportoRepository.ExistAsync(aeroporto.Id))
+                    if (!await _airportRepository.ExistAsync(aeroporto.Id))
                     {
                         return NotFound();
                     }
@@ -132,14 +134,14 @@ namespace BilheticaAeronauticaWeb.Controllers
                 return new NotFoundViewResult("AeroportoNotFound");
             }
 
-            var aeroporto = await _aeroportoRepository.GetByIdAsync(id.Value);
+            var airport = await _airportRepository.GetByIdAsync(id.Value);
 
-            if (aeroporto == null)
+            if (airport == null)
             {
                 return NotFound();
             }
 
-            return View(aeroporto);
+            return View(airport);
         }
 
         // POST: Aeroportos/Delete/5
@@ -147,11 +149,11 @@ namespace BilheticaAeronauticaWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var aeroporto = await _aeroportoRepository.GetByIdAsync(id);
+            var airport = await _airportRepository.GetByIdAsync(id);
 
             try
             {
-                await _aeroportoRepository.DeleteAsync(aeroporto);
+                await _airportRepository.DeleteAsync(airport);
                 return RedirectToAction(nameof(Index)); 
             }
             catch (DbUpdateException ex)
@@ -159,8 +161,8 @@ namespace BilheticaAeronauticaWeb.Controllers
 
                 if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
                 {
-                    ViewBag.ErrorTitle = $"{aeroporto.Nome} provavelmente está a ser usado!!";
-                    ViewBag.ErrorMessage = $"{aeroporto.Nome} não pode ser apagado visto haverem encomendas que o usam.</br></br>" +
+                    ViewBag.ErrorTitle = $"{airport.Name} provavelmente está a ser usado!!";
+                    ViewBag.ErrorMessage = $"{airport.Name} não pode ser apagado visto haverem encomendas que o usam.</br></br>" +
                         $"Experimente primeiro apagar todas as encomendas que o estão a usar," +
                         $"e torne novamente a apagá-lo";
                 }

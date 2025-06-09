@@ -2,7 +2,7 @@
 
 namespace BilheticaAeronauticaWeb.Data
 {
-    public interface IAeroportoRepository :IGenericRepository<Aeroporto>
+    public interface IAirportRepository :IGenericRepository<Airport>
     {
 
     }

@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using BilheticaAeronauticaWeb.Data;
+using BilheticaAeronauticaWeb.Entities;
+using Microsoft.AspNetCore.Identity;
+using BilheticaAeronauticaWeb.Helpers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,14 +10,29 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+
+
+builder.Services.AddScoped<SeedDb>();
+builder.Services.AddScoped<IAirportRepository, AirportRepository>();
+builder.Services.AddIdentity<User, IdentityRole>(cfg =>
+{
+    cfg.User.RequireUniqueEmail = true; 
+                cfg.Password.RequireDigit = false;
+    cfg.Password.RequiredUniqueChars = 0;
+    cfg.Password.RequireUppercase = false;
+    cfg.Password.RequireLowercase = false;
+    cfg.Password.RequireNonAlphanumeric = false;
+    cfg.Password.RequiredLength = 6;
+})
+     .AddEntityFrameworkStores<DataContext>(); 
+                
+
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddScoped<SeedDb>();
-builder.Services.AddScoped<IAeroportoRepository, AeroportoRepository>();
-
+builder.Services.AddScoped<IUserHelper, UserHelper>();
 
 var app = builder.Build();
 
@@ -38,6 +56,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
