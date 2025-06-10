@@ -13,7 +13,7 @@ namespace BilheticaAeronauticaWeb.Data
             _context = context;
         }
 
-        public IQueryable<T> GetAll()
+        public virtual IQueryable<T> GetAll()
         {
             return _context.Set<T>().AsNoTracking();
         }

@@ -11,13 +11,13 @@ namespace BilheticaAeronauticaWeb.Controllers
     {
         private readonly DataContext _context;
         private readonly IAirportRepository _airportRepository;
-        private readonly IBlobHelper _blobHelper;
+        //private readonly IBlobHelper _blobHelper;
 
-        public AirportsController(DataContext context, IAirportRepository aeroportoRepository, IBlobHelper blobHelper)
+        public AirportsController(DataContext context, IAirportRepository aeroportoRepository)
         {
             _context = context;
             _airportRepository = aeroportoRepository;
-            _blobHelper = blobHelper;
+            //_blobHelper = blobHelper;
         }
 
         // GET: Airports
@@ -34,15 +34,15 @@ namespace BilheticaAeronauticaWeb.Controllers
                 return NotFound();
             }
 
-            var aeroporto = await _airportRepository.GetByIdAsync(id.Value);
+            var airport = await _airportRepository.GetByIdAsync(id.Value);
 
 
-            if (aeroporto == null)
+            if (airport == null)
             {
                 return NotFound();
             }
 
-            return View(aeroporto);
+            return View(airport);
         }
 
         // GET: Airports/Create
@@ -98,7 +98,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(AirportViewModel aeroporto)
+        public async Task<IActionResult> Edit(AirportViewModel airport)
         {
             if (ModelState.IsValid)
             {
@@ -106,13 +106,13 @@ namespace BilheticaAeronauticaWeb.Controllers
                 {
 
 
-                await _airportRepository.UpdateAsync(aeroporto);
+                await _airportRepository.UpdateAsync(airport);
 
 
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!await _airportRepository.ExistAsync(aeroporto.Id))
+                    if (!await _airportRepository.ExistAsync(airport.Id))
                     {
                         return NotFound();
                     }
@@ -123,7 +123,7 @@ namespace BilheticaAeronauticaWeb.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(aeroporto);
+            return View(airport);
         }
 
         // GET: Aeroportos/Delete/5

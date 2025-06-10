@@ -3,9 +3,9 @@ using BilheticaAeronauticaWeb.Entities;
 
 namespace BilheticaAeronauticaWeb.Models
 {
-    public class AirportViewModel : Airport
+    public class CountryViewModel : Country
     {
-        
+        [Display(Name = "Flag")]
+        public IFormFile ImageFile { get; set; }
     }
 }
-

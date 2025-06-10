@@ -1,6 +1,7 @@
 ﻿using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Helpers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BilheticaAeronauticaWeb.Data
 {
@@ -21,7 +22,36 @@ namespace BilheticaAeronauticaWeb.Data
         {
             await _context.Database.EnsureCreatedAsync();
 
-            var user = await _userHelper.GetUserByEmailAsync("timothyharris04@gmail.com"); 
+            if (!_context.Countries.Any())
+            {
+
+                var flagId = Guid.NewGuid();
+
+                
+                var sourcePath = Path.Combine("SeedImages", "england.jpeg"); 
+                var destinationPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "flags", $"{flagId}.jpg");
+
+       
+                Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
+
+                File.Copy(sourcePath, destinationPath, overwrite: true);
+
+                var cities = new List<City>();
+                cities.Add(new City { Name = "Birmingham" });
+                cities.Add(new City { Name = "London" });
+                cities.Add(new City { Name = "Manchester" });
+
+                _context.Countries.Add(new Country
+                {
+                    FlagImageId = flagId,
+                    Cities = cities,
+                    Name = "England"
+                });
+
+                await _context.SaveChangesAsync();
+            }
+
+                var user = await _userHelper.GetUserByEmailAsync("timothyharris04@gmail.com"); 
 
             if (user == null)
             {
@@ -44,22 +74,30 @@ namespace BilheticaAeronauticaWeb.Data
 
             }
 
-            if (!_context.Airports.Any())
+
+            var englandCountry = _context.Countries.Include(c => c.Cities).FirstOrDefault(c => c.Name == "England");
+
+            if (englandCountry != null && !_context.Airports.Any())
             {
-                AddAeroporto("Heathrow", "London", "United Kingdom");
-                AddAeroporto("Luton", "London", "United Kingdom");
-                AddAeroporto("Birmingham International", "Birmingham", "United Kingdom");
-                AddAeroporto("Manchester", "Manchester", "United Kingdom");
+                var londonCity = englandCountry.Cities.FirstOrDefault(c => c.Name == "London");
+                var birminghamCity = englandCountry.Cities.FirstOrDefault(c => c.Name == "Birmingham");
+                var manchesterCity = englandCountry.Cities.FirstOrDefault(c => c.Name == "Manchester");
+
+                AddAirport("Heathrow", londonCity, englandCountry);
+                AddAirport("Luton", londonCity, englandCountry);
+                AddAirport("Birmingham International", birminghamCity, englandCountry);
+                AddAirport("Manchester", manchesterCity, englandCountry);
+
                 await _context.SaveChangesAsync();
             }
         }
 
-        private void AddAeroporto(string name, string city, string country)
+        private void AddAirport(string name, City city, Country country)
         {
             _context.Airports.Add(new Airport
             {
                 Name = name,
-                City= city,
+                City = city,
                 Country = country
             });
 
