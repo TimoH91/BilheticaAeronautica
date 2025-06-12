@@ -8,6 +8,8 @@ namespace BilheticaAeronauticaWeb.Data
     {
         public DbSet<Airport> Airports { get; set; }
 
+        public DbSet<Airplane>  Airplanes { get; set; }
+
         public DbSet<Country> Countries { get; set; }
 
         public DbSet<City> Cities { get; set; }

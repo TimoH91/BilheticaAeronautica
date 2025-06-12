@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\images\flags\" />
+    <Folder Include="wwwroot\images\airplanes\" />
   </ItemGroup>
 
 </Project>

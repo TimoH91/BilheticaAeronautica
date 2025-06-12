@@ -1,4 +1,4 @@
-﻿@model BilheticaAeronauticaWeb.Entities.Airport
+﻿@model BilheticaAeronauticaWeb.Entities.Country
 
 @{
     ViewData["Title"] = "Details";
@@ -7,7 +7,7 @@
 <h1>Details</h1>
 
 <div>
-    <h4>Airport</h4>
+    <h4>Country</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -17,16 +17,10 @@
             @Html.DisplayFor(model => model.Name)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.City.Name)
+            @Html.DisplayNameFor(model => model.FlagImageId)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.City.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Country)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Country.Name)
+            @Html.DisplayFor(model => model.FlagImageId)
         </dd>
     </dl>
 </div>

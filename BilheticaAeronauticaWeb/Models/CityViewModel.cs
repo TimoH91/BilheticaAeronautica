@@ -3,12 +3,15 @@ using BilheticaAeronauticaWeb.Entities;
 
 namespace BilheticaAeronauticaWeb.Models
 {
-    public class AirportViewModel
+    public class CityViewModel
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
         public int CountryId { get; set; }
+
         public int CityId { get; set; }
+
+        [Required]
+        [Display(Name = "City")]
+        [MaxLength(50, ErrorMessage = "The field {0} can contain {1} character.")]
+        public string Name { get; set; }
     }
 }
-

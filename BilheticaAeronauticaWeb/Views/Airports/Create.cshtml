@@ -1,4 +1,4 @@
-﻿@model BilheticaAeronauticaWeb.Entities.Airport
+﻿@model BilheticaAeronauticaWeb.Models.AirportViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -18,17 +18,21 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="City" class="control-label"></label>
-                <input asp-for="City" class="form-control" />
-                <span asp-validation-for="City" class="text-danger"></span>
+                <label asp-for="CountryId" class="control-label">Country</label>
+                <select asp-for="CountryId" id="CountryId" asp-items="ViewBag.Countries" class="form-control">
+                    <option value="">Select a country</option>
+                </select>
+                <span asp-validation-for="CountryId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Country" class="control-label"></label>
-                <input asp-for="Country" class="form-control" />
-                <span asp-validation-for="Country" class="text-danger"></span>
+                <label asp-for="CityId" class="control-label">City</label>
+                <select asp-for="CityId" id="CityId" asp-items="ViewBag.Cities" class="form-control">
+                    <option value="">Select a city</option>
+                </select>
+                <span asp-validation-for="CityId" class="text-danger"></span>
             </div>
-            <div class ="form-group">
-@*             <label asp-for="FlagImageFile" class="control-label"></label>
+            <div class="form-group">
+                @*             <label asp-for="FlagImageFile" class="control-label"></label>
             <input asp-for="FlagImageFile" class="form-control" type="file" />
             <span asp-validation-for="FlagImageFile" class="text-danger"></span> *@
             </div>
@@ -44,5 +48,37 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#CountryId").change(function () {
+                $("#CityId").empty();
+                $.ajax({
+                    url: '@Url.Action("GetCitiesAsync", "Airports")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {countryId:$("#CountryId").val()},
+                    success: function (cities) {
+                        debugger;
+                        $("#CityId").append('<option value="0">(Select a city...)</option>');
+                        $.each(cities, function (i, city) {
+                            $("#CityId").append('<option value="'
+                                + city.id + '">'
+                                + city.name + '</option>');
+                        });
+                    },
+                    error: function (ex) {
+                        debugger;
+                        alert('Failed to retrieve cities.' + ex);
+                    }
+                });
+                return false;
+            })
+        });
+    </script>
+
+        }

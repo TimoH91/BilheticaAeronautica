@@ -7,7 +7,7 @@ namespace BilheticaAeronauticaWeb.Entities
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(50, ErrorMessage = "The field {0} can contain {1} characters.")]
+        [MaxLength(60, ErrorMessage = "The field {0} can contain {1} characters.")]
         public string Name { get; set; }
 
         public ICollection<City> Cities { get; set; }

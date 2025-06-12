@@ -14,6 +14,9 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<SeedDb>();
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
+builder.Services.AddScoped<IAirplaneRepository, AirplaneRepository>();
+builder.Services.AddScoped<ICountryRepository, CountryRepository>();
+builder.Services.AddScoped<IConverterHelper, ConverterHelper>();
 builder.Services.AddIdentity<User, IdentityRole>(cfg =>
 {
     cfg.User.RequireUniqueEmail = true; 

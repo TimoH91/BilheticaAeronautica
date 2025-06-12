@@ -1,8 +1,10 @@
-﻿using BilheticaAeronauticaWeb.Data;
+﻿using System.Runtime.InteropServices;
+using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Helpers;
 using BilheticaAeronauticaWeb.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace BilheticaAeronauticaWeb.Controllers
@@ -11,12 +13,16 @@ namespace BilheticaAeronauticaWeb.Controllers
     {
         private readonly DataContext _context;
         private readonly IAirportRepository _airportRepository;
+        private readonly ICountryRepository _countryRepository;
+        private readonly IConverterHelper _converterHelper;
         //private readonly IBlobHelper _blobHelper;
 
-        public AirportsController(DataContext context, IAirportRepository aeroportoRepository)
+        public AirportsController(DataContext context, IAirportRepository aeroportoRepository, IConverterHelper converterHelper, ICountryRepository countryRepository)
         {
             _context = context;
             _airportRepository = aeroportoRepository;
+            _converterHelper = converterHelper;
+            _countryRepository = countryRepository;
             //_blobHelper = blobHelper;
         }
 
@@ -48,6 +54,13 @@ namespace BilheticaAeronauticaWeb.Controllers
         // GET: Airports/Create
         public IActionResult Create()
         {
+            ViewBag.Countries = _countryRepository.GetComboCountries();
+
+            ViewBag.Cities = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "(Select a country first...)", Value = "0" }
+            };
+
             return View();
         }
 
@@ -60,9 +73,11 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (ModelState.IsValid)
             {
+                var airport = await _converterHelper.ToAirport(model, true);
+
                 try
                 {
-                    await _airportRepository.CreateAsync(model);
+                    await _airportRepository.CreateAsync(airport);
 
                     return RedirectToAction(nameof(Index));
 
@@ -100,30 +115,38 @@ namespace BilheticaAeronauticaWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(AirportViewModel airport)
         {
-            if (ModelState.IsValid)
-            {
-                try
-                {
+            //if (ModelState.IsValid)
+            //{
+            //    try
+            //    {
 
 
-                await _airportRepository.UpdateAsync(airport);
+            //    await _airportRepository.UpdateAsync(airport);
 
 
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await _airportRepository.ExistAsync(airport.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
+            //    }
+            //    catch (DbUpdateConcurrencyException)
+            //    {
+            //        if (!await _airportRepository.ExistAsync(airport.Id))
+            //        {
+            //            return NotFound();
+            //        }
+            //        else
+            //        {
+            //            throw;
+            //        }
+            //    }
+            //    return RedirectToAction(nameof(Index));
+            //}
             return View(airport);
+        }
+
+        [HttpPost]
+        [Route("Airports/GetCitiesAsync")]
+        public async Task<JsonResult> GetCitiesAsync(int countryId)
+        {
+            var country = await _countryRepository.GetCountryWithCitiesAsync(countryId);
+            return Json(country.Cities.OrderBy(c => c.Name));
         }
 
         // GET: Aeroportos/Delete/5

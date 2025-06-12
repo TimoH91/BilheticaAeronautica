@@ -90,6 +90,33 @@ namespace BilheticaAeronauticaWeb.Data
 
                 await _context.SaveChangesAsync();
             }
+
+            if (!_context.Airplanes.Any()) 
+            {
+                var imageId = Guid.NewGuid();
+
+
+                var sourcePath = Path.Combine("SeedImages", "boeing_737.png");
+                var destinationPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "airplanes", $"{imageId}.jpg");
+
+
+                Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
+
+                File.Copy(sourcePath, destinationPath, overwrite: true);
+
+                var airplane = new Airplane
+                {
+                    Name = "737",
+                    Manufacturer = "Boeing",
+                    SeatsPerRow = 7,
+                    Rows = 30,
+                    ImageId = imageId,
+                    Status = true
+                };
+
+                _context.Airplanes.Add(airplane);
+                await _context.SaveChangesAsync();
+            }
         }
 
         private void AddAirport(string name, City city, Country country)
