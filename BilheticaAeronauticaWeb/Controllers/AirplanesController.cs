@@ -65,6 +65,9 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (ModelState.IsValid)
             {
+
+                
+                //TODO this will be empty as the blob helper creates the guid, when I change it
                 Guid imageId = Guid.NewGuid();
 
 
