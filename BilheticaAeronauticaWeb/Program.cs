@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using BilheticaAeronauticaWeb.Helpers;
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,8 +16,15 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<SeedDb>();
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAirplaneRepository, AirplaneRepository>();
+builder.Services.AddScoped<IFlightRepository, FlightRepository>();
 builder.Services.AddScoped<ICountryRepository, CountryRepository>();
 builder.Services.AddScoped<IConverterHelper, ConverterHelper>();
+
+builder.Services.AddDbContext<DataContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
 builder.Services.AddIdentity<User, IdentityRole>(cfg =>
 {
     cfg.User.RequireUniqueEmail = true; 
@@ -30,12 +38,12 @@ builder.Services.AddIdentity<User, IdentityRole>(cfg =>
      .AddEntityFrameworkStores<DataContext>(); 
                 
 
-builder.Services.AddDbContext<DataContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-
 builder.Services.AddScoped<IUserHelper, UserHelper>();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/NotAuthorized";
+    options.AccessDeniedPath = "/Account/Not/Authorized";
+});
 
 var app = builder.Build();
 
@@ -54,6 +62,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/error/{0}");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

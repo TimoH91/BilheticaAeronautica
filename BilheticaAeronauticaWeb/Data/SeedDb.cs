@@ -22,15 +22,17 @@ namespace BilheticaAeronauticaWeb.Data
         {
             await _context.Database.EnsureCreatedAsync();
 
+            await _userHelper.CheckRoleAsync("Admin");
+            await _userHelper.CheckRoleAsync("Staff");
+            await _userHelper.CheckRoleAsync("Customer");
+
             if (!_context.Countries.Any())
             {
 
                 var flagId = Guid.NewGuid();
-
                 
                 var sourcePath = Path.Combine("SeedImages", "england.jpeg"); 
                 var destinationPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "flags", $"{flagId}.jpg");
-
        
                 Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
 
@@ -72,6 +74,16 @@ namespace BilheticaAeronauticaWeb.Data
                     throw new InvalidOperationException("Could not create the user in seeder");
                 }
 
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
+
+            }
+
+            var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
+
+            if (!isInRole)
+            {
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
+
             }
 
 
@@ -96,7 +108,7 @@ namespace BilheticaAeronauticaWeb.Data
                 var imageId = Guid.NewGuid();
 
 
-                var sourcePath = Path.Combine("SeedImages", "boeing_737.png");
+                var sourcePath = Path.Combine("SeedImages", "boeing_737.jpeg");
                 var destinationPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "airplanes", $"{imageId}.jpg");
 
 
@@ -117,7 +129,30 @@ namespace BilheticaAeronauticaWeb.Data
                 _context.Airplanes.Add(airplane);
                 await _context.SaveChangesAsync();
             }
+
+            if (!_context.Flights.Any() && _context.Airplanes.Any() && _context.Airports.Any())
+            {
+                var originAirport = _context.Airports.FirstOrDefault(a => a.Id == 1);
+                var destinationAirport = _context.Airports.FirstOrDefault(a => a.Id == 3);
+                var airplane = _context.Airplanes.FirstOrDefault(a => a.Id == 1);
+
+                var flight = new Flight
+                {
+                    Date = DateTime.Now.Date,
+                    Time = DateTime.Now.TimeOfDay,
+                    Duration = 60,
+                    BasePrice = 50,
+                    OriginAirport = originAirport,
+                    DestinationAirport = destinationAirport,
+                    Airplane = airplane
+                };
+
+                _context.Flights.Add(flight);
+                await _context.SaveChangesAsync();
+            }
         }
+
+       
 
         private void AddAirport(string name, City city, Country country)
         {

@@ -9,17 +9,16 @@ using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Models;
 using Microsoft.AspNetCore.Authorization;
+using BilheticaAeronauticaWeb.Helpers;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
     public class CountriesController : Controller
     {
-        private readonly DataContext _context;
         private readonly ICountryRepository _countryRepository;
 
-        public CountriesController(DataContext context, ICountryRepository countryRepository)
+        public CountriesController(ICountryRepository countryRepository)
         {
-            _context = context;
             _countryRepository = countryRepository;
         }
 
@@ -32,13 +31,14 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CityNotFound");
             }
 
             var city = await _countryRepository.GetCityAsync(id.Value);
+
             if (city == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CityNotFound");
             }
 
             var countryId = await _countryRepository.DeleteCityAsync(city);
@@ -49,13 +49,13 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CityNotFound");
             }
 
             var city = await _countryRepository.GetCityAsync(id.Value);
             if (city == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CityNotFound");
             }
 
             return View(city);
@@ -81,14 +81,14 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CityNotFound");
             }
 
             var country = await _countryRepository.GetByIdAsync(id.Value);
 
             if (country == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CountryNotFound");
             }
 
             var model = new CityViewModel { CountryId = country.Id };
@@ -112,14 +112,14 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CountryNotFound");
             }
 
             var country = await _countryRepository.GetCountryWithCitiesAsync(id.Value);
 
             if (country == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CountryNotFound");
             }
 
             return View(country);
@@ -163,13 +163,13 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CountryNotFound");
             }
 
             var country = await _countryRepository.GetByIdAsync(id.Value);
             if (country == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CountryNotFound");
             }
             return View(country);
         }
@@ -191,17 +191,27 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CountryNotFound");
             }
 
             var country = await _countryRepository.GetByIdAsync(id.Value);
             if (country == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CountryNotFound");
             }
 
             await _countryRepository.DeleteAsync(country);
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult CountryNotFound()
+        {
+            return View();
+        }
+
+        public IActionResult CityNotFound()
+        {
+            return View();
         }
     }
 }

@@ -12,6 +12,7 @@ namespace BilheticaAeronauticaWeb.Entities
         public string Name { get; set; }
 
         [Required]
+        [MaxLength(100, ErrorMessage = "The field {0} cannot contain more than {1} characters length.")]
         public string Manufacturer { get; set; }
 
         [Required(ErrorMessage = "The field {0} is required.")]
@@ -26,6 +27,7 @@ namespace BilheticaAeronauticaWeb.Entities
         [DisplayName("Active")]
         public bool Status { get; set; }
 
+        [DisplayName("Photo")]
         public Guid ImageId { get; set; }
 
         //TODO: get another 30 days on azure and get blob storage link

@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BilheticaAeronauticaWeb.Data
 {
-    public interface IAirplaneRepository : IGenericRepository<Airplane>
+    public interface IFlightRepository : IGenericRepository<Flight>
     {
-        IEnumerable<SelectListItem> GetComboAirplanes();
+
+
     }
 }

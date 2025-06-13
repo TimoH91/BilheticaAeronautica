@@ -14,13 +14,12 @@ namespace BilheticaAeronauticaWeb.Controllers
 {
     public class AirplanesController : Controller
     {
-        private readonly DataContext _context;
+
         private readonly IAirplaneRepository _airplaneRepository;
         private readonly IConverterHelper _converterHelper;
 
-        public AirplanesController(DataContext context, IAirplaneRepository airplaneRepository, IConverterHelper converterHelper)
+        public AirplanesController(IAirplaneRepository airplaneRepository, IConverterHelper converterHelper)
         {
-            _context = context;
             _airplaneRepository = airplaneRepository;
             _converterHelper = converterHelper;
         }
@@ -36,7 +35,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("AirplaneNotFound");
             }
 
             var airplane = await _airplaneRepository.GetByIdAsync(id.Value);
@@ -44,7 +43,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             if (airplane == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("AirplaneNotFound");
             }
 
             return View(airplane);
@@ -108,93 +107,98 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(model);
         }
 
-        // GET: Airplanes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //// GET: Airplanes/Edit/5
+        //public async Task<IActionResult> Edit(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return new NotFoundViewResult("AirplaneNotFound");
+        //    }
 
-            var airplane = await _context.Airplanes.FindAsync(id);
-            if (airplane == null)
-            {
-                return NotFound();
-            }
-            return View(airplane);
-        }
+        //    var airplane = await _context.Airplanes.FindAsync(id);
+        //    if (airplane == null)
+        //    {
+        //        return new NotFoundViewResult("AirplaneNotFound");
+        //    }
+        //    return View(airplane);
+        //}
 
-        // POST: Airplanes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Manufacturer,Rows,SeatsPerRow,Status,ImageId")] Airplane airplane)
-        {
-            if (id != airplane.Id)
-            {
-                return NotFound();
-            }
+        //// POST: Airplanes/Edit/5
+        //// To protect from overposting attacks, enable the specific properties you want to bind to.
+        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Manufacturer,Rows,SeatsPerRow,Status,ImageId")] Airplane airplane)
+        //{
+        //    if (id != airplane.Id)
+        //    {
+        //        return new NotFoundViewResult("AirplaneNotFound");
+        //    }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(airplane);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AirplaneExists(airplane.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(airplane);
-        }
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            _context.Update(airplane);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!AirplaneExists(airplane.Id))
+        //            {
+        //                return new NotFoundViewResult("AirplaneNotFound");
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View(airplane);
+        //}
 
-        // GET: Airplanes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //// GET: Airplanes/Delete/5
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return new NotFoundViewResult("AirplaneNotFound");
+        //    }
 
-            var airplane = await _context.Airplanes
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (airplane == null)
-            {
-                return NotFound();
-            }
+        //    var airplane = await _context.Airplanes
+        //        .FirstOrDefaultAsync(m => m.Id == id);
+        //    if (airplane == null)
+        //    {
+        //        return new NotFoundViewResult("AirplaneNotFound");
+        //    }
 
-            return View(airplane);
-        }
+        //    return View(airplane);
+        //}
 
-        // POST: Airplanes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var airplane = await _context.Airplanes.FindAsync(id);
-            if (airplane != null)
-            {
-                _context.Airplanes.Remove(airplane);
-            }
+        //// POST: Airplanes/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(int id)
+        //{
+        //    var airplane = await _context.Airplanes.FindAsync(id);
+        //    if (airplane != null)
+        //    {
+        //        _context.Airplanes.Remove(airplane);
+        //    }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+        //    await _context.SaveChangesAsync();
+        //    return RedirectToAction(nameof(Index));
+        //}
 
-        private bool AirplaneExists(int id)
-        {
-            return _context.Airplanes.Any(e => e.Id == id);
-        }
+        //private bool AirplaneExists(int id)
+        //{
+        //    return _context.Airplanes.Any(e => e.Id == id);
+        //}
+
+        //public IActionResult AirplaneNotFound()
+        //{
+        //    return View();
+        //}
     }
 }

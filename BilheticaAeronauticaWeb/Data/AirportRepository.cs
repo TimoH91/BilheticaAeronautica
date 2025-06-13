@@ -1,4 +1,5 @@
 ﻿using BilheticaAeronauticaWeb.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace BilheticaAeronauticaWeb.Data
@@ -17,6 +18,24 @@ namespace BilheticaAeronauticaWeb.Data
             return _context.Airports
                 .Include(a => a.City)
                 .Include(a => a.Country);
+        }
+
+        public IEnumerable<SelectListItem> GetComboAirports()
+        {
+            var list = _context.Airports.Select(a => new SelectListItem
+            {
+                Text = a.Name,
+                Value = a.Id.ToString()
+
+            }).OrderBy(l => l.Text).ToList();
+
+            list.Insert(0, new SelectListItem
+            {
+                Text = "(Select an airport...)",
+                Value = "0"
+            });
+
+            return list;
         }
     }
 }

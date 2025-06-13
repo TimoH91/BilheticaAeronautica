@@ -1,4 +1,5 @@
-﻿using BilheticaAeronauticaWeb.Data;
+﻿using System.Threading.Tasks;
+using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Models;
 
@@ -7,11 +8,16 @@ namespace BilheticaAeronauticaWeb.Helpers
     public class ConverterHelper : IConverterHelper
     {
         private readonly ICountryRepository _countryRepository;
+        private readonly IAirplaneRepository _airplaneRepository;
+        private readonly IAirportRepository _airportRepository;
+        
 
 
-        public ConverterHelper(ICountryRepository countryRepository)
+        public ConverterHelper(ICountryRepository countryRepository, IAirplaneRepository airplaneRepository, IAirportRepository airportRepository)
         {
             _countryRepository = countryRepository;
+            _airplaneRepository = airplaneRepository;
+            _airportRepository = airportRepository;
         }
 
         public Country ToCountry(CountryViewModel model, Guid ImageId, bool isNew)
@@ -81,6 +87,38 @@ namespace BilheticaAeronauticaWeb.Helpers
                 SeatsPerRow = airplane.SeatsPerRow,
                 ImageId = airplane.ImageId,
                 Status = airplane.Status
+            };
+        }
+
+        public async Task<Flight> ToFlight(FlightViewModel model, bool isNew)
+        {
+                return new Flight
+                {
+                    Id = isNew ? 0 : model.Id,
+                    Date = model.Date,
+                    Time = model.Time,
+                    BasePrice = model.BasePrice,
+                    Duration = model.Duration,
+                    AirplaneId = model.AirplaneId,
+                    OriginAirportId = model.OriginAirportId,    
+                    DestinationAirportId = model.DestinationAirportId,
+                    LayoverId = model.LayoverId,
+                };
+        }
+
+        public FlightViewModel ToFlightViewModel(Flight flight)
+        {
+            return new FlightViewModel
+            {
+                Id = flight.Id,
+                Date = flight.Date,
+                Time = flight.Time,
+                BasePrice = flight.BasePrice,
+                Duration = flight.Duration,
+                AirplaneId = flight.AirplaneId,
+                OriginAirportId = flight.OriginAirportId,
+                DestinationAirportId = flight.DestinationAirportId,
+                LayoverId = flight.LayoverId,
             };
         }
     }

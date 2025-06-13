@@ -17,5 +17,9 @@ namespace BilheticaAeronauticaWeb.Helpers
 
             AirplaneViewModel ToAirplaneViewModel(Airplane airplane);
 
+            Task<Flight> ToFlight(FlightViewModel model, bool isNew);
+
+            FlightViewModel ToFlightViewModel(Flight flight);
+
     }
 }

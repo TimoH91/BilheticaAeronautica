@@ -11,15 +11,13 @@ namespace BilheticaAeronauticaWeb.Controllers
 {
     public class AirportsController : Controller
     {
-        private readonly DataContext _context;
         private readonly IAirportRepository _airportRepository;
         private readonly ICountryRepository _countryRepository;
         private readonly IConverterHelper _converterHelper;
         //private readonly IBlobHelper _blobHelper;
 
-        public AirportsController(DataContext context, IAirportRepository aeroportoRepository, IConverterHelper converterHelper, ICountryRepository countryRepository)
+        public AirportsController(IAirportRepository aeroportoRepository, IConverterHelper converterHelper, ICountryRepository countryRepository)
         {
-            _context = context;
             _airportRepository = aeroportoRepository;
             _converterHelper = converterHelper;
             _countryRepository = countryRepository;
@@ -37,7 +35,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("AirportNotFound");
             }
 
             var airport = await _airportRepository.GetByIdAsync(id.Value);
@@ -45,7 +43,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             if (airport == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("AirportNotFound");
             }
 
             return View(airport);
@@ -154,7 +152,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return new NotFoundViewResult("AeroportoNotFound");
+                return new NotFoundViewResult("AirportNotFound");
             }
 
             var airport = await _airportRepository.GetByIdAsync(id.Value);
@@ -194,7 +192,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             }
         }
 
-        public IActionResult AeroportoNotFound()
+        public IActionResult AirportNotFound()
         {
             return View();
         }
