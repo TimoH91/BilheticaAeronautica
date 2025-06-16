@@ -10,23 +10,27 @@ using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Helpers;
 using BilheticaAeronauticaWeb.Models;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+using BilheticaAeronauticaWeb.Services;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
+    [Authorize]
     public class FlightsController : Controller
     {
         private readonly IFlightRepository _flightRepository;
         private readonly IAirplaneRepository _airplaneRepository;
         private readonly IAirportRepository _airportRepository;
         private readonly IConverterHelper _converterHelper;
+        private readonly IFlightService _flightService;
 
-        public FlightsController(IFlightRepository flightRepository, IAirplaneRepository airplaneRepository, IAirportRepository airportRepository, IConverterHelper converterHelper)
+        public FlightsController(IFlightRepository flightRepository, IAirplaneRepository airplaneRepository, IAirportRepository airportRepository, IConverterHelper converterHelper, IFlightService flightService)
         {
             _flightRepository = flightRepository;
             _airplaneRepository = airplaneRepository;
             _airportRepository = airportRepository;
             _converterHelper = converterHelper;
-
+            _flightService = flightService;
         }
 
         // GET: Flights
@@ -54,6 +58,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(airport);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Flights/Create
         public IActionResult Create()
         {
@@ -78,6 +83,9 @@ namespace BilheticaAeronauticaWeb.Controllers
                 {
                     await _flightRepository.CreateAsync(flight);
 
+
+                    await _flightService.CreateSeatsForFlightAsync(flight);
+
                     return RedirectToAction(nameof(Index));
 
                 }
@@ -89,93 +97,121 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(model);
         }
 
-        // GET: Flights/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-            //if (id == null)
-            //{
-            //    return NotFound();
-            //}
+        //GET: Flights/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new NotFoundViewResult("FlightNotFound");
+            }
 
-            //var flight = await _context.Flights.FindAsync(id);
-            //if (flight == null)
-            //{
-            //    return NotFound();
-            //}
-            //return View(flight);
-        //}
+            var flight = await _flightRepository.GetByIdAsync(id.Value);
 
-        // POST: Flights/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Time,Duration,BasePrice")] Flight flight)
-        //{
-            //if (id != flight.Id)
-            //{
-            //    return NotFound();
-            //}
+            if (flight == null)
+            {
+                return new NotFoundViewResult("FlightNotFound");
+            }
 
-            //if (ModelState.IsValid)
-            //{
-            //    try
-            //    {
-            //        _context.Update(flight);
-            //        await _context.SaveChangesAsync();
-            //    }
-            //    catch (DbUpdateConcurrencyException)
-            //    {
-            //        if (!FlightExists(flight.Id))
-            //        {
-            //            return NotFound();
-            //        }
-            //        else
-            //        {
-            //            throw;
-            //        }
-            //    }
-            //    return RedirectToAction(nameof(Index));
-            //}
-            //return View(flight);
+            var model = _converterHelper.ToFlightViewModel(flight);
+
+            ViewBag.Airplanes = _airplaneRepository.GetComboAirplanes();
+            ViewBag.Airports = _airportRepository.GetComboAirports();
+
+            return View(model);
+
         }
 
-        // GET: Flights/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-            //if (id == null)
-            //{
-            //    return NotFound();
-            //}
+        //POST: Flights/Edit/5
+        //To protect from overposting attacks, enable the specific properties you want to bind to.
+        //For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(FlightViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var flight = await _converterHelper.ToFlight(model, false);
 
-            //var flight = await _context.Flights
-            //    .FirstOrDefaultAsync(m => m.Id == id);
-            //if (flight == null)
-            //{
-            //    return NotFound();
-            //}
+                    await _flightRepository.UpdateAsync(flight);
+                }
 
-            //return View(flight);
-        //}
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await _flightRepository.ExistAsync(model.Id))
+                    {
+                        return new NotFoundViewResult("FlightNotFound"); ;
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(model);
+        }
 
-        // POST: Flights/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    //var flight = await _context.Flights.FindAsync(id);
-        //    //if (flight != null)
-        //    //{
-        //    //    _context.Flights.Remove(flight);
-        //    //}
+        //GET: Flights/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return new NotFoundViewResult("FlightNotFound");
+            }
 
-        //    //await _context.SaveChangesAsync();
-        //    //return RedirectToAction(nameof(Index));
-        //}
+            var flight = await _flightRepository.GetByIdAsync(id.Value);
+
+            if (flight == null)
+            {
+                return new NotFoundViewResult("FlightNotFound");
+            }
+
+            return View(flight);
+        }
+
+        //POST: Flights/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var flight = await _flightRepository.GetByIdAsync(id);
+
+            try
+            {
+                await _flightRepository.DeleteAsync(flight);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                {
+                    var errorModel = new ErrorViewModel
+                    {
+                        ErrorTitle = $"{flight.Id} provavelmente está a ser usado!!",
+                        ErrorMessage = $"{flight.Id} não pode ser apagado visto haverem encomendas que o usam.<br/><br/>" +
+                                      $"Experimente primeiro apagar todas as encomendas que o estão a usar," +
+                                      $"e torne novamente a apagá-lo"
+                    };
+
+                    return View("Error", errorModel);
+                }
+
+
+                return View("Error", new ErrorViewModel
+                {
+                    ErrorTitle = "Erro de base de dados",
+                    ErrorMessage = "Ocorreu um erro inesperado ao tentar apagar o aeroporto."
+                });
+
+            }
+        }
 
         //private bool FlightExists(int id)
         //{
         //    //return _context.Flights.Any(e => e.Id == id);
         //}
-    //}
+    }
 }

@@ -3,6 +3,7 @@ using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
 using Microsoft.AspNetCore.Identity;
 using BilheticaAeronauticaWeb.Helpers;
+using BilheticaAeronauticaWeb.Services;
 
 
 
@@ -18,6 +19,8 @@ builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAirplaneRepository, AirplaneRepository>();
 builder.Services.AddScoped<IFlightRepository, FlightRepository>();
 builder.Services.AddScoped<ICountryRepository, CountryRepository>();
+builder.Services.AddScoped<ISeatRepository, SeatRepository>();
+builder.Services.AddScoped<IFlightService, FlightService>();
 builder.Services.AddScoped<IConverterHelper, ConverterHelper>();
 
 builder.Services.AddDbContext<DataContext>(options =>
@@ -28,7 +31,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddIdentity<User, IdentityRole>(cfg =>
 {
     cfg.User.RequireUniqueEmail = true; 
-                cfg.Password.RequireDigit = false;
+    cfg.Password.RequireDigit = false;
     cfg.Password.RequiredUniqueChars = 0;
     cfg.Password.RequireUppercase = false;
     cfg.Password.RequireLowercase = false;

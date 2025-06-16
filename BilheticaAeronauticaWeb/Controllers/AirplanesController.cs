@@ -107,98 +107,142 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(model);
         }
 
-        //// GET: Airplanes/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return new NotFoundViewResult("AirplaneNotFound");
-        //    }
+        // GET: Airplanes/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new NotFoundViewResult("AirplaneNotFound");
+            }
 
-        //    var airplane = await _context.Airplanes.FindAsync(id);
-        //    if (airplane == null)
-        //    {
-        //        return new NotFoundViewResult("AirplaneNotFound");
-        //    }
-        //    return View(airplane);
-        //}
+            var airplane = await _airplaneRepository.GetByIdAsync(id.Value);
 
-        //// POST: Airplanes/Edit/5
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Manufacturer,Rows,SeatsPerRow,Status,ImageId")] Airplane airplane)
-        //{
-        //    if (id != airplane.Id)
-        //    {
-        //        return new NotFoundViewResult("AirplaneNotFound");
-        //    }
+            if (airplane == null)
+            {
+                return new NotFoundViewResult("AirplaneNotFound");
+            }
 
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(airplane);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!AirplaneExists(airplane.Id))
-        //            {
-        //                return new NotFoundViewResult("AirplaneNotFound");
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(airplane);
-        //}
+            var model = _converterHelper.ToAirplaneViewModel(airplane);
 
-        //// GET: Airplanes/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return new NotFoundViewResult("AirplaneNotFound");
-        //    }
+            return View(model);
+        }
 
-        //    var airplane = await _context.Airplanes
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (airplane == null)
-        //    {
-        //        return new NotFoundViewResult("AirplaneNotFound");
-        //    }
+        // POST: Airplanes/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(AirplaneViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    //TODO: Change when blobstorage is setup
+                    //Guid imageId = model.ImageId;
+                    Guid imageId = Guid.NewGuid();
 
-        //    return View(airplane);
-        //}
 
-        //// POST: Airplanes/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var airplane = await _context.Airplanes.FindAsync(id);
-        //    if (airplane != null)
-        //    {
-        //        _context.Airplanes.Remove(airplane);
-        //    }
+                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
 
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
+                            var destinationPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "airplanes", $"{imageId}.jpg");
+
+                            Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
+
+                            using (var stream = new FileStream(destinationPath, FileMode.Create))
+                            {
+                                await model.ImageFile.CopyToAsync(stream);
+                            }                     
+                        //TODO uncomment code below when blob helper is setup
+                        //imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "products");
+                    }
+
+                    var airplane =  _converterHelper.ToAirplane(model, imageId, false);
+
+                    await _airplaneRepository.UpdateAsync(airplane);
+                }
+
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await _airplaneRepository.ExistAsync(model.Id))
+                    {
+                        return new NotFoundViewResult("AirplaneNotFound");
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(model);
+        }
+
+        // GET: Airplanes/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return new NotFoundViewResult("AirplaneNotFound");
+            }
+
+            var airplane = await _airplaneRepository.GetByIdAsync(id.Value);
+
+
+            if (airplane == null)
+            {
+                return new NotFoundViewResult("AirplaneNotFound");
+            }
+
+            return View(airplane);
+        }
+
+        // POST: Airplanes/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var airplane = await _airplaneRepository.GetByIdAsync(id);
+
+            try
+            {
+                await _airplaneRepository.DeleteAsync(airplane);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                {
+                    var errorModel = new ErrorViewModel
+                    {
+                        ErrorTitle = $"{airplane.Name} provavelmente está a ser usado!!",
+                        ErrorMessage = $"{airplane.Name} não pode ser apagado visto haverem encomendas que o usam.<br/><br/>" +
+                                      $"Experimente primeiro apagar todas as encomendas que o estão a usar," +
+                                      $"e torne novamente a apagá-lo"
+                    };
+
+                    return View("Error", errorModel);
+                }
+
+
+                return View("Error", new ErrorViewModel
+                {
+                    ErrorTitle = "Erro de base de dados",
+                    ErrorMessage = "Ocorreu um erro inesperado ao tentar apagar o aeroporto."
+                });
+            } 
+        }
 
         //private bool AirplaneExists(int id)
         //{
-        //    return _context.Airplanes.Any(e => e.Id == id);
+        //    return _airplaneRepository.Any(e => e.Id == id);
         //}
 
-        //public IActionResult AirplaneNotFound()
-        //{
-        //    return View();
-        //}
+        public IActionResult AirplaneNotFound()
+        {
+            return View();
+        }
     }
 }

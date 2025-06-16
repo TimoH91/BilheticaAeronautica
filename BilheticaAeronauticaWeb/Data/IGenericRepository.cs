@@ -15,7 +15,8 @@ namespace BilheticaAeronauticaWeb.Data
 
             Task DeleteAsync(T entity);
 
-            Task<bool> ExistAsync(int id); 
-    
-        }
+            Task<bool> ExistAsync(int id);
+
+            Task CreateRangeAsync(IEnumerable<T> entities);
+    }
 }

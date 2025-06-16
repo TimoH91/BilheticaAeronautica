@@ -16,6 +16,8 @@ namespace BilheticaAeronauticaWeb.Data
 
         public DbSet<Flight> Flights { get; set; }
 
+        public DbSet<Seat> Seats { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
             

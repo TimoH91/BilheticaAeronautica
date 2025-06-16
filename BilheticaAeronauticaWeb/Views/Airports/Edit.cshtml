@@ -1,4 +1,4 @@
-﻿@model BilheticaAeronauticaWeb.Entities.Airport
+﻿@model BilheticaAeronauticaWeb.Models.AirportViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -10,23 +10,25 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="City" class="control-label"></label>
-                <input asp-for="City" class="form-control" />
-                <span asp-validation-for="City" class="text-danger"></span>
+                <label asp-for="CountryId" class="control-label">Country</label>
+                <select asp-for="CountryId" id="CountryId" asp-items="ViewBag.Countries" class="form-control">
+                </select>
+                <span asp-validation-for="CountryId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Country" class="control-label"></label>
-                <input asp-for="Country" class="form-control" />
-                <span asp-validation-for="Country" class="text-danger"></span>
+                <label asp-for="CityId" class="control-label">City</label>
+                <select asp-for="CityId" id="CityId" asp-items="ViewBag.Cities" class="form-control">
+                    <option value="">Select a city</option>
+                </select>
+                <span asp-validation-for="CityId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -40,5 +42,45 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
+
+<script type="text/javascript">
+        $(document).ready(function () {
+            function loadCities() {
+                var countryId = $("#CountryId").val();
+                if (countryId) {
+                    $("#CityId").empty();
+                    $.ajax({
+                        url: '@Url.Action("GetCitiesAsync", "Airports")',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: { countryId: countryId },
+                        success: function (cities) {
+                            $("#CityId").append('<option value="0">(Select a city...)</option>');
+                            $.each(cities, function (i, city) {
+                                $("#CityId").append('<option value="' + city.id + '">' + city.name + '</option>');
+                            });
+                        },
+                        error: function (ex) {
+                            alert('Failed to retrieve cities.' + ex);
+                        }
+                    });
+                } else {
+                    // Optional: clear city dropdown if no country selected
+                    $("#CityId").empty();
+                    $("#CityId").append('<option value="0">(Select a city...)</option>');
+                }
+            }
+
+            // Initial load for the pre-selected country on page load
+            loadCities();
+
+            // Load cities again whenever country changes
+            $("#CountryId").change(function () {
+                loadCities();
+            });
+        });
+</script>
+
+        }

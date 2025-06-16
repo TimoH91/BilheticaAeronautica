@@ -86,7 +86,7 @@ namespace BilheticaAeronauticaWeb.Data
             return country.Id;
         }
 
-        public IEnumerable<SelectListItem> GetComboCountries()
+        public IEnumerable<SelectListItem> GetComboCountries(bool includeSelect)
         {
             var list = _context.Countries.Select(c => new SelectListItem
             {
@@ -95,11 +95,15 @@ namespace BilheticaAeronauticaWeb.Data
 
             }).OrderBy(l => l.Text).ToList();
 
-            list.Insert(0, new SelectListItem
+            if (includeSelect)
             {
-                Text = "(Select a country...)",
-                Value = "0"
-            });
+                list.Insert(0, new SelectListItem
+                {
+                    Text = "(Select a country...)",
+                    Value = "0"
+                });
+            }
+
 
             return list;
         }

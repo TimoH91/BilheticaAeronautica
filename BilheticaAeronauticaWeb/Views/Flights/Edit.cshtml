@@ -1,4 +1,4 @@
-﻿@model BilheticaAeronauticaWeb.Entities.Flight
+﻿@model BilheticaAeronauticaWeb.Models.FlightViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -12,10 +12,9 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" />
+                <input asp-for="Date" class="form-control" type="date" />
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -34,6 +33,34 @@
                 <span asp-validation-for="BasePrice" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="AirplaneId" class="control-label">Airplane</label>
+                <select asp-for="AirplaneId" asp-items="ViewBag.Airplanes" class="form-control">
+                    <option value="">Select an airplane</option>
+                </select>
+                <span asp-validation-for="AirplaneId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OriginAirportId" class="control-label">Origin Airport</label>
+                <select asp-for="OriginAirportId" asp-items="ViewBag.Airports" class="form-control">
+                    <option value="">Select an airport</option>
+                </select>
+                <span asp-validation-for="OriginAirportId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DestinationAirportId" class="control-label">Destination Airport</label>
+                <select asp-for="DestinationAirportId" asp-items="ViewBag.Airports" class="form-control">
+                    <option value="">Select an airport</option>
+                </select>
+                <span asp-validation-for="DestinationAirportId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LayoverId" class="control-label">Layover Airport</label>
+                <select asp-for="LayoverId" asp-items="ViewBag.Airports" class="form-control">
+                    <option value="">Select an airport</option>
+                </select>
+                <span asp-validation-for="LayoverId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
@@ -44,3 +71,8 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+                @section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+                }

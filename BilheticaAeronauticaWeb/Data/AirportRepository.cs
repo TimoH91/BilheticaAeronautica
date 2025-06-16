@@ -20,6 +20,15 @@ namespace BilheticaAeronauticaWeb.Data
                 .Include(a => a.Country);
         }
 
+        public override Task<Airport> GetByIdAsync(int id) 
+        {
+            return  _context.Airports
+                .Include(a => a.City)
+                .Include(a => a.Country)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.Id == id);
+        }
+
         public IEnumerable<SelectListItem> GetComboAirports()
         {
             var list = _context.Airports.Select(a => new SelectListItem

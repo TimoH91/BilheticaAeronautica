@@ -18,7 +18,7 @@ namespace BilheticaAeronauticaWeb.Data
             return _context.Set<T>().AsNoTracking();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public virtual async Task<T> GetByIdAsync(int id)
         {
             return await _context.Set<T>()
                 .AsNoTracking()
@@ -53,7 +53,10 @@ namespace BilheticaAeronauticaWeb.Data
             return await _context.SaveChangesAsync() > 0;
         }
 
-
-
+        public async Task CreateRangeAsync(IEnumerable<T> entities)
+        {
+            await _context.Set<T>().AddRangeAsync(entities);
+            await SaveAllAsync();
+        }
     }
 }

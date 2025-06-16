@@ -20,7 +20,7 @@ namespace BilheticaAeronauticaWeb.Data
 
         Task<int> DeleteCityAsync(City city);
 
-        IEnumerable<SelectListItem> GetComboCountries();
+        IEnumerable<SelectListItem> GetComboCountries(bool includeSelect);
         IEnumerable<SelectListItem> GetComboCities(int countryID);
 
         Task<Country> GetCountryAsync(City city);

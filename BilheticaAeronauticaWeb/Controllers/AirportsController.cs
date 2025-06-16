@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Helpers;
@@ -52,7 +53,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         // GET: Airports/Create
         public IActionResult Create()
         {
-            ViewBag.Countries = _countryRepository.GetComboCountries();
+            ViewBag.Countries = _countryRepository.GetComboCountries(true);
 
             ViewBag.Cities = new List<SelectListItem>
             {
@@ -103,7 +104,17 @@ namespace BilheticaAeronauticaWeb.Controllers
                 return new NotFoundViewResult("AirportNotFound");
             }
 
-            return View(airport);
+            var model = _converterHelper.ToAirportViewModel(airport);
+
+            ViewBag.Countries = _countryRepository.GetComboCountries(false);
+
+            ViewBag.Cities = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "(Select a country first...)", Value = "0" }
+            };
+
+            return View(model);
+
         }
 
         // POST: Airports/Edit/5
@@ -111,40 +122,46 @@ namespace BilheticaAeronauticaWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(AirportViewModel airport)
+        public async Task<IActionResult> Edit(AirportViewModel model)
         {
-            //if (ModelState.IsValid)
-            //{
-            //    try
-            //    {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+
+                    var airport = await _converterHelper.ToAirport(model, false);
+
+                    await _airportRepository.UpdateAsync(airport);
 
 
-            //    await _airportRepository.UpdateAsync(airport);
-
-
-            //    }
-            //    catch (DbUpdateConcurrencyException)
-            //    {
-            //        if (!await _airportRepository.ExistAsync(airport.Id))
-            //        {
-            //            return NotFound();
-            //        }
-            //        else
-            //        {
-            //            throw;
-            //        }
-            //    }
-            //    return RedirectToAction(nameof(Index));
-            //}
-            return View(airport);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await _airportRepository.ExistAsync(model.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(model);
         }
 
         [HttpPost]
         [Route("Airports/GetCitiesAsync")]
         public async Task<JsonResult> GetCitiesAsync(int countryId)
         {
-            var country = await _countryRepository.GetCountryWithCitiesAsync(countryId);
-            return Json(country.Cities.OrderBy(c => c.Name));
+            if (countryId > 0) 
+            {
+                var country = await _countryRepository.GetCountryWithCitiesAsync(countryId);
+                return Json(country.Cities.OrderBy(c => c.Name));
+            }
+
+            return Json(Enumerable.Empty<City>());
         }
 
         // GET: Aeroportos/Delete/5
@@ -159,7 +176,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             if (airport == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("AirportNotFound");
             }
 
             return View(airport);
@@ -175,20 +192,31 @@ namespace BilheticaAeronauticaWeb.Controllers
             try
             {
                 await _airportRepository.DeleteAsync(airport);
-                return RedirectToAction(nameof(Index)); 
+                return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateException ex)
             {
-
+                
                 if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
                 {
-                    ViewBag.ErrorTitle = $"{airport.Name} provavelmente está a ser usado!!";
-                    ViewBag.ErrorMessage = $"{airport.Name} não pode ser apagado visto haverem encomendas que o usam.</br></br>" +
-                        $"Experimente primeiro apagar todas as encomendas que o estão a usar," +
-                        $"e torne novamente a apagá-lo";
+                    var errorModel = new ErrorViewModel
+                    {
+                        ErrorTitle = $"{airport.Name} provavelmente está a ser usado!!",
+                        ErrorMessage = $"{airport.Name} não pode ser apagado visto haverem encomendas que o usam.<br/><br/>" +
+                                      $"Experimente primeiro apagar todas as encomendas que o estão a usar," +
+                                      $"e torne novamente a apagá-lo"
+                    };
+
+                    return View("Error", errorModel);
                 }
 
-                return View("Error");
+                
+                return View("Error", new ErrorViewModel
+                {
+                    ErrorTitle = "Erro de base de dados",
+                    ErrorMessage = "Ocorreu um erro inesperado ao tentar apagar o aeroporto."
+                });
+
             }
         }
 
