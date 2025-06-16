@@ -18,6 +18,8 @@ namespace BilheticaAeronauticaWeb.Data
 
         public DbSet<Seat> Seats { get; set; }
 
+        public DbSet<Ticket> Tickets { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
             
@@ -33,6 +35,18 @@ namespace BilheticaAeronauticaWeb.Data
             modelBuilder.Entity<Flight>()
                 .Property(f => f.BasePrice)
                 .HasColumnType("decimal(18,2)");
+
+
+
+            modelBuilder.Entity<Ticket>()
+    .HasDiscriminator<string>("TicketType")
+    .HasValue<AdultTicket>("Adult")
+    .HasValue<ChildTicket>("Child")
+    .HasValue<InfantTicket>("Infant");
+
+            modelBuilder.Entity<Ticket>()
+.Property(f => f.Price)
+.HasColumnType("decimal(18,2)");
 
             foreach (var foreignKey in modelBuilder.Model
             .GetEntityTypes()

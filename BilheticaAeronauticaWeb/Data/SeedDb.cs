@@ -150,9 +150,71 @@ namespace BilheticaAeronauticaWeb.Data
                 _context.Flights.Add(flight);
                 await _context.SaveChangesAsync();
             }
+
+            if (!_context.Seats.Any() && _context.Flights.Any())
+            {
+                var airplane = _context.Airplanes.FirstOrDefault(a => a.Id == 1);
+                var flight = _context.Flights.FirstOrDefault(a => a.Id == 1);
+
+                if (airplane == null)
+                {
+                    throw new Exception("Airplane not found.");
+                }
+                if (flight == null)
+                {
+                    throw new Exception("Flight not found.");
+                }
+
+                var seats = new List<Seat>();
+
+                for (int row = 1; row <= airplane.Rows; row++)
+                {
+                    for (int col = 1; col <= airplane.SeatsPerRow; col++)
+                    {
+                        seats.Add(new Seat
+                        {
+                            Flight = flight,
+                            Row = row,
+                            Column = col,
+                            Occupied = false
+                        });
+                    }
+                }
+
+                _context.Seats.AddRange(seats);
+                await _context.SaveChangesAsync();
+            }
+
+            if (!_context.Tickets.Any() && _context.Seats.Any())
+            {
+                var originAirport = _context.Airports.FirstOrDefault(a => a.Id == 1);
+                var destinationAirport = _context.Airports.FirstOrDefault(a => a.Id == 3);
+                var flight = _context.Flights.FirstOrDefault(a => a.Id == 1);
+                var seat = _context.Seats.FirstOrDefault(a => a.Id == 1);
+
+                
+
+                var adultTicket = new AdultTicket
+                {
+                    Name = "John",
+                    Surname = "Smith",
+                    OriginAirport = originAirport,
+                    DestinationAirport = destinationAirport,
+                    Flight = flight,
+                    Seat = seat,
+                    Payment = Payment.Paid,
+                    Class = TicketClass.Economic,
+                    Price = 50,
+                    Type = "Adult",
+                };
+
+                seat.Occupied = true;
+
+                _context.Tickets.Add(adultTicket);
+                await _context.SaveChangesAsync();
+            }
         }
 
-       
 
         private void AddAirport(string name, City city, Country country)
         {

@@ -4,6 +4,8 @@
     {
         public int Id { get; set ; }
 
+        public int FlightId { get; set; }
+
         public Flight Flight { get; set ; }
 
         public bool Occupied { get; set ; }
