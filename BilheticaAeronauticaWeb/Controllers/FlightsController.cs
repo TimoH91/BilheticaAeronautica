@@ -47,15 +47,15 @@ namespace BilheticaAeronauticaWeb.Controllers
                 return new NotFoundViewResult("FlightNotFound");
             }
 
-            var airport = await _flightRepository.GetByIdAsync(id.Value);
+            var flight = await _flightRepository.GetByIdAsync(id.Value);
 
 
-            if (airport == null)
+            if (flight == null)
             {
                 return new NotFoundViewResult("FlightNotFound");
             }
 
-            return View(airport);
+            return View(flight);
         }
 
         [Authorize(Roles = "Admin")]

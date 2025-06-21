@@ -60,7 +60,12 @@ namespace BilheticaAeronauticaWeb.Data
 
         public async Task<Country> GetCountryWithCitiesAsync(int id)
         {
-            return await _context.Countries.Include(c => c.Cities).Where(c => c.Id == id).FirstOrDefaultAsync();
+            return await 
+                _context.
+                Countries
+                .Include(c => c.Cities).
+                Where(c => c.Id == id).
+                FirstOrDefaultAsync();
         }
 
         public Task<Country> GetCountriesWithCities(int id)

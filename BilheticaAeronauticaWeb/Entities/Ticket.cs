@@ -3,7 +3,12 @@ using NuGet.ContentModel;
 
 namespace BilheticaAeronauticaWeb.Entities
 {
-    
+    public enum PassengerType
+    {
+        Adult,
+        Child,
+        Infant
+    };
     public enum TicketClass
     {
         Economic,
@@ -61,6 +66,6 @@ namespace BilheticaAeronauticaWeb.Entities
 
         public decimal Price { get; set; }
 
-        public abstract string Type { get; set; }
+        public abstract PassengerType Type { get; set; }
     }
 }

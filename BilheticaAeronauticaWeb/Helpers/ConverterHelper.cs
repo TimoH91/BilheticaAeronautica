@@ -121,5 +121,85 @@ namespace BilheticaAeronauticaWeb.Helpers
                 LayoverId = flight.LayoverId,
             };
         }
+
+        public TicketViewModel ToTicketViewModel(Ticket ticket) 
+        {
+            return new TicketViewModel
+            {
+                Id =ticket.Id,
+                Name = ticket.Name,
+                Surname = ticket.Surname,
+                FlightId = ticket.FlightId,
+                Class = ticket.Class,
+                OriginAirportId = ticket.OriginAirportId,
+                DestinationAirportId = ticket.DestinationAirportId,
+                SeatId = ticket.SeatId,
+                Payment = ticket.Payment,
+                Price = ticket.Price,
+                Type = ticket.Type
+            };
+        
+        }
+
+        public Ticket ToTicket(TicketViewModel model, bool isNew)
+        {
+            if (model.Type == PassengerType.Adult)
+            {
+                return new AdultTicket
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Surname = model.Surname,
+                    FlightId = model.FlightId,
+                    Class = model.Class,
+                    OriginAirportId = model.OriginAirportId,
+                    DestinationAirportId = model.DestinationAirportId,
+                    SeatId = model.SeatId,
+                    Payment = model.Payment,
+                    Price = model.Price,
+                    Type = model.Type
+                };
+            }
+
+            if (model.Type == PassengerType.Child)
+            {
+                return new ChildTicket
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Surname = model.Surname,
+                    FlightId = model.FlightId,
+                    Class = model.Class,
+                    OriginAirportId = model.OriginAirportId,
+                    DestinationAirportId = model.DestinationAirportId,
+                    SeatId = model.SeatId,
+                    Payment = model.Payment,
+                    Price = model.Price,
+                    Type = model.Type
+                };
+            }
+
+            if (model.Type == PassengerType.Infant)
+            {
+                return new InfantTicket
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Surname = model.Surname,
+                    FlightId = model.FlightId,
+                    Class = model.Class,
+                    OriginAirportId = model.OriginAirportId,
+                    DestinationAirportId = model.DestinationAirportId,
+                    SeatId = model.SeatId,
+                    Payment = model.Payment,
+                    Price = model.Price,
+                    Type = PassengerType.Infant
+                };
+            }
+
+            throw new ArgumentException($"Invalid ticket type: {model.Type}");
+        }
+
+
     }
 }

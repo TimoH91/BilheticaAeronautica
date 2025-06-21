@@ -1,0 +1,185 @@
+﻿@using BilheticaAeronauticaWeb.Entities;
+@model BilheticaAeronauticaWeb.Entities.Ticket
+
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Ticket</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Surname" class="control-label"></label>
+                <input asp-for="Surname" class="form-control" />
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FlightId" class="control-label">Flight</label>
+                <select asp-for="FlightId" id="FlightId" asp-items="ViewBag.Flights" class="form-control">
+                    <option value="">Select a flight</option>
+                </select>
+                <span asp-validation-for="FlightId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Class" class="control-label"></label>
+                <select asp-for="Class" class="form-control" asp-items="Html.GetEnumSelectList<TicketClass>()">
+                    <option value="">Select a class</option>
+                </select>
+                <span asp-validation-for="Class" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SeatId" class="control-label">Seat</label>
+                <select asp-for="SeatId" id="SeatId" class="form-control" asp-items="ViewBag.Seats">
+                    <option value="">Select a seat</option>
+                </select>
+                <span asp-validation-for="SeatId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OriginAirportId" class="control-label">Origin</label>
+                <select asp-for="OriginAirportId" id="OriginAirportId" class ="form-control" asp-items="ViewBag.Airports">
+                    <option value="">Select an point of departure</option>
+                </select>
+                <span asp-validation-for="OriginAirportId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DestinationAirportId" class="control-label">Destination</label>
+                <select asp-for="DestinationAirportId" id="DestinationAirportId" class ="form-control" asp-items="ViewBag.Airports">
+                    <option value="">Select a destination</option>
+                </select>
+                <span asp-validation-for="DestinationAirportId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Payment" class="control-label"></label>
+                <select asp-for="Payment" class="form-control" asp-items="Html.GetEnumSelectList<Payment>()">
+                <option value="">Select payment status</option>
+                </select>
+                <span asp-validation-for="Payment" class="text-danger"></span>
+                
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                <select asp-for="Type" class="form-control" asp-items="Html.GetEnumSelectList<PassengerType>()">
+                <option value="">Select a type</option>
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+<script type="text/javascript">
+    $(document).ready(function () {
+            let flightPrices = {};
+        
+        function updateFlights() {
+            var originId = $("#OriginAirportId").val();
+            var destinationId = $("#DestinationAirportId").val();
+
+            if (originId && destinationId) {
+                $("#FlightId").empty();
+
+                $.ajax({
+                    url: '@Url.Action("GetFlightsByRoute", "Tickets")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        originAirportId: originId,
+                        destinationAirportId: destinationId
+                    },
+                                success: function (flights) {
+                               $("#FlightId").append('<option value="">Select a flight</option>');
+                               flightPrices = {};
+
+                               $.each(flights, function (i, flight) {
+                                   $("#FlightId").append('<option value="' + flight.id + '">' + flight.name + '</option>');
+                                   flightPrices[flight.id] = flight.price; 
+                               });
+                    },
+                    error: function () {
+                        alert("Failed to load flights.");
+                    }
+                });
+            }
+        }
+
+      
+        $("#OriginAirportId, #DestinationAirportId").change(function () {
+            updateFlights();
+        });
+
+             $("#FlightId").change(function () {
+                var selectedFlightId = $(this).val();
+                var price = flightPrices[selectedFlightId];
+
+                if (price !== undefined) {
+                    $("#Price").val(price);
+                } else {
+                    $("#Price").val("");
+                }
+            });
+    });
+</script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function updateSeats() {
+                var flightId = $("#FlightId").val();
+
+                if (flightId) {
+                    $("#SeatId").empty();
+
+                    $.ajax({
+                        url: '@Url.Action("GetSeatsByFlight", "Tickets")',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            flightId: flightId,
+                        },
+                        success: function (seats) {
+                            $("#SeatId").append('<option value="">Select a seat</option>');
+                            $.each(seats, function (i, seat) {
+                                $("#SeatId").append('<option value="' + seat.value + '">' + seat.text + '</option>');
+
+                            });
+                        },
+                        error: function () {
+                            alert("Failed to load seats.");
+                        }
+                    });
+                }
+            }
+
+            
+            $("#FlightId").change(function () {
+                updateSeats();
+            });
+        });
+    </script>
+}

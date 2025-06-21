@@ -1,0 +1,26 @@
+﻿using BilheticaAeronauticaWeb.Entities;
+
+namespace BilheticaAeronauticaWeb.Models
+{
+    public class TicketViewModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
+
+        public int? FlightId { get; set; }
+        public TicketClass Class { get; set; }
+
+        public int? SeatId { get; set; }
+
+        public int OriginAirportId { get; set; }
+
+        public int DestinationAirportId { get; set; }
+
+        public Payment Payment { get; set; }
+
+        public decimal Price { get; set; }
+
+        public PassengerType Type { get; set; }
+    }
+}

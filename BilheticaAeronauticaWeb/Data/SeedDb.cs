@@ -190,9 +190,8 @@ namespace BilheticaAeronauticaWeb.Data
                 var originAirport = _context.Airports.FirstOrDefault(a => a.Id == 1);
                 var destinationAirport = _context.Airports.FirstOrDefault(a => a.Id == 3);
                 var flight = _context.Flights.FirstOrDefault(a => a.Id == 1);
-                var seat = _context.Seats.FirstOrDefault(a => a.Id == 1);
-
-                
+                var seat1 = _context.Seats.FirstOrDefault(a => a.Id == 1);
+                var seat2 = _context.Seats.FirstOrDefault(a => a.Id == 2);
 
                 var adultTicket = new AdultTicket
                 {
@@ -201,16 +200,32 @@ namespace BilheticaAeronauticaWeb.Data
                     OriginAirport = originAirport,
                     DestinationAirport = destinationAirport,
                     Flight = flight,
-                    Seat = seat,
+                    Seat = seat1,
                     Payment = Payment.Paid,
                     Class = TicketClass.Economic,
                     Price = 50,
-                    Type = "Adult",
+                    Type = PassengerType.Adult
                 };
 
-                seat.Occupied = true;
+                var childTicket = new ChildTicket
+                {
+                    Name = "Lucy",
+                    Surname = "Smith",
+                    OriginAirport = originAirport,
+                    DestinationAirport = destinationAirport,
+                    Flight = flight,
+                    Seat = seat2,
+                    Payment = Payment.Paid,
+                    Class = TicketClass.Economic,
+                    Price = 50,
+                    Type = PassengerType.Child
+                };
+
+                seat1.Occupied = true;
+                seat2.Occupied = true;
 
                 _context.Tickets.Add(adultTicket);
+                _context.Tickets.Add(childTicket);
                 await _context.SaveChangesAsync();
             }
         }

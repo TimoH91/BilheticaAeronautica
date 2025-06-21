@@ -5,6 +5,7 @@ namespace BilheticaAeronauticaWeb.Helpers
 {
     public interface IConverterHelper
     {
+        //TODO: Check which of these need tasks and which don't
             Country ToCountry(CountryViewModel model, Guid ImageId, bool isNew);
 
             CountryViewModel ToCountryViewModel(Country country);
@@ -20,6 +21,10 @@ namespace BilheticaAeronauticaWeb.Helpers
             Task<Flight> ToFlight(FlightViewModel model, bool isNew);
 
             FlightViewModel ToFlightViewModel(Flight flight);
+
+            TicketViewModel ToTicketViewModel(Ticket ticket);
+
+            Ticket ToTicket(TicketViewModel model, bool isNew);
 
     }
 }

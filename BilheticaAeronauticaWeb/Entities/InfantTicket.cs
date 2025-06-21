@@ -2,7 +2,7 @@
 {
     public class InfantTicket : Ticket
     {
-        public override string Type { get; set; } = "Infant";
+        public override PassengerType Type { get; set; } = PassengerType.Infant;
 
         public int ResponsibleAdultId { get; set; }
 
