@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BilheticaAeronauticaWeb.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using BilheticaAeronauticaWeb.Models;
 
 namespace BilheticaAeronauticaWeb.Data
 {
@@ -57,5 +58,6 @@ namespace BilheticaAeronauticaWeb.Data
 
             base.OnModelCreating(modelBuilder);
         }
+        //public DbSet<BilheticaAeronauticaWeb.Models.UserViewModel> UserViewModel { get; set; } = default!;
     }
 }

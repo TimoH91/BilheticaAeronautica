@@ -26,5 +26,8 @@ namespace BilheticaAeronauticaWeb.Helpers
 
             Ticket ToTicket(TicketViewModel model, bool isNew);
 
+            Task<User> ToUser(UserViewModel model, bool isNew);
+            Task<UserViewModel> ToUserViewModelAsync(User user);
+
     }
 }

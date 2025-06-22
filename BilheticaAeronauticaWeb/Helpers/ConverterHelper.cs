@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Data;
+using System.Threading.Tasks;
 using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace BilheticaAeronauticaWeb.Helpers
 {
@@ -10,14 +12,18 @@ namespace BilheticaAeronauticaWeb.Helpers
         private readonly ICountryRepository _countryRepository;
         private readonly IAirplaneRepository _airplaneRepository;
         private readonly IAirportRepository _airportRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly UserManager<User> _userManager;
         
 
 
-        public ConverterHelper(ICountryRepository countryRepository, IAirplaneRepository airplaneRepository, IAirportRepository airportRepository)
+        public ConverterHelper(ICountryRepository countryRepository, IAirplaneRepository airplaneRepository, IAirportRepository airportRepository, UserManager<User> userManager, IUserRepository userRepository)
         {
             _countryRepository = countryRepository;
             _airplaneRepository = airplaneRepository;
             _airportRepository = airportRepository;
+            _userManager = userManager;
+            _userRepository = userRepository;
         }
 
         public Country ToCountry(CountryViewModel model, Guid ImageId, bool isNew)
@@ -200,6 +206,51 @@ namespace BilheticaAeronauticaWeb.Helpers
             throw new ArgumentException($"Invalid ticket type: {model.Type}");
         }
 
+            public async Task<UserViewModel> ToUserViewModelAsync(User user)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
 
+                return new UserViewModel
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Role = roles.FirstOrDefault() ?? "No role"
+                };
+            }
+
+        public async Task<User> ToUser(UserViewModel model, bool isNew)
+        {
+
+            if (isNew)
+            {
+                return new User
+                {
+                    Id = model.Id,
+                    UserName = model.UserName,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                };
+            }
+
+
+            var user = await _userRepository.GetByIdAsync(model.Id);
+
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            user.UserName = model.UserName;
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Email = model.Email;
+
+            return user;
+        
+        }
     }
 }

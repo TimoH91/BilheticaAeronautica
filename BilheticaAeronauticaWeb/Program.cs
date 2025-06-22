@@ -21,6 +21,7 @@ builder.Services.AddScoped<IFlightRepository, FlightRepository>();
 builder.Services.AddScoped<ICountryRepository, CountryRepository>();
 builder.Services.AddScoped<ISeatRepository, SeatRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IFlightService, FlightService>();
 builder.Services.AddScoped<IConverterHelper, ConverterHelper>();
 
