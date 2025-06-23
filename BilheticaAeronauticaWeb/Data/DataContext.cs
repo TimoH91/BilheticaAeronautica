@@ -21,6 +21,12 @@ namespace BilheticaAeronauticaWeb.Data
 
         public DbSet<Ticket> Tickets { get; set; }
 
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<ShoppingBasket> ShoppingBaskets { get; set; }
+        public DbSet<ShoppingBasketTicket> ShoppingBasketTickets { get; set; }
+
+
+
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
             
@@ -38,16 +44,24 @@ namespace BilheticaAeronauticaWeb.Data
                 .HasColumnType("decimal(18,2)");
 
 
+                    modelBuilder.Entity<Ticket>()
+            .HasDiscriminator<string>("TicketType")
+            .HasValue<AdultTicket>("Adult")
+            .HasValue<ChildTicket>("Child")
+            .HasValue<InfantTicket>("Infant");
 
-            modelBuilder.Entity<Ticket>()
-    .HasDiscriminator<string>("TicketType")
-    .HasValue<AdultTicket>("Adult")
-    .HasValue<ChildTicket>("Child")
-    .HasValue<InfantTicket>("Infant");
+                        modelBuilder.Entity<ShoppingBasketTicket>()
+            .Property(f => f.Price)
+            .HasColumnType("decimal(18,2)");
 
-            modelBuilder.Entity<Ticket>()
-.Property(f => f.Price)
-.HasColumnType("decimal(18,2)");
+
+                        modelBuilder.Entity<Order>()
+            .Property(f => f.TotalPrice)
+            .HasColumnType("decimal(18,2)");
+
+                        modelBuilder.Entity<Ticket>()
+            .Property(f => f.Price)
+            .HasColumnType("decimal(18,2)");
 
             foreach (var foreignKey in modelBuilder.Model
             .GetEntityTypes()

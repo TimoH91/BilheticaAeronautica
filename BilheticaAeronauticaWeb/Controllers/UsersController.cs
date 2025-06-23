@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
+    [Authorize]
     public class UsersController : Controller
     {
         private readonly IUserRepository _userRepository;
@@ -87,7 +88,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
                 try
                 {
-                    await _userRepository.CreateAsync(user, model.Role);
+                    await _userRepository.CreateAsync(user, model.Role, model.Password);
 
                     return RedirectToAction(nameof(Index));
 

@@ -11,9 +11,11 @@ using BilheticaAeronauticaWeb.Helpers;
 using System.Diagnostics;
 using BilheticaAeronauticaWeb.Models;
 using BilheticaAeronauticaWeb.Migrations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
+    [Authorize]
     public class TicketsController : Controller
     {
         private readonly DataContext _context;

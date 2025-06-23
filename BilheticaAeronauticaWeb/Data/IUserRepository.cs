@@ -8,7 +8,7 @@ namespace BilheticaAeronauticaWeb.Data
 
         Task<User> GetByIdAsync(string id);
 
-        Task CreateAsync(User user, string role);
+        Task CreateAsync(User user, string role, string password);
 
         Task UpdateAsync(User user);
 

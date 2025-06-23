@@ -4,12 +4,14 @@ using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Helpers;
 using BilheticaAeronauticaWeb.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
+    [Authorize]
     public class AirportsController : Controller
     {
         private readonly IAirportRepository _airportRepository;

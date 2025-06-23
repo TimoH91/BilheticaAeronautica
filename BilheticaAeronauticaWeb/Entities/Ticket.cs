@@ -41,18 +41,21 @@ namespace BilheticaAeronauticaWeb.Entities
         //    Price = price;
         //}
 
+        public string UserId { get; set; }
+        public User User { get; set; }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
 
         public int? FlightId { get; set; }
 
-        public Flight Flight { get; set; }
+        public Flight? Flight { get; set; }
         public TicketClass Class { get; set; }
 
         public int? SeatId { get; set; }
 
-        public Seat Seat { get; set; }
+        public Seat? Seat { get; set; }
 
         public Airport OriginAirport { get; set; }
 

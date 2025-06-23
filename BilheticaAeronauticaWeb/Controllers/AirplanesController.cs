@@ -9,9 +9,11 @@ using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Models;
 using BilheticaAeronauticaWeb.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
+    [Authorize]
     public class AirplanesController : Controller
     {
 

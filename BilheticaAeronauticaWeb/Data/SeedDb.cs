@@ -53,7 +53,8 @@ namespace BilheticaAeronauticaWeb.Data
                 await _context.SaveChangesAsync();
             }
 
-                var user = await _userHelper.GetUserByEmailAsync("timothyharris04@gmail.com"); 
+            var user = await _userHelper.GetUserByEmailAsync("timothyharris04@gmail.com"); 
+            var user2 = await _userHelper.GetUserByEmailAsync("johnSmith@gmail.com");
 
             if (user == null)
             {
@@ -78,12 +79,40 @@ namespace BilheticaAeronauticaWeb.Data
 
             }
 
-            var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
+            if (user2 == null)
+            {
+                user2 = new User
+                {
+                    FirstName = "John",
+                    LastName = "Smith",
+                    Email = "johnSmith@gmail.com",
+                    UserName = "johnSmith@gmail.com",
+                    PhoneNumber = "1234567890"
 
-            if (!isInRole)
+                };
+
+                var result = await _userHelper.AddUserAsync(user2, "123456");
+
+                if (result != IdentityResult.Success)
+                {
+                    throw new InvalidOperationException("Could not create the user in seeder");
+                }
+
+                await _userHelper.AddUserToRoleAsync(user2, "Customer");
+
+            }
+
+            var isInRole1 = await _userHelper.IsUserInRoleAsync(user, "Admin");
+            var isInRole2 = await _userHelper.IsUserInRoleAsync(user2, "Customer");
+
+            if (!isInRole1)
             {
                 await _userHelper.AddUserToRoleAsync(user, "Admin");
-
+            }            
+            
+            if (!isInRole2)
+            {
+                await _userHelper.AddUserToRoleAsync(user2, "Customer");
             }
 
 
@@ -195,6 +224,7 @@ namespace BilheticaAeronauticaWeb.Data
 
                 var adultTicket = new AdultTicket
                 {
+                    User = user2,
                     Name = "John",
                     Surname = "Smith",
                     OriginAirport = originAirport,
@@ -209,6 +239,7 @@ namespace BilheticaAeronauticaWeb.Data
 
                 var childTicket = new ChildTicket
                 {
+                    User = user2,
                     Name = "Lucy",
                     Surname = "Smith",
                     OriginAirport = originAirport,

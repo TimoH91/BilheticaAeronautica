@@ -1,0 +1,43 @@
+﻿@model BilheticaAeronauticaWeb.Entities.ShoppingBasket
+
+@{
+    ViewData["Title"] = "Shopping Basket";
+}
+
+<h1>Your Shopping Basket</h1>
+
+<p>
+    <a asp-action="AddTicket" class="btn btn-primary">Add more tickets</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Class</th>
+            <th>Flight</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Tickets)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Surname</td>
+                <td>@item.Class</td>
+                <td>@item.FlightId</td>
+                <td>@item.Price.ToString("C")</td>
+                <td>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>
+    <a asp-action="Purchase" class="btn btn-success">Purchase</a>
+</p>

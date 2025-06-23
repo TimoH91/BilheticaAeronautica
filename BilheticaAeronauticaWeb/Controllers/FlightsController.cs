@@ -15,7 +15,7 @@ using BilheticaAeronauticaWeb.Services;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
-    [Authorize]
+    
     public class FlightsController : Controller
     {
         private readonly IFlightRepository _flightRepository;

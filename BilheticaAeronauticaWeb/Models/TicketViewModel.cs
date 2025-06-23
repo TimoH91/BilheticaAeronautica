@@ -17,10 +17,12 @@ namespace BilheticaAeronauticaWeb.Models
 
         public int DestinationAirportId { get; set; }
 
-        public Payment Payment { get; set; }
+        //public Payment Payment { get; set; }
 
         public decimal Price { get; set; }
 
         public PassengerType Type { get; set; }
+
+        public int? ResponsibleAdultId { get; set; }
     }
 }

@@ -13,6 +13,7 @@ using BilheticaAeronauticaWeb.Helpers;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
+    [Authorize]
     public class CountriesController : Controller
     {
         private readonly ICountryRepository _countryRepository;

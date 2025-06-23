@@ -132,7 +132,7 @@ namespace BilheticaAeronauticaWeb.Helpers
         {
             return new TicketViewModel
             {
-                Id =ticket.Id,
+                Id = ticket.Id,
                 Name = ticket.Name,
                 Surname = ticket.Surname,
                 FlightId = ticket.FlightId,
@@ -140,7 +140,7 @@ namespace BilheticaAeronauticaWeb.Helpers
                 OriginAirportId = ticket.OriginAirportId,
                 DestinationAirportId = ticket.DestinationAirportId,
                 SeatId = ticket.SeatId,
-                Payment = ticket.Payment,
+                //Payment = ticket.Payment,
                 Price = ticket.Price,
                 Type = ticket.Type
             };
@@ -153,7 +153,7 @@ namespace BilheticaAeronauticaWeb.Helpers
             {
                 return new AdultTicket
                 {
-                    Id = model.Id,
+                    Id = isNew ? 0 : model.Id,
                     Name = model.Name,
                     Surname = model.Surname,
                     FlightId = model.FlightId,
@@ -161,7 +161,7 @@ namespace BilheticaAeronauticaWeb.Helpers
                     OriginAirportId = model.OriginAirportId,
                     DestinationAirportId = model.DestinationAirportId,
                     SeatId = model.SeatId,
-                    Payment = model.Payment,
+                    //Payment = model.Payment,
                     Price = model.Price,
                     Type = model.Type
                 };
@@ -171,7 +171,7 @@ namespace BilheticaAeronauticaWeb.Helpers
             {
                 return new ChildTicket
                 {
-                    Id = model.Id,
+                    Id = isNew ? 0 : model.Id,
                     Name = model.Name,
                     Surname = model.Surname,
                     FlightId = model.FlightId,
@@ -179,7 +179,7 @@ namespace BilheticaAeronauticaWeb.Helpers
                     OriginAirportId = model.OriginAirportId,
                     DestinationAirportId = model.DestinationAirportId,
                     SeatId = model.SeatId,
-                    Payment = model.Payment,
+                    //Payment = model.Payment,
                     Price = model.Price,
                     Type = model.Type
                 };
@@ -189,7 +189,7 @@ namespace BilheticaAeronauticaWeb.Helpers
             {
                 return new InfantTicket
                 {
-                    Id = model.Id,
+                    Id = isNew ? 0 : model.Id,
                     Name = model.Name,
                     Surname = model.Surname,
                     FlightId = model.FlightId,
@@ -197,7 +197,7 @@ namespace BilheticaAeronauticaWeb.Helpers
                     OriginAirportId = model.OriginAirportId,
                     DestinationAirportId = model.DestinationAirportId,
                     SeatId = model.SeatId,
-                    Payment = model.Payment,
+                    //Payment = model.Payment,
                     Price = model.Price,
                     Type = PassengerType.Infant
                 };
@@ -228,7 +228,7 @@ namespace BilheticaAeronauticaWeb.Helpers
             {
                 return new User
                 {
-                    Id = model.Id,
+                    //Id = model.Id,
                     UserName = model.UserName,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
@@ -251,6 +251,32 @@ namespace BilheticaAeronauticaWeb.Helpers
 
             return user;
         
+        }
+
+        public ShoppingBasketTicket ToShoppingBasketTicket(TicketViewModel model, bool isNew)
+        {
+            if (model.FlightId != null || model.SeatId != null)
+            {
+                return new ShoppingBasketTicket
+                {
+                    Id = isNew ? 0 : model.Id,
+                    Name = model.Name,
+                    Surname = model.Surname,
+                    FlightId = model.FlightId.Value,
+                    Class = model.Class,
+                    SeatId = model.SeatId.Value,
+                    Price = model.Price,
+                    PassengerType = model.Type,
+                    ResponsibleAdultId = model.ResponsibleAdultId,
+                };
+            }
+
+            throw new ArgumentException($"Ticket missing information");
+        }
+
+        public Ticket BasketToTicket(ShoppingBasketTicket basketTicket)
+        {
+            throw new NotImplementedException();
         }
     }
 }

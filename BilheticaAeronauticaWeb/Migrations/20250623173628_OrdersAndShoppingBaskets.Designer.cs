@@ -4,6 +4,7 @@ using BilheticaAeronauticaWeb.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BilheticaAeronauticaWeb.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250623173628_OrdersAndShoppingBaskets")]
+    partial class OrdersAndShoppingBaskets
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,9 +261,6 @@ namespace BilheticaAeronauticaWeb.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Class")
-                        .HasColumnType("int");
-
                     b.Property<int>("FlightId")
                         .HasColumnType("int");
 
@@ -268,7 +268,7 @@ namespace BilheticaAeronauticaWeb.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PassengerType")
+                    b.Property<int>("Passenger")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
@@ -287,7 +287,14 @@ namespace BilheticaAeronauticaWeb.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TicketClass")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("FlightId");
+
+                    b.HasIndex("SeatId");
 
                     b.HasIndex("ShoppingBasketId");
 
@@ -692,11 +699,29 @@ namespace BilheticaAeronauticaWeb.Migrations
 
             modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasketTicket", b =>
                 {
-                    b.HasOne("BilheticaAeronauticaWeb.Entities.ShoppingBasket", null)
+                    b.HasOne("BilheticaAeronauticaWeb.Entities.Flight", "Flight")
+                        .WithMany()
+                        .HasForeignKey("FlightId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BilheticaAeronauticaWeb.Entities.Seat", "Seat")
+                        .WithMany()
+                        .HasForeignKey("SeatId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BilheticaAeronauticaWeb.Entities.ShoppingBasket", "ShoppingBasket")
                         .WithMany("Tickets")
                         .HasForeignKey("ShoppingBasketId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Flight");
+
+                    b.Navigation("Seat");
+
+                    b.Navigation("ShoppingBasket");
                 });
 
             modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.Ticket", b =>

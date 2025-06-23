@@ -12,7 +12,8 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-controller="Orders" asp-action="ShoppingBasket" method="post">
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
@@ -59,14 +60,14 @@
                 </select>
                 <span asp-validation-for="DestinationAirportId" class="text-danger"></span>
             </div>
-            <div class="form-group">
+@*             <div class="form-group">
                 <label asp-for="Payment" class="control-label"></label>
                 <select asp-for="Payment" class="form-control" asp-items="Html.GetEnumSelectList<Payment>()">
                 <option value="">Select payment status</option>
                 </select>
                 <span asp-validation-for="Payment" class="text-danger"></span>
                 
-            </div>
+            </div> *@
             <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
                 <input asp-for="Price" class="form-control" />
@@ -80,7 +81,7 @@
                 <span asp-validation-for="Type" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Add to basket" class="btn btn-primary" />
             </div>
         </form>
     </div>

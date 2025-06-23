@@ -15,9 +15,10 @@ namespace BilheticaAeronauticaWeb.Data
             _userManager = userManager;
         }
 
-        public async Task CreateAsync(User user, string role)
+        public async Task CreateAsync(User user, string role, string password)
         {
-            var result1 = await _userManager.CreateAsync(user);
+
+            var result1 = await _userManager.CreateAsync(user, password);
 
             if (!result1.Succeeded)
             {

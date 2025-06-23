@@ -4,6 +4,7 @@ using BilheticaAeronauticaWeb.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BilheticaAeronauticaWeb.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250622143936_AddUserToTicket")]
+    partial class AddUserToTicket
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -177,33 +180,6 @@ namespace BilheticaAeronauticaWeb.Migrations
                     b.ToTable("Flights");
                 });
 
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Payment")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Orders");
-                });
-
             modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.Seat", b =>
                 {
                     b.Property<int>("Id")
@@ -231,69 +207,6 @@ namespace BilheticaAeronauticaWeb.Migrations
                     b.ToTable("Seats");
                 });
 
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasket", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ShoppingBaskets");
-                });
-
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasketTicket", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Class")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FlightId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PassengerType")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("ResponsibleAdultId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SeatId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ShoppingBasketId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Surname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ShoppingBasketId");
-
-                    b.ToTable("ShoppingBasketTickets");
-                });
-
             modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.Ticket", b =>
                 {
                     b.Property<int>("Id")
@@ -314,9 +227,6 @@ namespace BilheticaAeronauticaWeb.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int");
 
                     b.Property<int>("OriginAirportId")
                         .HasColumnType("int");
@@ -351,8 +261,6 @@ namespace BilheticaAeronauticaWeb.Migrations
                     b.HasIndex("DestinationAirportId");
 
                     b.HasIndex("FlightId");
-
-                    b.HasIndex("OrderId");
 
                     b.HasIndex("OriginAirportId");
 
@@ -658,16 +566,6 @@ namespace BilheticaAeronauticaWeb.Migrations
                     b.Navigation("OriginAirport");
                 });
 
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.Order", b =>
-                {
-                    b.HasOne("BilheticaAeronauticaWeb.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.Seat", b =>
                 {
                     b.HasOne("BilheticaAeronauticaWeb.Entities.Flight", "Flight")
@@ -677,26 +575,6 @@ namespace BilheticaAeronauticaWeb.Migrations
                         .IsRequired();
 
                     b.Navigation("Flight");
-                });
-
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasket", b =>
-                {
-                    b.HasOne("BilheticaAeronauticaWeb.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasketTicket", b =>
-                {
-                    b.HasOne("BilheticaAeronauticaWeb.Entities.ShoppingBasket", null)
-                        .WithMany("Tickets")
-                        .HasForeignKey("ShoppingBasketId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.Ticket", b =>
@@ -712,11 +590,6 @@ namespace BilheticaAeronauticaWeb.Migrations
                         .HasForeignKey("FlightId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("BilheticaAeronauticaWeb.Entities.Order", null)
-                        .WithMany("Tickets")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("BilheticaAeronauticaWeb.Entities.Airport", "OriginAirport")
                         .WithMany()
                         .HasForeignKey("OriginAirportId")
@@ -729,7 +602,7 @@ namespace BilheticaAeronauticaWeb.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("BilheticaAeronauticaWeb.Entities.User", "User")
-                        .WithMany("Tickets")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -804,21 +677,6 @@ namespace BilheticaAeronauticaWeb.Migrations
             modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.Country", b =>
                 {
                     b.Navigation("Cities");
-                });
-
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.Order", b =>
-                {
-                    b.Navigation("Tickets");
-                });
-
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasket", b =>
-                {
-                    b.Navigation("Tickets");
-                });
-
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.User", b =>
-                {
-                    b.Navigation("Tickets");
                 });
 #pragma warning restore 612, 618
         }
