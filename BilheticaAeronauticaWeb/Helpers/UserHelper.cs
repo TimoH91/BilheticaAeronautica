@@ -34,6 +34,7 @@ namespace BilheticaAeronauticaWeb.Helpers
         public async Task CheckRoleAsync(string roleName)
         {
             var roleExists = await _roleManager.RoleExistsAsync(roleName);
+
             if (!roleExists) 
             {
                 await _roleManager.CreateAsync(new IdentityRole
@@ -42,6 +43,13 @@ namespace BilheticaAeronauticaWeb.Helpers
                 });
             }
         }
+
+
+        public async Task<IList<string>> GetRolesAsync(User user)
+        {
+            return await _userManager.GetRolesAsync(user);
+        }
+
 
         public async Task<User> GetUserByEmailAsync(string email)
         {

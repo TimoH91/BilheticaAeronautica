@@ -3,6 +3,7 @@ using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -65,6 +66,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userHelper.GetUserByEmailAsync(model.Username);
+               
                 if (user == null)
                 {
                     user = new User
@@ -82,15 +84,21 @@ namespace BilheticaAeronauticaWeb.Controllers
                         ModelState.AddModelError(string.Empty, "The user couldn't be created.");
                         return View(model);
                     }
-
-                    var loginViewModel = new LoginViewModel
+                    else
                     {
-                        Password = model.Password,
-                        RememberMe = false,
-                        Username = model.Username,
-                    };
+                        //TODO add a result check here?
+                        await _userHelper.AddUserToRoleAsync(user, "Customer");
+                    }
+
+                        var loginViewModel = new LoginViewModel
+                        {
+                            Password = model.Password,
+                            RememberMe = false,
+                            Username = model.Username,
+                        };
 
                     var result2 = await _userHelper.LoginAsync(loginViewModel);
+
                     if (result2.Succeeded)
                     {
                         return RedirectToAction("Index", "Home");

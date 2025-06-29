@@ -20,72 +20,25 @@ namespace BilheticaAeronauticaWeb.Data
             _converterHelper = converterHelper;
         }
 
-        public async Task<ShoppingBasket> AddTicketToShoppingBasket(ShoppingBasketTicket basketTicket, string userName)
+        public async Task<IEnumerable<Order>> GetOrdersByUserAsync(string userName)
         {
             var user = await _userHelper.GetUserByEmailAsync(userName);
 
             if (user == null)
             {
-                throw new ArgumentException("User not deteceted");
+                return null;
             }
 
-            var shoppingBasket = await _context.ShoppingBaskets.Where(s => s.User == user)
-                .FirstOrDefaultAsync();
-
-
-            if (shoppingBasket == null) 
+            if (await _userHelper.IsUserInRoleAsync(user, "Customer"))
             {
-                var shoppingBasket1 = new ShoppingBasket
-                {
-                    User = user,
-                };
-            
-                _context.ShoppingBaskets.Add(shoppingBasket1);
-                await _context.SaveChangesAsync();
-
-                basketTicket.ShoppingBasketId = shoppingBasket1.Id;
-                _context.ShoppingBasketTickets.Add(basketTicket);
-
-                await _context.SaveChangesAsync();
-
-                return shoppingBasket1;
+                return _context.Orders.
+                    Include(o => o.User).
+                    Include(o => o.Tickets).
+                    Where(o => o.User == user);
             }
-            else
-            {
-                basketTicket.ShoppingBasketId = shoppingBasket.Id;
-                _context.ShoppingBasketTickets.Add(basketTicket);
 
-                await _context.SaveChangesAsync();
-
-                return shoppingBasket;
-            }
+            return null;
         }
 
-        //public async Task AddTicketToBasketAsync(TicketViewModel model, string userName)
-        //{
-        //    var user = await _userHelper.GetUserByEmailAsync(userName);
-
-        //    if (user == null)
-        //    {
-        //        return;
-
-        //    }
-
-        //    var shoppingBasketTicket = _converterHelper.ToShoppingBasketTicket(model, true);
-
-        //    //var orderBasketTicket = await _context.ShoppingBasketTickets.Where(odt => odt.User == user && odt.Product == product)
-        //        //.FirstOrDefaultAsync();
-
-
-        //    if ((shoppingBasketTicket == null))
-        //    {
-        //        return;
-        //    }
-
-
-
-
-        //    await _context.SaveChangesAsync();
-        //}
     }
 }

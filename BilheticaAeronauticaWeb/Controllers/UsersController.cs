@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private readonly IUserRepository _userRepository;
@@ -24,7 +24,6 @@ namespace BilheticaAeronauticaWeb.Controllers
             _converterHelper = converterHelper;
         }
 
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             return View(_userRepository.GetAll().OrderBy(u => u.UserName).ToList());
@@ -49,7 +48,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         }
 
         // GET: Flights/Details/5
-        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Details(string? id)
         {
             if (id == null)
@@ -68,7 +67,6 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(user);
         }
 
-        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -77,7 +75,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         //POST: Flights/Create
         //To protect from overposting attacks, enable the specific properties you want to bind to.
         //For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize(Roles = "Admin")]
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UserViewModel model)
@@ -101,7 +99,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin")]
+
         //GET: Users/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
@@ -126,7 +124,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         //POST: Flights/Edit/5
         //To protect from overposting attacks, enable the specific properties you want to bind to.
         //For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize(Roles = "Admin")]
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UserViewModel model)
@@ -156,7 +154,6 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin")]
         //GET: Users/Delete/5
         public async Task<IActionResult> Delete(string? id)
         {
@@ -175,8 +172,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(flight);
         }
 
-        //POST: Flights/Delete/5
-        [Authorize(Roles = "Admin")]
+        //POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)

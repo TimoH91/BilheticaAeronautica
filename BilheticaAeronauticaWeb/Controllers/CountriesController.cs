@@ -13,7 +13,7 @@ using BilheticaAeronauticaWeb.Helpers;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class CountriesController : Controller
     {
         private readonly ICountryRepository _countryRepository;
@@ -69,6 +69,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             if (this.ModelState.IsValid)
             {
                 var countryId = await _countryRepository.UpdateCityAsync(city);
+
                 if (countryId != 0)
                 {
                     return this.RedirectToAction($"Details", new { id = countryId });

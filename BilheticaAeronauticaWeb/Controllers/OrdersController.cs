@@ -9,6 +9,9 @@ using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Models;
 using BilheticaAeronauticaWeb.Helpers;
+using System.Diagnostics;
+using NuGet.Packaging;
+using BilheticaAeronauticaWeb.Services;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -16,19 +19,38 @@ namespace BilheticaAeronauticaWeb.Controllers
     {
         private readonly DataContext _context;
         private readonly IOrderRepository _orderRepository;
+        private readonly IOrderService _orderService;
         private readonly IConverterHelper _converterHelper;
+        private readonly IShoppingBasketRepository _shoppingBasketRepository;
+        private readonly ITicketRepository _ticketRepository;
+        private readonly IUserHelper _userHelper;
+        private readonly IBasketHelper _basketHelper;
 
-        public OrdersController(DataContext context, IOrderRepository orderRepository, IConverterHelper converterHelper)
+        public OrdersController(DataContext context, IOrderRepository orderRepository, IConverterHelper converterHelper,
+            IShoppingBasketRepository shoppingBasketRepository, ITicketRepository ticketRepository, IUserHelper userHelper,
+            IOrderService orderService, IBasketHelper basketHelper)
         {
             _context = context;
             _orderRepository = orderRepository;
             _converterHelper = converterHelper;
+            _shoppingBasketRepository = shoppingBasketRepository;
+            _ticketRepository = ticketRepository;
+            _userHelper = userHelper;
+            _orderService = orderService;
+            _basketHelper = basketHelper;
         }
 
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Orders.ToListAsync());
+            var orders = await _orderRepository.GetOrdersByUserAsync(User.Identity.Name);
+
+            if (orders == null)
+            {
+                return new NotFoundViewResult("");
+            }
+
+            return View(orders);
         }
 
         // GET: Orders/Details/5
@@ -36,37 +58,45 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("TicketNotFound");
             }
 
-            var order = await _context.Orders
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (order == null)
-            {
-                return NotFound();
-            }
+            return null;
 
-            return View(order);
+            //Potentially this method will servce for Details here
+
+            //ShoppingBasketTicket shoppingBasketTicket = await _shoppingBasketRepository.GetShoppingBasketTicketAsync(id.Value);
+
+            //if (shoppingBasketTicket == null)
+            //{
+            //    return new NotFoundViewResult("TicketNotFound");
+            //}
+
+            //var ticket = await _ticketRepository.GetTicketBySeatIdAsync(shoppingBasketTicket.SeatId, shoppingBasketTicket.Name, shoppingBasketTicket.Surname);
+
+            //return View("~/Views/Tickets/Details.cshtml", ticket);
         }
 
         // GET: Orders/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+           var shoppingBasket1 = await _shoppingBasketRepository.GetShoppingBasketAsync(User.Identity.Name);
+
+            return View(shoppingBasket1);
         }
 
         public async Task<IActionResult> ShoppingBasket(TicketViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var basketTicket = _converterHelper.ToShoppingBasketTicket(model, true);
+            //if (ModelState.IsValid)
+            //{
+            //    var basketTicket = _converterHelper.ToShoppingBasketTicket(model, true);
 
-                var shoppingBasket = await _orderRepository.AddTicketToShoppingBasket(basketTicket, User.Identity.Name);
+            //    var shoppingBasket = await _orderRepository.AddTicketToShoppingBasket(basketTicket, User.Identity.Name);
 
-                //shoppingBasket.Tickets.Add(basketTicket);
+            //    //shoppingBasket.Tickets.Add(basketTicket);
 
-                return View(shoppingBasket);
-            }
+            //    return View(shoppingBasket);
+            //}
 
             return RedirectToAction("Create", "Tickets");
         }
@@ -76,15 +106,81 @@ namespace BilheticaAeronauticaWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,OrderDate,TotalPrice,Payment")] Order order)
+        public async Task<IActionResult> Purchase(ShoppingBasketWithUserViewModel model)
         {
-            if (ModelState.IsValid)
+            Order order = new Order();
+            Decimal totalPrice = 0;
+            List<Ticket> tickets = new List<Ticket>();
+
+            var user = new User();
+
+            if (model.NewUser != null)
             {
-                _context.Add(order);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                user = new User
+                {
+                    FirstName = model.NewUser.FirstName,
+                    LastName = model.NewUser.LastName,
+                    Email = model.NewUser.Username,
+                    UserName = model.NewUser.Username,
+                };
+
+                model.ShoppingBasket = _basketHelper.GetBasket(HttpContext.Session);
+
+                await _userHelper.AddUserAsync(user, model.NewUser.Password);
+                await _userHelper.AddUserToRoleAsync(user, "Customer");
+
+                var loginViewModel = new LoginViewModel
+                {
+                    Password = model.NewUser.Password,
+                    RememberMe = false,
+                    Username = model.NewUser.Username,
+                };
+
+                var result2 = await _userHelper.LoginAsync(loginViewModel);
             }
-            return View(order);
+            else
+            {
+                user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+                model.ShoppingBasket = await _shoppingBasketRepository.GetShoppingBasketAsync(user.Email);
+            }
+
+            foreach (ShoppingBasketTicket basketTicket in model.ShoppingBasket.Tickets)
+            {
+                //TODO: will this work for different ticket types?
+
+                Ticket ticket = await _converterHelper.BasketToTicket(basketTicket);
+
+                ticket.UserId = user.Id;
+
+                totalPrice += ticket.Price;
+
+                tickets.Add(ticket);
+            }
+
+            order.TotalPrice = totalPrice;
+            order.User = user;
+            order.OrderDate = DateTime.Now;
+
+            await _orderRepository.CreateAsync(order);
+
+            foreach (Ticket ticket in tickets)
+            {
+                ticket.OrderId = order.Id;
+            }
+
+
+            await _ticketRepository.CreateRangeAsync(tickets);
+
+            if (model.NewUser == null)
+            {
+                await _orderService.ClearShoppingBasket(model.ShoppingBasket);
+            }
+            else
+            {
+                _basketHelper.ClearBasket(HttpContext.Session);
+            }
+
+                return View("ThankyouForBooking");
         }
 
         // GET: Orders/Edit/5

@@ -8,8 +8,7 @@ namespace BilheticaAeronauticaWeb.Entities
     {
             public int Id { get ; set; }
 
-            [Required]
-            public User User { get; set; } 
+            public User? User { get; set; } 
 
             public ICollection<ShoppingBasketTicket> Tickets { get; set; } = new List<ShoppingBasketTicket>();
     }

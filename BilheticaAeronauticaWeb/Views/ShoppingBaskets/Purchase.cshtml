@@ -1,42 +1,37 @@
 ﻿@model BilheticaAeronauticaWeb.Models.ShoppingBasketWithUserViewModel
 
-
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Purchase";
 }
 
 <h1>Your Final Order</h1>
 
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Surname</th>
-            <th>Class</th>
-            <th>Flight</th>
-            <th>Price</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.ShoppingBasket.Tickets)
-        {
-            <tr>
-                <td>@item.Name</td>
-                <td>@item.Surname</td>
-                <td>@item.Class</td>
-                <td>@item.FlightId</td>
-                <td>@item.Price.ToString("C")</td>
-                <td>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<form method="post">
+<form asp-controller="Orders" asp-action="Purchase" method="post">
     <div asp-validation-summary="ModelOnly"></div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Class</th>
+                <th>Flight</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ShoppingBasket.Tickets)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Surname</td>
+                    <td>@item.Class</td>
+                    <td>@item.FlightId</td>
+                    <td>@item.Price.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
     @if (!User.Identity.IsAuthenticated)
     {
@@ -45,21 +40,25 @@
             <input asp-for="NewUser.FirstName" class="form-control" />
             <span asp-validation-for="NewUser.FirstName" class="text-warning"></span>
         </div>
+
         <div class="form-group">
             <label asp-for="NewUser.LastName">Last Name</label>
             <input asp-for="NewUser.LastName" class="form-control" />
             <span asp-validation-for="NewUser.LastName" class="text-warning"></span>
         </div>
+
         <div class="form-group">
             <label asp-for="NewUser.Username">Username</label>
             <input asp-for="NewUser.Username" class="form-control" />
             <span asp-validation-for="NewUser.Username" class="text-warning"></span>
         </div>
+
         <div class="form-group">
             <label asp-for="NewUser.Password">Password</label>
             <input asp-for="NewUser.Password" type="password" class="form-control" />
             <span asp-validation-for="NewUser.Password" class="text-warning"></span>
         </div>
+
         <div class="form-group">
             <label asp-for="NewUser.Confirm">Confirm</label>
             <input asp-for="NewUser.Confirm" type="password" class="form-control" />
@@ -67,11 +66,5 @@
         </div>
     }
 
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
-
-
-<form asp-action="Purchase" method="post">
     <button type="submit" class="btn btn-success">Confirm</button>
 </form>
-

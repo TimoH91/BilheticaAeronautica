@@ -16,10 +16,10 @@ namespace BilheticaAeronauticaWeb.Entities
         public string Surname { get; set; }
 
         //[Required]
-        //public Airport OriginAirport { get; set; }
+        //public int OriginAirportId { get; set; }
 
         //[Required]
-        //public Airport DestinationAirport { get; set; }
+        //public int DestinationAirportId { get; set; }
 
         [Required]
         public int SeatId { get; set; }
@@ -37,6 +37,7 @@ namespace BilheticaAeronauticaWeb.Entities
         public decimal Price { get; set; }
 
         public int? ResponsibleAdultId { get; set; }
+
 
     }
 }

@@ -1,4 +1,4 @@
-﻿@model BilheticaAeronauticaWeb.Entities.ShoppingBasket
+﻿@model BilheticaAeronauticaWeb.Models.ShoppingBasketWithUserViewModel
 
 @{
     ViewData["Title"] = "Shopping Basket";
@@ -22,7 +22,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Tickets)
+        @foreach (var item in Model.ShoppingBasket.Tickets)
         {
             <tr>
                 <td>@item.Name</td>
@@ -41,3 +41,4 @@
 <p>
     <a asp-action="Purchase" class="btn btn-success">Purchase</a>
 </p>
+

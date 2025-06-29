@@ -12,18 +12,20 @@ namespace BilheticaAeronauticaWeb.Helpers
         private readonly ICountryRepository _countryRepository;
         private readonly IAirplaneRepository _airplaneRepository;
         private readonly IAirportRepository _airportRepository;
+        private readonly IFlightRepository _flightRepository;
         private readonly IUserRepository _userRepository;
         private readonly UserManager<User> _userManager;
         
 
 
-        public ConverterHelper(ICountryRepository countryRepository, IAirplaneRepository airplaneRepository, IAirportRepository airportRepository, UserManager<User> userManager, IUserRepository userRepository)
+        public ConverterHelper(ICountryRepository countryRepository, IAirplaneRepository airplaneRepository, IAirportRepository airportRepository, UserManager<User> userManager, IUserRepository userRepository, IFlightRepository flightRepository)
         {
             _countryRepository = countryRepository;
             _airplaneRepository = airplaneRepository;
             _airportRepository = airportRepository;
             _userManager = userManager;
             _userRepository = userRepository;
+            _flightRepository = flightRepository;
         }
 
         public Country ToCountry(CountryViewModel model, Guid ImageId, bool isNew)
@@ -274,9 +276,63 @@ namespace BilheticaAeronauticaWeb.Helpers
             throw new ArgumentException($"Ticket missing information");
         }
 
-        public Ticket BasketToTicket(ShoppingBasketTicket basketTicket)
+        public async Task<Ticket> BasketToTicket(ShoppingBasketTicket basketTicket)
         {
-            throw new NotImplementedException();
+            var flight = await _flightRepository.GetByIdAsync(basketTicket.FlightId);
+
+            if (basketTicket.PassengerType == PassengerType.Adult)
+            {
+                return new AdultTicket
+                {
+                    Name = basketTicket.Name,
+                    Surname = basketTicket.Surname,
+                    FlightId = basketTicket.FlightId,
+                    Class = basketTicket.Class,
+                    OriginAirportId = flight.OriginAirportId,
+                    DestinationAirportId = flight.DestinationAirportId,
+                    SeatId = basketTicket.SeatId,
+                    Payment = Payment.Paid,
+                    Price = basketTicket.Price,
+                    Type = PassengerType.Adult
+                };
+            }
+
+            if (basketTicket.PassengerType == PassengerType.Child)
+            {
+                return new ChildTicket
+                {
+                    Name = basketTicket.Name,
+                    Surname = basketTicket.Surname,
+                    FlightId = basketTicket.FlightId,
+                    Class = basketTicket.Class,
+                    OriginAirportId = flight.OriginAirportId,
+                    DestinationAirportId = flight.DestinationAirportId,
+                    SeatId = basketTicket.SeatId,
+                    Payment = Payment.Paid,
+                    Price = basketTicket.Price,
+                    Type = PassengerType.Child
+                };
+            }
+
+            if (basketTicket.PassengerType == PassengerType.Infant)
+            {
+                return new InfantTicket
+                {
+                    Name = basketTicket.Name,
+                    Surname = basketTicket.Surname,
+                    FlightId = basketTicket.FlightId,
+                    Class = basketTicket.Class,
+                    OriginAirportId = flight.OriginAirportId,
+                    DestinationAirportId = flight.DestinationAirportId,
+                    SeatId = basketTicket.SeatId,
+                    Payment = Payment.Paid,
+                    Price = basketTicket.Price,
+                    Type = PassengerType.Infant,
+                    ResponsibleAdultId = basketTicket.ResponsibleAdultId.Value,
+                };
+            }
+
+            throw new ArgumentException($"Invalid ticket type: {basketTicket}");
         }
     }
 }

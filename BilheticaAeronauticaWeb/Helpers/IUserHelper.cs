@@ -18,7 +18,9 @@ namespace BilheticaAeronauticaWeb.Helpers
 
         Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword);
 
-        Task CheckRoleAsync(string roleName); 
+        Task CheckRoleAsync(string roleName);
+
+        Task<IList<string>> GetRolesAsync(User user);
         Task AddUserToRoleAsync(User user, string roleName);
         Task<bool> IsUserInRoleAsync(User user, string roleName);
     }

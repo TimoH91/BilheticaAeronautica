@@ -4,6 +4,6 @@ namespace BilheticaAeronauticaWeb.Data
 {
     public interface IOrderRepository : IGenericRepository<Order>
     {
-        Task<ShoppingBasket> AddTicketToShoppingBasket(ShoppingBasketTicket basketTicket, string userName);
+        Task<IEnumerable<Order>> GetOrdersByUserAsync(string userName);
     }
 }

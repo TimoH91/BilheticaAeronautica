@@ -25,6 +25,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Flights" asp-action="Index">Flights</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="ShoppingBaskets" asp-action="Index">Shopping Basket</a>
+                        </li>
                         @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
@@ -35,6 +38,9 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Airplanes" asp-action="Index">Airplanes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
                             </li>
                         }
 
@@ -53,6 +59,14 @@
                                 </ul>
                             </li>
 
+                        }
+
+                        @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Customer"))
+                        {
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Orders" asp-action="Index">My bookings</a>
+                            </li>
                         }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>

@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class AirplanesController : Controller
     {
 

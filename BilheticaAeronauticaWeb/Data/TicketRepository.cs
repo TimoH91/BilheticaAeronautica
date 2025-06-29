@@ -16,5 +16,11 @@ namespace BilheticaAeronauticaWeb.Data
         {
             return _context.Tickets.Include(t => t.DestinationAirport).Include(t => t.Flight).Include(t => t.OriginAirport).Include(t => t.Seat);
         }
+
+        public async Task<Ticket> GetTicketBySeatIdAsync(int seatId, string firstName, string lastName)
+        {
+            return await _context.Tickets
+                .FirstOrDefaultAsync(t => t.SeatId == seatId && t.Name == firstName && t.Surname == lastName);
+        }
     }
 }

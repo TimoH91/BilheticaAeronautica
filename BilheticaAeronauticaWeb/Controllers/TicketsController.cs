@@ -12,10 +12,12 @@ using System.Diagnostics;
 using BilheticaAeronauticaWeb.Models;
 using BilheticaAeronauticaWeb.Migrations;
 using Microsoft.AspNetCore.Authorization;
+using System.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
-    [Authorize]
+    
     public class TicketsController : Controller
     {
         private readonly DataContext _context;
@@ -24,6 +26,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly IFlightRepository _flightRepository;
         private readonly IAirportRepository _airportRepository;
         private readonly IConverterHelper _converterHelper;
+        private readonly IUserHelper _userHelper;
 
         
         public TicketsController(DataContext context, 
@@ -31,7 +34,8 @@ namespace BilheticaAeronauticaWeb.Controllers
             IFlightRepository flightRepository,
             IAirportRepository airportRepository,
             ISeatRepository seatRepository,
-            IConverterHelper converterHelper)
+            IConverterHelper converterHelper,
+            IUserHelper userHelper)
         {
             _context = context;
             _ticketRepository = ticketRepository;
@@ -39,14 +43,17 @@ namespace BilheticaAeronauticaWeb.Controllers
             _airportRepository = airportRepository;
             _seatRepository = seatRepository;
             _converterHelper = converterHelper;
+            _userHelper = userHelper;
         }
 
+        [Authorize(Roles = "Staff")]
         // GET: Tickets
         public async Task<IActionResult> Index()
         {
             return View(_ticketRepository.GetAll().OrderBy(a => a.Id));
         }
 
+        [Authorize(Roles = "Staff")]
         // GET: Tickets/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -67,17 +74,22 @@ namespace BilheticaAeronauticaWeb.Controllers
         }
 
         // GET: Tickets/Create
-        public IActionResult Create()
-        {
-            //ViewData["DestinationAirportId"] = new SelectList(_context.Airports, "Id", "Name");
-            //ViewData["FlightId"] = new SelectList(_context.Flights, "Id", "Id");
-            //ViewData["OriginAirportId"] = new SelectList(_context.Airports, "Id", "Name");
-            //ViewData["SeatId"] = new SelectList(_context.Seats, "Id", "Id");
+        public async Task<IActionResult> Create()
+        {       
+            if (User.Identity.Name != null)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+
+                var roles = await _userHelper.GetRolesAsync(user);
+
+                if (roles.Contains("Admin") || roles.Contains("Staff"))
+                {
+                    //TODO: change this page
+                    return Forbid();
+                }
+            }
 
             ViewBag.Airports = _airportRepository.GetComboAirports();
-            
-            //ViewBag.Flights = _flightRepository.GetComboFlights();
-            //ViewBag.Seats = _seatRepository.GetComboSeats();
 
             return View();
         }
