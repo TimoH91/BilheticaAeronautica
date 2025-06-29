@@ -4,6 +4,8 @@ using BilheticaAeronauticaWeb.Entities;
 using Microsoft.AspNetCore.Identity;
 using BilheticaAeronauticaWeb.Helpers;
 using BilheticaAeronauticaWeb.Services;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 
 
@@ -12,7 +14,18 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-
+builder.Services.AddAuthentication()
+                        .AddCookie()
+                        .AddJwtBearer(cfg =>
+                        {
+                            cfg.TokenValidationParameters = new TokenValidationParameters
+                            {
+                            ValidIssuer = builder.Configuration["Tokens:Issuer"],
+                            ValidAudience = builder.Configuration["Tokens:Audience"],
+                            IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Tokens:Key"]))
+                            };
+                        });
 
 builder.Services.AddScoped<SeedDb>();
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
