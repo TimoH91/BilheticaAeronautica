@@ -68,8 +68,9 @@ namespace BilheticaAeronauticaWeb.Entities
         public Payment Payment { get; set; }
 
         public decimal Price { get; set; }
+
         public abstract PassengerType Type { get; set; }
 
-        public int OrderId { get; set; }
+        public Order Order { get; set; }
     }
 }

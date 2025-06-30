@@ -334,5 +334,31 @@ namespace BilheticaAeronauticaWeb.Helpers
 
             throw new ArgumentException($"Invalid ticket type: {basketTicket}");
         }
+
+        public Order ToOrder(OrderViewModel model, bool isNew, User user)
+        {
+            return new Order
+            {
+                Id = isNew ? 0 : model.Id,
+                User = user,
+                OrderDate = model.OrderDate,
+                Tickets = model.Tickets,
+                TotalPrice = model.TotalPrice,
+                Payment = model.Payment
+            };
+        }
+
+        public OrderViewModel ToOrderViewModel(Order order)
+        {
+            return new OrderViewModel
+            {
+                Id = order.Id,
+                OrderDate = order.OrderDate,
+                UserId = order.User.Id,
+                Tickets = (List<Ticket>)order.Tickets,
+                TotalPrice = order.TotalPrice,
+                Payment = order.Payment,
+            };
+        }
     }
 }

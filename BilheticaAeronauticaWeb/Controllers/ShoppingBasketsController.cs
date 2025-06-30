@@ -14,16 +14,14 @@ namespace BilheticaAeronauticaWeb.Controllers
 {
     public class ShoppingBasketsController : Controller
     {
-        private readonly DataContext _context;
         private readonly IUserHelper _userHelper;
         private readonly IConverterHelper _converterHelper;
         private readonly IShoppingBasketRepository _shoppingBasketRepository;
         private readonly ITicketRepository _ticketRepository;
         private readonly IBasketHelper _basketHelper;
 
-        public ShoppingBasketsController(DataContext context, IUserHelper userHelper, IConverterHelper converterHelper, IShoppingBasketRepository shoppingBasketRepository, ITicketRepository ticketRepository, IBasketHelper basketHelper)
+        public ShoppingBasketsController(IUserHelper userHelper, IConverterHelper converterHelper, IShoppingBasketRepository shoppingBasketRepository, ITicketRepository ticketRepository, IBasketHelper basketHelper)
         {
-            _context = context;
             _userHelper = userHelper;
             _converterHelper = converterHelper;
             _shoppingBasketRepository = shoppingBasketRepository;
@@ -66,23 +64,11 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(shoppingBasketWithUser);
         }
 
-        // GET: ShoppingBaskets/Details/5
+        ////GET: ShoppingBaskets/Details/5
         //public async Task<IActionResult> Details(int? id)
         //{
-        //    //if (id == null)
-        //    //{
-        //    //    return new NotFoundViewResult("AirplaneNotFound");
-        //    //}
 
-        //    //var airplane = await _airplaneRepository.GetByIdAsync(id.Value);
-
-
-        //    //if (airplane == null)
-        //    //{
-        //    //    return new NotFoundViewResult("AirplaneNotFound");
-        //    //}
-
-        //    //return View(airplane);
+        //    return View();
         //}
 
         public async Task<IActionResult> Details(int? id)
@@ -147,7 +133,7 @@ namespace BilheticaAeronauticaWeb.Controllers
                     NewUser = user == null ? new RegisterNewUserViewModel() : null
                 };
 
-                return View(shoppingBasketWithUserViewModel);
+                return RedirectToAction("Index");
             }
 
             return RedirectToAction("Create", "Tickets");
@@ -180,102 +166,14 @@ namespace BilheticaAeronauticaWeb.Controllers
                 NewUser = user == null ? new RegisterNewUserViewModel() : null
             };
 
+            if (basket == null)
+            {
+                return View("NoShoppingBasket");
+            }
+
             return View(shoppingBasketWithUserViewModel);
 
         }     
-        
-        
-        //[ValidateAntiForgeryToken]
-
-        
-
-            // GET: ShoppingBaskets/Edit/5
-            //public async Task<IActionResult> Edit(int? id)
-            //{
-            //    if (id == null)
-            //    {
-            //        return NotFound();
-            //    }
-
-            //    var shoppingBasket = await _context.ShoppingBaskets.FindAsync(id);
-            //    if (shoppingBasket == null)
-            //    {
-            //        return NotFound();
-            //    }
-            //    return View(shoppingBasket);
-            //}
-
-            // POST: ShoppingBaskets/Edit/5
-            // To protect from overposting attacks, enable the specific properties you want to bind to.
-            //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-            //[HttpPost]
-            //[ValidateAntiForgeryToken]
-            //public async Task<IActionResult> Edit(int id, [Bind("Id")] ShoppingBasket shoppingBasket)
-            //{
-            //    if (id != shoppingBasket.Id)
-            //    {
-            //        return NotFound();
-            //    }
-
-            //    if (ModelState.IsValid)
-            //    {
-            //        try
-            //        {
-            //            _context.Update(shoppingBasket);
-            //            await _context.SaveChangesAsync();
-            //        }
-            //        catch (DbUpdateConcurrencyException)
-            //        {
-            //            if (!ShoppingBasketExists(shoppingBasket.Id))
-            //            {
-            //                return NotFound();
-            //            }
-            //            else
-            //            {
-            //                throw;
-            //            }
-            //        }
-            //        return RedirectToAction(nameof(Index));
-            //    }
-            //    return View(shoppingBasket);
-            //}
-
-            // GET: ShoppingBaskets/Delete/5
-            //public async Task<IActionResult> Delete(int? id)
-            //{
-            //    if (id == null)
-            //    {
-            //        return NotFound();
-            //    }
-
-            //    var shoppingBasket = await _context.ShoppingBaskets
-            //        .FirstOrDefaultAsync(m => m.Id == id);
-            //    if (shoppingBasket == null)
-            //    {
-            //        return NotFound();
-            //    }
-
-            //    return View(shoppingBasket);
-            //}
-
-            // POST: ShoppingBaskets/Delete/5
-            //[HttpPost, ActionName("Delete")]
-            //[ValidateAntiForgeryToken]
-            //public async Task<IActionResult> DeleteConfirmed(int id)
-            //{
-            //    var shoppingBasket = await _context.ShoppingBaskets.FindAsync(id);
-            //    if (shoppingBasket != null)
-            //    {
-            //        _context.ShoppingBaskets.Remove(shoppingBasket);
-            //    }
-
-            //    await _context.SaveChangesAsync();
-            //    return RedirectToAction(nameof(Index));
-            //}
-
-            //private bool ShoppingBasketExists(int id)
-            //{
-            //    return _context.ShoppingBaskets.Any(e => e.Id == id);
-            //}
-        }
+         
+    }
 }

@@ -33,7 +33,9 @@ namespace BilheticaAeronauticaWeb.Helpers
             Task<User> ToUser(UserViewModel model, bool isNew);
             Task<UserViewModel> ToUserViewModelAsync(User user);
 
+            Order ToOrder(OrderViewModel model, bool isNew, User user);
 
+            OrderViewModel ToOrderViewModel(Order order);
 
     }
 }

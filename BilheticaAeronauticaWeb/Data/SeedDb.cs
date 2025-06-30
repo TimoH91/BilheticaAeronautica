@@ -2,6 +2,7 @@
 using BilheticaAeronauticaWeb.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Mono.TextTemplating;
 
 namespace BilheticaAeronauticaWeb.Data
 {
@@ -76,6 +77,8 @@ namespace BilheticaAeronauticaWeb.Data
                 }
 
                 await _userHelper.AddUserToRoleAsync(user, "Admin");
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                await _userHelper.ConfirmEmailAsync(user, token);
 
             }
 
@@ -99,6 +102,8 @@ namespace BilheticaAeronauticaWeb.Data
                 }
 
                 await _userHelper.AddUserToRoleAsync(user2, "Customer");
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user2);
+                await _userHelper.ConfirmEmailAsync(user2, token);
 
             }
 
@@ -214,6 +219,20 @@ namespace BilheticaAeronauticaWeb.Data
                 await _context.SaveChangesAsync();
             }
 
+            if (!_context.Orders.Any())
+            {
+                Order order = new Order
+                {
+                    OrderDate = DateTime.Now,
+                    User = user2,
+                    TotalPrice = 100,
+                    Payment = Payment.Paid,
+                };
+
+                _context.Orders.Add(order);
+                await _context.SaveChangesAsync();
+            }
+
             if (!_context.Tickets.Any() && _context.Seats.Any())
             {
                 var originAirport = _context.Airports.FirstOrDefault(a => a.Id == 1);
@@ -221,6 +240,7 @@ namespace BilheticaAeronauticaWeb.Data
                 var flight = _context.Flights.FirstOrDefault(a => a.Id == 1);
                 var seat1 = _context.Seats.FirstOrDefault(a => a.Id == 1);
                 var seat2 = _context.Seats.FirstOrDefault(a => a.Id == 2);
+                var order = _context.Orders.FirstOrDefault(a => a.Id == 1); 
 
                 var adultTicket = new AdultTicket
                 {
@@ -234,7 +254,9 @@ namespace BilheticaAeronauticaWeb.Data
                     Payment = Payment.Paid,
                     Class = TicketClass.Economic,
                     Price = 50,
-                    Type = PassengerType.Adult
+                    Type = PassengerType.Adult,
+                    Order = order
+                    
                 };
 
                 var childTicket = new ChildTicket
@@ -249,6 +271,7 @@ namespace BilheticaAeronauticaWeb.Data
                     Payment = Payment.Paid,
                     Class = TicketClass.Economic,
                     Price = 50,
+                    Order = order,
                     Type = PassengerType.Child
                 };
 
@@ -260,7 +283,6 @@ namespace BilheticaAeronauticaWeb.Data
                 await _context.SaveChangesAsync();
             }
         }
-
 
         private void AddAirport(string name, City city, Country country)
         {

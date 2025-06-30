@@ -12,6 +12,8 @@ using BilheticaAeronauticaWeb.Helpers;
 using System.Diagnostics;
 using NuGet.Packaging;
 using BilheticaAeronauticaWeb.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -25,10 +27,11 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly ITicketRepository _ticketRepository;
         private readonly IUserHelper _userHelper;
         private readonly IBasketHelper _basketHelper;
+        private readonly IMailHelper _mailHelper;
 
         public OrdersController(DataContext context, IOrderRepository orderRepository, IConverterHelper converterHelper,
             IShoppingBasketRepository shoppingBasketRepository, ITicketRepository ticketRepository, IUserHelper userHelper,
-            IOrderService orderService, IBasketHelper basketHelper)
+            IOrderService orderService, IBasketHelper basketHelper, IMailHelper mailHelper)
         {
             _context = context;
             _orderRepository = orderRepository;
@@ -38,6 +41,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             _userHelper = userHelper;
             _orderService = orderService;
             _basketHelper = basketHelper;
+            _mailHelper = mailHelper;
         }
 
         // GET: Orders
@@ -58,23 +62,17 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (id == null)
             {
-                return new NotFoundViewResult("TicketNotFound");
+                return new NotFoundViewResult("OrderNotFound");
             }
 
-            return null;
+            var order = await _orderRepository.GetByIdAsync(id.Value);
 
-            //Potentially this method will servce for Details here
+            if (id == null)
+            {
+                return new NotFoundViewResult("OrderNotFound");
+            }
 
-            //ShoppingBasketTicket shoppingBasketTicket = await _shoppingBasketRepository.GetShoppingBasketTicketAsync(id.Value);
-
-            //if (shoppingBasketTicket == null)
-            //{
-            //    return new NotFoundViewResult("TicketNotFound");
-            //}
-
-            //var ticket = await _ticketRepository.GetTicketBySeatIdAsync(shoppingBasketTicket.SeatId, shoppingBasketTicket.Name, shoppingBasketTicket.Surname);
-
-            //return View("~/Views/Tickets/Details.cshtml", ticket);
+            return View(order);
         }
 
         // GET: Orders/Create
@@ -85,21 +83,10 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(shoppingBasket1);
         }
 
-        public async Task<IActionResult> ShoppingBasket(TicketViewModel model)
-        {
-            //if (ModelState.IsValid)
-            //{
-            //    var basketTicket = _converterHelper.ToShoppingBasketTicket(model, true);
-
-            //    var shoppingBasket = await _orderRepository.AddTicketToShoppingBasket(basketTicket, User.Identity.Name);
-
-            //    //shoppingBasket.Tickets.Add(basketTicket);
-
-            //    return View(shoppingBasket);
-            //}
-
-            return RedirectToAction("Create", "Tickets");
-        }
+        //public async Task<IActionResult> ShoppingBasket(TicketViewModel model)
+        //{
+        //    return RedirectToAction("Create", "Tickets");
+        //}
 
         // POST: Orders/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -126,17 +113,40 @@ namespace BilheticaAeronauticaWeb.Controllers
 
                 model.ShoppingBasket = _basketHelper.GetBasket(HttpContext.Session);
 
-                await _userHelper.AddUserAsync(user, model.NewUser.Password);
-                await _userHelper.AddUserToRoleAsync(user, "Customer");
+                var result = await _userHelper.AddUserAsync(user, model.NewUser.Password);
 
-                var loginViewModel = new LoginViewModel
+                if (result != IdentityResult.Success)
                 {
-                    Password = model.NewUser.Password,
-                    RememberMe = false,
-                    Username = model.NewUser.Username,
-                };
+                    ModelState.AddModelError(string.Empty, "The user couldn't be created.");
+                    return View(model);
+                }
+                else
+                {
+                    await _userHelper.AddUserToRoleAsync(user, "Customer");
+                }
 
-                var result2 = await _userHelper.LoginAsync(loginViewModel);
+                    string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                    string tokenLink = Url.Action("ConfirmEmail", "Account", new
+                    {
+                        userid = user.Id,
+                        token = myToken
+                    }, protocol: HttpContext.Request.Scheme);
+
+                    Response response = _mailHelper.SendEmail(model.NewUser.Username, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                                                                             $"To allow the user, " +
+                                                                            $"please click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
+
+
+                    if (response.IsSuccess)
+                    {
+
+                        ViewBag.Message = "The instructions to allow you user has been sent to email";
+                        //return View(model);
+                    }
+
+
+                    ModelState.AddModelError(string.Empty, "The user couldn't be logged.");
+
             }
             else
             {
@@ -165,7 +175,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             foreach (Ticket ticket in tickets)
             {
-                ticket.OrderId = order.Id;
+                ticket.Order = order;
             }
 
 
@@ -184,45 +194,56 @@ namespace BilheticaAeronauticaWeb.Controllers
         }
 
         // GET: Orders/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("OrderNotFound");
             }
 
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _orderRepository.GetByIdAsync(id.Value);
+
             if (order == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("OrderNotFound");
             }
-            return View(order);
+
+            var model = _converterHelper.ToOrderViewModel(order);
+
+            return View(model);
         }
 
         // POST: Orders/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,OrderDate,TotalPrice,Payment")] Order order)
+        public async Task<IActionResult> Edit(OrderViewModel model)
         {
-            if (id != order.Id)
-            {
-                return NotFound();
+
+            User user = null;
+
+            if (User.Identity.IsAuthenticated)
+            { 
+                user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
             }
 
-            if (ModelState.IsValid)
-            {
+            if(ModelState.IsValid && user != null)
+            { 
                 try
                 {
-                    _context.Update(order);
-                    await _context.SaveChangesAsync();
+                    var order = _converterHelper.ToOrder(model, false, user);
+
+                    await _orderRepository.UpdateAsync(order);
                 }
+
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!OrderExists(order.Id))
+                    if (!await _orderRepository.ExistAsync(model.Id))
                     {
-                        return NotFound();
+                        return new NotFoundViewResult("OrderNotFound"); ;
                     }
                     else
                     {
@@ -231,45 +252,65 @@ namespace BilheticaAeronauticaWeb.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(order);
+            return View(model);
         }
 
         // GET: Orders/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("OrderNotFound");
             }
 
-            var order = await _context.Orders
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (order == null)
+            var ticket = await _orderRepository.GetByIdAsync(id.Value);
+
+            if (ticket == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("OrderNotFound");
             }
 
-            return View(order);
+            return View(ticket);
         }
 
         // POST: Orders/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
-            if (order != null)
+            var order = await _orderRepository.GetByIdAsync(id);
+
+            try
             {
-                _context.Orders.Remove(order);
+                await _orderRepository.DeleteAsync(order);
+                return RedirectToAction(nameof(Index));
             }
+            catch (DbUpdateException ex)
+            {
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                {
+                    var errorModel = new ErrorViewModel
+                    {
+                        ErrorTitle = $"{order.Id} provavelmente está a ser usado!!",
+                        ErrorMessage = $"{order.Id} não pode ser apagado<br/><br/>"
+                            
+                    };
+
+                    return View("Error", errorModel);
+                }
+
+
+                return View("Error", new ErrorViewModel
+                {
+                    ErrorTitle = "Erro de base de dados",
+                    ErrorMessage = "Ocorreu um erro inesperado ao tentar apagar o aeroporto."
+                });
+
+            }
         }
 
-        private bool OrderExists(int id)
-        {
-            return _context.Orders.Any(e => e.Id == id);
-        }
     }
 }

@@ -6,15 +6,15 @@ namespace BilheticaAeronauticaWeb.Helpers
 {
     public interface IUserHelper
     {
-        Task<User> GetUserByEmailAsync(string email); 
+        Task<User> GetUserByEmailAsync(string email);
 
         Task<IdentityResult> AddUserAsync(User user, string password);
 
-        Task<SignInResult> LoginAsync(LoginViewModel model); 
+        Task<SignInResult> LoginAsync(LoginViewModel model);
 
         Task LogoutAsync();
 
-        Task<IdentityResult> UpdateUserAsync(User user); 
+        Task<IdentityResult> UpdateUserAsync(User user);
 
         Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword);
 
@@ -25,5 +25,11 @@ namespace BilheticaAeronauticaWeb.Helpers
         Task<bool> IsUserInRoleAsync(User user, string roleName);
 
         Task<SignInResult> ValidatePasswordAsync(User user, string password);
+
+        Task<string> GenerateEmailConfirmationTokenAsync(User user);
+
+        Task<IdentityResult> ConfirmEmailAsync(User user, string token);
+
+        Task<User> GetUserByIdAsync(string userId);
     }
 }

@@ -40,5 +40,12 @@ namespace BilheticaAeronauticaWeb.Data
             return null;
         }
 
+        public async Task<Order> GetByIdAsync(int id)
+        {
+            return await _context.Orders.Include(o => o.Tickets)
+                .Include(o => o.User)
+                .FirstOrDefaultAsync(t => t.Id == id);
+        }
+
     }
 }

@@ -91,7 +91,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             ViewBag.Airports = _airportRepository.GetComboAirports();
 
-            return View();
+            return View(new TicketViewModel());
         }
 
         [HttpPost]

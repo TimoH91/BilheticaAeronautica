@@ -29,6 +29,16 @@
             @Html.DisplayFor(model => model.Payment)
         </dd>
     </dl>
+        <h5>Tickets</h5>
+        <ul>
+            @foreach (var ticket in Model.Tickets)
+            {
+                <li>@ticket.Name @ticket.Surname</li>
+                <a asp-controller="Tickets" asp-action="Edit" asp-route-id="@ticket.Id">Edit</a>
+            }
+        
+        </ul>
+
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
