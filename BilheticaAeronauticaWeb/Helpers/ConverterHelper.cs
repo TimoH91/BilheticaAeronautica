@@ -187,25 +187,20 @@ namespace BilheticaAeronauticaWeb.Helpers
                 };
             }
 
-            if (model.Type == PassengerType.Infant)
+            return new InfantTicket
             {
-                return new InfantTicket
-                {
-                    Id = isNew ? 0 : model.Id,
-                    Name = model.Name,
-                    Surname = model.Surname,
-                    FlightId = model.FlightId,
-                    Class = model.Class,
-                    OriginAirportId = model.OriginAirportId,
-                    DestinationAirportId = model.DestinationAirportId,
-                    SeatId = model.SeatId,
-                    //Payment = model.Payment,
-                    Price = model.Price,
-                    Type = PassengerType.Infant
-                };
-            }
-
-            throw new ArgumentException($"Invalid ticket type: {model.Type}");
+                Id = isNew ? 0 : model.Id,
+                Name = model.Name,
+                Surname = model.Surname,
+                FlightId = model.FlightId,
+                Class = model.Class,
+                OriginAirportId = model.OriginAirportId,
+                DestinationAirportId = model.DestinationAirportId,
+                SeatId = model.SeatId,
+                //Payment = model.Payment,
+                Price = model.Price,
+                Type = PassengerType.Infant
+            };
         }
 
             public async Task<UserViewModel> ToUserViewModelAsync(User user)
@@ -225,7 +220,6 @@ namespace BilheticaAeronauticaWeb.Helpers
 
         public async Task<User> ToUser(UserViewModel model, bool isNew)
         {
-
             if (isNew)
             {
                 return new User
@@ -235,6 +229,7 @@ namespace BilheticaAeronauticaWeb.Helpers
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     Email = model.Email,
+                    Role = model.Role
                 };
             }
 
@@ -250,35 +245,33 @@ namespace BilheticaAeronauticaWeb.Helpers
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.Email = model.Email;
+            user.Role = model.Role;
 
             return user;
         
         }
 
-        public ShoppingBasketTicket ToShoppingBasketTicket(TicketViewModel model, bool isNew)
+        public ShoppingBasketTicket ToShoppingBasketTicket(TicketViewModel model, bool isNew, Flight flight, Seat? seat)
         {
-            if (model.FlightId != null || model.SeatId != null)
-            {
+            //if (model.FlightId != null || model.SeatId != null)
+            
                 return new ShoppingBasketTicket
                 {
                     Id = isNew ? 0 : model.Id,
                     Name = model.Name,
                     Surname = model.Surname,
-                    FlightId = model.FlightId.Value,
+                    Flight = flight,
                     Class = model.Class,
-                    SeatId = model.SeatId.Value,
+                    Seat = seat,
                     Price = model.Price,
                     PassengerType = model.Type,
                     ResponsibleAdultId = model.ResponsibleAdultId,
                 };
-            }
-
-            throw new ArgumentException($"Ticket missing information");
         }
 
         public async Task<Ticket> BasketToTicket(ShoppingBasketTicket basketTicket)
         {
-            var flight = await _flightRepository.GetByIdAsync(basketTicket.FlightId);
+            //var flight = await _flightRepository.GetByIdAsync(basketTicket.FlightId);
 
             if (basketTicket.PassengerType == PassengerType.Adult)
             {
@@ -286,11 +279,11 @@ namespace BilheticaAeronauticaWeb.Helpers
                 {
                     Name = basketTicket.Name,
                     Surname = basketTicket.Surname,
-                    FlightId = basketTicket.FlightId,
+                    Flight = basketTicket.Flight,
                     Class = basketTicket.Class,
-                    OriginAirportId = flight.OriginAirportId,
-                    DestinationAirportId = flight.DestinationAirportId,
-                    SeatId = basketTicket.SeatId,
+                    OriginAirport = basketTicket.Flight.OriginAirport,
+                    DestinationAirport = basketTicket.Flight.DestinationAirport,
+                    Seat = basketTicket.Seat,
                     Payment = Payment.Paid,
                     Price = basketTicket.Price,
                     Type = PassengerType.Adult
@@ -303,36 +296,32 @@ namespace BilheticaAeronauticaWeb.Helpers
                 {
                     Name = basketTicket.Name,
                     Surname = basketTicket.Surname,
-                    FlightId = basketTicket.FlightId,
+                    Flight = basketTicket.Flight,
                     Class = basketTicket.Class,
-                    OriginAirportId = flight.OriginAirportId,
-                    DestinationAirportId = flight.DestinationAirportId,
-                    SeatId = basketTicket.SeatId,
+                    OriginAirport = basketTicket.Flight.OriginAirport,
+                    DestinationAirport = basketTicket.Flight.DestinationAirport,
+                    Seat = basketTicket.Seat,
                     Payment = Payment.Paid,
                     Price = basketTicket.Price,
                     Type = PassengerType.Child
                 };
             }
 
-            if (basketTicket.PassengerType == PassengerType.Infant)
-            {
                 return new InfantTicket
                 {
                     Name = basketTicket.Name,
                     Surname = basketTicket.Surname,
-                    FlightId = basketTicket.FlightId,
+                    Flight = basketTicket.Flight,
                     Class = basketTicket.Class,
-                    OriginAirportId = flight.OriginAirportId,
-                    DestinationAirportId = flight.DestinationAirportId,
-                    SeatId = basketTicket.SeatId,
+                    OriginAirport = basketTicket.Flight.OriginAirport,
+                    DestinationAirport = basketTicket.Flight.DestinationAirport,
+                    Seat = basketTicket.Seat,
                     Payment = Payment.Paid,
                     Price = basketTicket.Price,
                     Type = PassengerType.Infant,
                     ResponsibleAdultId = basketTicket.ResponsibleAdultId.Value,
                 };
-            }
 
-            throw new ArgumentException($"Invalid ticket type: {basketTicket}");
         }
 
         public Order ToOrder(OrderViewModel model, bool isNew, User user)

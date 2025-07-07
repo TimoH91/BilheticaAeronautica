@@ -28,10 +28,11 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly IUserHelper _userHelper;
         private readonly IBasketHelper _basketHelper;
         private readonly IMailHelper _mailHelper;
+        private readonly ITicketService _ticketService;
 
         public OrdersController(DataContext context, IOrderRepository orderRepository, IConverterHelper converterHelper,
             IShoppingBasketRepository shoppingBasketRepository, ITicketRepository ticketRepository, IUserHelper userHelper,
-            IOrderService orderService, IBasketHelper basketHelper, IMailHelper mailHelper)
+            IOrderService orderService, IBasketHelper basketHelper, IMailHelper mailHelper, ITicketService ticketService)
         {
             _context = context;
             _orderRepository = orderRepository;
@@ -42,19 +43,26 @@ namespace BilheticaAeronauticaWeb.Controllers
             _orderService = orderService;
             _basketHelper = basketHelper;
             _mailHelper = mailHelper;
+            _ticketService = ticketService;
         }
 
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var orders = await _orderRepository.GetOrdersByUserAsync(User.Identity.Name);
-
-            if (orders == null)
+            if (User.Identity.IsAuthenticated)
             {
-                return new NotFoundViewResult("");
+                var orders = await _orderRepository.GetOrdersByUserAsync(User.Identity.Name);
+
+                if (orders == null)
+                {
+                    return new NotFoundViewResult("NoBookings");
+                }
+
+                return View(orders);
             }
 
-            return View(orders);
+            return new NotFoundViewResult("NoBookings");
+
         }
 
         // GET: Orders/Details/5
@@ -75,18 +83,6 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(order);
         }
 
-        // GET: Orders/Create
-        public async Task<IActionResult> Create()
-        {
-           var shoppingBasket1 = await _shoppingBasketRepository.GetShoppingBasketAsync(User.Identity.Name);
-
-            return View(shoppingBasket1);
-        }
-
-        //public async Task<IActionResult> ShoppingBasket(TicketViewModel model)
-        //{
-        //    return RedirectToAction("Create", "Tickets");
-        //}
 
         // POST: Orders/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -95,102 +91,27 @@ namespace BilheticaAeronauticaWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Purchase(ShoppingBasketWithUserViewModel model)
         {
-            Order order = new Order();
-            Decimal totalPrice = 0;
-            List<Ticket> tickets = new List<Ticket>();
 
-            var user = new User();
+            model.ShoppingBasketTickets = await GetShoppingBasketTickets(model);
 
-            if (model.NewUser != null)
+            var user = await GetOrderUser(model);
+
+            if (user == null)
             {
-                user = new User
-                {
-                    FirstName = model.NewUser.FirstName,
-                    LastName = model.NewUser.LastName,
-                    Email = model.NewUser.Username,
-                    UserName = model.NewUser.Username,
-                };
-
-                model.ShoppingBasket = _basketHelper.GetBasket(HttpContext.Session);
-
-                var result = await _userHelper.AddUserAsync(user, model.NewUser.Password);
-
-                if (result != IdentityResult.Success)
-                {
-                    ModelState.AddModelError(string.Empty, "The user couldn't be created.");
-                    return View(model);
-                }
-                else
-                {
-                    await _userHelper.AddUserToRoleAsync(user, "Customer");
-                }
-
-                    string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-                    string tokenLink = Url.Action("ConfirmEmail", "Account", new
-                    {
-                        userid = user.Id,
-                        token = myToken
-                    }, protocol: HttpContext.Request.Scheme);
-
-                    Response response = _mailHelper.SendEmail(model.NewUser.Username, "Email confirmation", $"<h1>Email Confirmation</h1>" +
-                                                                             $"To allow the user, " +
-                                                                            $"please click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
-
-
-                    if (response.IsSuccess)
-                    {
-
-                        ViewBag.Message = "The instructions to allow you user has been sent to email";
-                        //return View(model);
-                    }
-
-
-                    ModelState.AddModelError(string.Empty, "The user couldn't be logged.");
-
-            }
-            else
-            {
-                user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
-                model.ShoppingBasket = await _shoppingBasketRepository.GetShoppingBasketAsync(user.Email);
+                return new NotFoundViewResult("UserNotFound");
             }
 
-            foreach (ShoppingBasketTicket basketTicket in model.ShoppingBasket.Tickets)
-            {
-                //TODO: will this work for different ticket types?
+            var tickets = await ConvertToTickets(model.ShoppingBasketTickets, model, user);
 
-                Ticket ticket = await _converterHelper.BasketToTicket(basketTicket);
-
-                ticket.UserId = user.Id;
-
-                totalPrice += ticket.Price;
-
-                tickets.Add(ticket);
-            }
-
-            order.TotalPrice = totalPrice;
-            order.User = user;
-            order.OrderDate = DateTime.Now;
+            var order = ConvertToOrder(tickets, user);
 
             await _orderRepository.CreateAsync(order);
 
-            foreach (Ticket ticket in tickets)
-            {
-                ticket.Order = order;
-            }
+            await AddTicketsAsync(tickets, order);
 
+            await ClearBasket(model);
 
-            await _ticketRepository.CreateRangeAsync(tickets);
-
-            if (model.NewUser == null)
-            {
-                await _orderService.ClearShoppingBasket(model.ShoppingBasket);
-            }
-            else
-            {
-                _basketHelper.ClearBasket(HttpContext.Session);
-            }
-
-                return View("ThankyouForBooking");
+            return View("ThankyouForBooking");
         }
 
         // GET: Orders/Edit/5
@@ -285,8 +206,10 @@ namespace BilheticaAeronauticaWeb.Controllers
             try
             {
                 await _orderRepository.DeleteAsync(order);
+
                 return RedirectToAction(nameof(Index));
             }
+
             catch (DbUpdateException ex)
             {
 
@@ -311,6 +234,150 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             }
         }
+
+        public async Task<User> RegisterNewUser(RegisterNewUserViewModel newUser)
+        {
+            User user = new User
+            {
+                FirstName = newUser.FirstName,
+                LastName = newUser.LastName,
+                Email = newUser.Username,
+                UserName = newUser.Username,
+                Role = "Customer"
+            };
+
+            var result = await _userHelper.AddUserAsync(user, newUser.Password);
+
+            if (result != IdentityResult.Success)
+            {
+                ModelState.AddModelError(string.Empty, "The user couldn't be created.");
+                //return View(model);
+            }
+            else
+            {
+                await _userHelper.AddUserToRoleAsync(user, "Customer");
+            }
+
+            string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+            string tokenLink = Url.Action("ConfirmEmail", "Account", new
+            {
+                userid = user.Id,
+                token = myToken
+            }, protocol: HttpContext.Request.Scheme);
+
+            Response response = _mailHelper.SendEmail(newUser.Username, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                                                                     $"To allow the user, " +
+                                                                    $"please click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
+
+
+            if (response.IsSuccess)
+            {
+
+                ViewBag.Message = "The instructions to allow you user has been sent to email";
+                //return View(model);
+            }
+
+
+            ModelState.AddModelError(string.Empty, "The user couldn't be logged.");
+
+            return user;
+        }
+
+        public async Task<List<Ticket>> ConvertToTickets(List<ShoppingBasketTicket> shoppingBasketTickets, ShoppingBasketWithUserViewModel model, User user)
+        {
+            var tickets = new List<Ticket>();
+
+            foreach (ShoppingBasketTicket basketTicket in model.ShoppingBasketTickets)
+            {
+                var ticket = await _converterHelper.BasketToTicket(basketTicket);
+                ticket.UserId = user.Id;
+                tickets.Add(ticket);
+            }
+
+            return tickets;
+        }
+
+        public decimal TotalPrice(List<Ticket> tickets)
+        {
+            decimal total = 0;
+
+            foreach (Ticket ticket in tickets)
+            {
+                total += ticket.Price;
+            }
+
+            return total;
+        }
+
+        public async Task<User> GetOrderUser(ShoppingBasketWithUserViewModel model)
+        {
+            User user;
+
+            if (model.NewUser != null)
+            {
+                return user = await RegisterNewUser(model.NewUser);
+            }
+            else
+            {
+                return user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+            }
+        }
+
+        public Order ConvertToOrder(List<Ticket> tickets, User user)
+        {
+            Order order = new Order();
+
+            order.TotalPrice = TotalPrice(tickets);
+            order.User = user;
+            order.OrderDate = DateTime.Now;
+
+            return order;
+        }
+
+        public async Task AddTicketsAsync(List<Ticket> tickets, Order order)
+        {
+            foreach (Ticket ticket in tickets)
+            {
+                ticket.Order = order;
+                await _ticketService.OccupySeats(ticket.Seat);
+            }
+
+            await _ticketRepository.CreateRangeAsync(tickets);
+        }
+
+        public async Task ClearBasket(ShoppingBasketWithUserViewModel model)
+        {
+            if (model.NewUser == null)
+            {
+                await _orderService.ClearShoppingBasket(model.ShoppingBasketTickets);
+            }
+            else
+            {
+                _basketHelper.ClearBasket(HttpContext.Session);
+            }
+        }
+
+        public async Task<List<ShoppingBasketTicket>> GetShoppingBasketTickets(ShoppingBasketWithUserViewModel model)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+                return model.ShoppingBasketTickets = await _shoppingBasketRepository.GetShoppingBasketTicketsAsync(user);
+            }
+            else
+            {
+                var sessionTickets = _basketHelper.GetBasketTickets(HttpContext.Session);
+                var shopBasketTickets = new List<ShoppingBasketTicket>();
+
+                foreach (var ticket in sessionTickets)
+                {
+                    shopBasketTickets.Add(await _shoppingBasketRepository.GetShoppingBasketTicketAsync(ticket.Flight.Id));
+                }
+
+                return shopBasketTickets;
+            }
+        }
+
 
     }
 }

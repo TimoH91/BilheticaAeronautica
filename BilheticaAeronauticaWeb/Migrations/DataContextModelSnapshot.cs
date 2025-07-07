@@ -218,6 +218,12 @@ namespace BilheticaAeronauticaWeb.Migrations
                     b.Property<int>("FlightId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("HoldingTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsHeld")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("Occupied")
                         .HasColumnType("bit");
 
@@ -229,24 +235,6 @@ namespace BilheticaAeronauticaWeb.Migrations
                     b.HasIndex("FlightId");
 
                     b.ToTable("Seats");
-                });
-
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasket", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ShoppingBaskets");
                 });
 
             modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasketTicket", b =>
@@ -279,16 +267,16 @@ namespace BilheticaAeronauticaWeb.Migrations
                     b.Property<int>("SeatId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ShoppingBasketId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ShoppingBasketId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("ShoppingBasketTickets");
                 });
@@ -415,6 +403,10 @@ namespace BilheticaAeronauticaWeb.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -678,7 +670,7 @@ namespace BilheticaAeronauticaWeb.Migrations
                     b.Navigation("Flight");
                 });
 
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasket", b =>
+            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasketTicket", b =>
                 {
                     b.HasOne("BilheticaAeronauticaWeb.Entities.User", "User")
                         .WithMany()
@@ -686,15 +678,6 @@ namespace BilheticaAeronauticaWeb.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasketTicket", b =>
-                {
-                    b.HasOne("BilheticaAeronauticaWeb.Entities.ShoppingBasket", null)
-                        .WithMany("Tickets")
-                        .HasForeignKey("ShoppingBasketId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.Ticket", b =>
@@ -710,7 +693,7 @@ namespace BilheticaAeronauticaWeb.Migrations
                         .HasForeignKey("FlightId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("BilheticaAeronauticaWeb.Entities.Order", null)
+                    b.HasOne("BilheticaAeronauticaWeb.Entities.Order", "Order")
                         .WithMany("Tickets")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -736,6 +719,8 @@ namespace BilheticaAeronauticaWeb.Migrations
                     b.Navigation("DestinationAirport");
 
                     b.Navigation("Flight");
+
+                    b.Navigation("Order");
 
                     b.Navigation("OriginAirport");
 
@@ -806,11 +791,6 @@ namespace BilheticaAeronauticaWeb.Migrations
                 });
 
             modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.Order", b =>
-                {
-                    b.Navigation("Tickets");
-                });
-
-            modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasket", b =>
                 {
                     b.Navigation("Tickets");
                 });

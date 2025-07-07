@@ -2,7 +2,141 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Bem-vindo a Brisa 97</h1>
-   
-</div>
+
+<br />
+<body>
+
+    <div class="background-image-div" style="border-radius: 15px;">
+        <div class="container d-flex justify-content-center align-items-center" style="min-height: 600px;">
+            <div class="card custom-bg w-75 p-4">
+                <div class="row">
+                    <div class="pb-3 h3 text-left">Flight Search &#128747;</div>
+                </div>
+                <form id="flight-form" asp-action="SearchFlightsWithAirports" method="get">
+                <div class="row">
+                        <div class="form-group col-md align-items-start flex-column">
+                            <label for="originAirportId" class="d-inline-flex">From</label>
+                            <select class="form-select" id="originAirportId" name="originAirportId" asp-items="ViewBag.Airports" required>
+                                <option value="">Select an airport</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md align-items-start flex-column">
+                            <label for="destinationAirportId" class="d-inline-flex">To</label>
+                            <select class="form-select" id="destinationAirportId" name="destinationAirportId" asp-items="ViewBag.Airports" required>
+                                <option value="">Select an airport</option>
+                            </select>
+                        </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md align-items-start flex-column">
+                        <label for="departureDate" class=" d-inline-flex">Depart</label>
+                        <input type="date" class="form-control" id="departureDate" name="departureDate"
+                               onkeydown="return false">
+                    </div>
+                    <div class="form-group col-md align-items-start flex-column">
+                        <label for="returndate" class="d-inline-flex">Return</label>
+                        <input type="date" placeholder="One way" value=""
+                               onChange="this.setAttribute('value', this.value)" class="form-control" id="returndate"
+                               name="returndate">
+                    </div>
+                </div>
+@*                 <div class="row">
+                    <div class="form-group col-lg-3 align-items-start flex-column">
+                        <label for="adults" class="d-inline-flex col-auto">
+                            Adults <span class="sublabel">
+                                12+
+                            </span>
+                        </label>
+                        <select class="form-select" id="adults"
+                                onchange="javascript: dynamicDropDown(this.options[this.selectedIndex].value);">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 align-items-start flex-column">
+                        <label for="children" class="d-inline-flex col-auto">
+                            Children <span class="sublabel">
+                                2-11
+                            </span>
+                        </label>
+                        <select class="form-select" id="children">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 align-items-start flex-column">
+                        <label for="infants" class="d-inline-flex col-auto">
+                            Infants <span class="sublabel">
+                                less than
+                                2
+                            </span>
+                        </label>
+                        <select class="form-select" id="infants">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                        </select>
+                    </div>
+                </div> *@
+                <div class="row">
+                    <div class="form-group col-lg-6 align-items-start flex-column">
+                        <label for="cabin" class="d-inline-flex">Cabin</label>
+                        <select class="form-select" id="cabin">
+                            <option value="ECONOMY">Economy</option>
+                            <option value="BUSINESS">Business</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-6 align-items-start flex-column pt-lg-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input align-self-center" type="checkbox" id="directFlights">
+                            <label class="form-check-label d-inline-flex align-self-center" for="directFlights">
+                                Direct
+                                flights
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="text-left col-auto">
+                        <button type="submit" class="btn btn-info">Search flights</button>
+                            @* <a asp-action="SearchFlights" class="btn btn-info">Search Flights</a> *@
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("flight-form");
+            const departureDateInput = document.getElementById("departureDate");
+
+            form.addEventListener("submit", function (e) {
+                const hasDate = departureDateInput.value !== "";
+
+                if (hasDate) {
+                    form.action = "/Home/SearchFlightsWithAirportsAndDate"; // Adjust controller name if needed
+                } else {
+                    form.action = "/Home/SearchFlightsWithAirports";
+                }
+            });
+        });
+    </script>
+}

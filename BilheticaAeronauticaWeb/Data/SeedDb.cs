@@ -65,7 +65,8 @@ namespace BilheticaAeronauticaWeb.Data
                     LastName = "Harris",
                     Email = "timothyharris04@gmail.com",
                     UserName = "timothyharris04@gmail.com",
-                    PhoneNumber = "1234567890"
+                    PhoneNumber = "1234567890",
+                    Role = "Admin"
 
                 };
 
@@ -90,7 +91,8 @@ namespace BilheticaAeronauticaWeb.Data
                     LastName = "Smith",
                     Email = "johnSmith@gmail.com",
                     UserName = "johnSmith@gmail.com",
-                    PhoneNumber = "1234567890"
+                    PhoneNumber = "1234567890",
+                    Role = "Customer"
 
                 };
 

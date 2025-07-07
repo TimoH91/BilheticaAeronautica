@@ -22,5 +22,13 @@ namespace BilheticaAeronauticaWeb.Data
             return await _context.Tickets
                 .FirstOrDefaultAsync(t => t.SeatId == seatId && t.Name == firstName && t.Surname == lastName);
         }
+
+        public override async Task<Ticket> GetByIdAsync(int id)
+        {
+            return await _context.Tickets
+                .Include(t => t.Flight)
+                .Include(t => t.Seat)
+                .FirstOrDefaultAsync(t => t.Id == id);
+        }
     }
 }

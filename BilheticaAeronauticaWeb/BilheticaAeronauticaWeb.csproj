@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Views\ShoppingBasketsController1\" />
     <Folder Include="wwwroot\images\flags\" />
     <Folder Include="wwwroot\images\airplanes\" />
   </ItemGroup>

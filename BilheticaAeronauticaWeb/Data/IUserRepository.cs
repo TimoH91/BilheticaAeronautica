@@ -17,5 +17,8 @@ namespace BilheticaAeronauticaWeb.Data
         Task<bool> ExistAsync(string? id);
 
         Task CreateRangeAsync(IEnumerable<User> users);
+
+        Task<List<User>> GetAllWithRoles();
+
     }
 }

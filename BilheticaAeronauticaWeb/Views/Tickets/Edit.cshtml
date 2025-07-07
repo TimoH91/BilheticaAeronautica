@@ -24,11 +24,11 @@
                 <input asp-for="Surname" class="form-control" />
                 <span asp-validation-for="Surname" class="text-danger"></span>
             </div>
-@*             <div class="form-group">
+            <div class="form-group">
                 <label asp-for="FlightId" class="control-label"></label>
-                <select asp-for="FlightId" class="form-control" asp-items="ViewBag.FlightId"></select>
+                <input asp-for="FlightId" class="form-control" />
                 <span asp-validation-for="FlightId" class="text-danger"></span>
-            </div> *@
+            </div>
             <div class="form-group">
                 <label asp-for="Class" class="control-label"></label>
                 <select asp-for="Class" class="form-control" asp-items="Html.GetEnumSelectList<TicketClass>()">
@@ -43,33 +43,7 @@
                     </select>
                 <span asp-validation-for="SeatId" class="text-danger"></span>
             </div>
-@*             <div class="form-group">
-                <label asp-for="OriginAirportId" class="control-label"></label>
-                <select asp-for="OriginAirportId" class="form-control" asp-items="ViewBag.OriginAirportId"></select>
-                <span asp-validation-for="OriginAirportId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DestinationAirportId" class="control-label"></label>
-                <select asp-for="DestinationAirportId" class="form-control" asp-items="ViewBag.DestinationAirportId"></select>
-                <span asp-validation-for="DestinationAirportId" class="text-danger"></span>
-            </div> *@
-@*             <div class="form-group">
-                <label asp-for="Payment" class="control-label"></label>
-                <select asp-for="Payment" class="form-control" asp-items="Html.GetEnumSelectList<Payment>()">
-                    <option value="">Select payment status</option>
-                </select>
-                <span asp-validation-for="Payment" class="text-danger"></span>
-            </div> *@
-@*             <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Type" class="control-label"></label>
-                <input asp-for="Type" class="form-control" />
-                <span asp-validation-for="Type" class="text-danger"></span>
-            </div> *@
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -81,3 +55,43 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+<script type="text/javascript">
+    $(document).ready(function () {
+        function updateSeats() {
+            var flightId = $("#FlightId").val();
+
+            if (flightId) {
+                $("#SeatId").empty();
+
+                $.ajax({
+                    url: '@Url.Action("GetSeatsByFlight", "Tickets")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        flightId: flightId,
+                    },
+                    success: function (seats) {
+                        $("#SeatId").append('<option value="">Select a seat</option>');
+                        $.each(seats, function (i, seat) {
+                            $("#SeatId").append('<option value="' + seat.value + '">' + seat.text + '</option>');
+
+                        });
+                    },
+                    error: function () {
+                        alert("Failed to load seats.");
+                    }
+                });
+            }
+        }
+              updateSeats();
+
+        $("#FlightId").change(function () {
+            updateSeats();
+        });
+    });
+</script>
+}

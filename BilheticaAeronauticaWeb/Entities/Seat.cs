@@ -13,5 +13,9 @@
         public int Row { get; set ; }
 
         public int Column { get; set ; }
+
+        public DateTime? HoldingTime { get; set; }
+
+        public bool IsHeld { get; set; }
     }
 }

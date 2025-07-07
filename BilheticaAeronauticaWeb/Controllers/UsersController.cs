@@ -26,25 +26,25 @@ namespace BilheticaAeronauticaWeb.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(_userRepository.GetAll().OrderBy(u => u.UserName).ToList());
+            //var users = _userRepository.GetAll().OrderBy(u => u.UserName).ToList();
 
-            
+            var users = await _userRepository.GetAllWithRoles();
 
-            //var userViewModels = new List<UserViewModel>();
+           // var userViewModels = new List<UserViewModel>();
 
-            //foreach (var user in users)
-            //{
-            //    var roles = await _userManager.GetRolesAsync(user);
-            //    userViewModels.Add(new UserViewModel
-            //    {
-            //        //Id = user.Id,
-            //        UserName = user.UserName,
-            //        Email = user.Email,
-            //        Role = roles.FirstOrDefault() ?? "No role"
-            //    });
-            //}
+           // foreach (var user in users)
+           // {
+           //     var roles = await _userManager.GetRolesAsync(user);
+           //     userViewModels.Add(new UserViewModel
+           //     {
+           //         //Id = user.Id,
+           //         UserName = user.UserName,
+           //         Email = user.Email,
+           //         Role = roles.FirstOrDefault() ?? "No role"
+           //     });
+           //}
 
-            //return View(userViewModels);
+            return View(users);
         }
 
         // GET: Flights/Details/5

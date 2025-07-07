@@ -7,6 +7,12 @@ namespace BilheticaAeronauticaWeb.Data
     {
         IEnumerable<SelectListItem> GetComboFlights();
 
-        Task<IEnumerable<object>> GetFlightsByOriginAndDestination(int originAirportId, int destinationAirport);
+        Task<IEnumerable<Flight>> GetFlightsByOriginAndDestination(int originAirportId, int destinationAirport);
+
+        Task<IEnumerable<Flight>> GetFlightsByOriginDestinationAndDate(int originAirportId, int destinationAirport, DateTime date);
+
+        //IQueryable<Flight> GetFlightsByOriginAndDestination(int originAirportId, int destinationAirportId);
+
+        Task<Flight> GetByIdTrackedAsync(int id);
     }
 }

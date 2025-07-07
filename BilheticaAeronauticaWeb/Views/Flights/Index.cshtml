@@ -1,19 +1,14 @@
 ﻿@model IEnumerable<BilheticaAeronauticaWeb.Entities.Flight>
 
-@{
-    ViewData["Title"] = "Index";
-}
 
-<h1>Index</h1>
 
-@if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Staff"))
-{
-    <p>
-        <a asp-action="Create">Create New</a>
-    </p>
-}
 
-<table class="table">
+<br />
+<div class="card mb-4">
+    <div class="card-header">
+    </div>
+    <div class="card-body">
+<table id="datatablesSimple" class="table table-bordered">
     <thead>
         <tr>
             <th>
@@ -44,7 +39,8 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model) {
+        @foreach (var item in Model)
+        {
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Date)
@@ -71,17 +67,44 @@
                     @Html.DisplayFor(modelItem => item.Layover.Name)
                 </th>
                 <td>
+                            @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Customer") || !User.Identity.IsAuthenticated)
+                            {
                     <a asp-controller="Tickets" asp-action="Create" asp-route-id="@item.Id" class="btn btn-success">
                         Buy Ticket
                     </a>
+                            }
                     @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Staff"))
                     {
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                    <a asp-action = "Details" asp-route-id = "@item.Id" > Details </a> 
-                    <a asp-action = "Delete" asp-route-id = "@item.Id" > Delete </a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-info">Edit</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-light"> Details </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id">class="btn btn-dark" Delete </a>
                     }
                 </td>
-        </tr>
-}
+            </tr>
+        }
     </tbody>
-</table>
+    </table>
+
+
+
+
+@if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Staff"))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-info">Create New</a>
+    </p>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#datatablesSimple').DataTable({
+                pageLength: 10,
+                language: {
+            search: "Search flights: ",
+            lengthMenu: "_MENU_" // Just the dropdown, no label
+                }
+            });
+        });
+    </script>
+}

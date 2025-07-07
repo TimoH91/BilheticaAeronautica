@@ -22,7 +22,6 @@ namespace BilheticaAeronauticaWeb.Data
         public DbSet<Ticket> Tickets { get; set; }
 
         public DbSet<Order> Orders { get; set; }
-        public DbSet<ShoppingBasket> ShoppingBaskets { get; set; }
         public DbSet<ShoppingBasketTicket> ShoppingBasketTickets { get; set; }
 
 

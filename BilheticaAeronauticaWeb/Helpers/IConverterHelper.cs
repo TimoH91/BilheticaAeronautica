@@ -26,7 +26,7 @@ namespace BilheticaAeronauticaWeb.Helpers
 
             Ticket ToTicket(TicketViewModel model, bool isNew);
 
-            ShoppingBasketTicket ToShoppingBasketTicket(TicketViewModel model, bool isNew);
+            ShoppingBasketTicket ToShoppingBasketTicket(TicketViewModel model, bool isNew, Flight flight, Seat? seat);
 
             Task<Ticket> BasketToTicket(ShoppingBasketTicket basketTicket);
 

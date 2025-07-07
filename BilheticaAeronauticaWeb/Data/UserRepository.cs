@@ -1,4 +1,6 @@
-﻿using BilheticaAeronauticaWeb.Entities;
+﻿using System.Data;
+using System.Threading.Tasks;
+using BilheticaAeronauticaWeb.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,24 +59,23 @@ namespace BilheticaAeronauticaWeb.Data
 
         public async Task<bool> ExistAsync(string? id)
         {
-            // Note: Your user ID is string (GUID), so maybe this int id doesn't fit, 
-            // you might want string id here instead
-            // But to keep your signature:
-            // Try to convert int id to string or change method signature to string id
-
-            // Here's a rough approach (if you changed method signature to string id):
-            // var user = await _userManager.FindByIdAsync(id);
-            // return user != null;
-
-            // Or throw NotImplemented if id is int and you don't have conversion
-            throw new NotImplementedException("ExistAsync should use string id, not int");
+            throw new NotImplementedException();
         }
 
         public IQueryable<User> GetAll()
         {
-            // UserManager does not have IQueryable access directly.
-            // You can expose _userManager.Users IQueryable
             return _userManager.Users;
+        }
+
+        public async Task<List<User>> GetAllWithRoles()
+        {
+            var users = _userManager.Users.ToList(); // Materialize query
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                user.Role = roles.FirstOrDefault() ?? "No Role";
+            }
+            return users;
         }
 
         public async Task<User> GetByIdAsync(string id)

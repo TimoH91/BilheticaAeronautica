@@ -14,6 +14,7 @@ using BilheticaAeronauticaWeb.Migrations;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
 using Microsoft.AspNetCore.Identity;
+using BilheticaAeronauticaWeb.Services;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -27,15 +28,18 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly IAirportRepository _airportRepository;
         private readonly IConverterHelper _converterHelper;
         private readonly IUserHelper _userHelper;
+        private readonly ITicketService _ticketService;
 
-        
+
+
         public TicketsController(DataContext context, 
             ITicketRepository ticketRepository, 
             IFlightRepository flightRepository,
             IAirportRepository airportRepository,
             ISeatRepository seatRepository,
             IConverterHelper converterHelper,
-            IUserHelper userHelper)
+            IUserHelper userHelper,
+            ITicketService ticketService)
         {
             _context = context;
             _ticketRepository = ticketRepository;
@@ -44,6 +48,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             _seatRepository = seatRepository;
             _converterHelper = converterHelper;
             _userHelper = userHelper;
+            _ticketService = ticketService;
         }
 
         [Authorize(Roles = "Staff")]
@@ -75,7 +80,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
         // GET: Tickets/Create
         public async Task<IActionResult> Create()
-        {       
+        {
             if (User.Identity.Name != null)
             {
                 var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
@@ -92,6 +97,8 @@ namespace BilheticaAeronauticaWeb.Controllers
             ViewBag.Airports = _airportRepository.GetComboAirports();
 
             return View(new TicketViewModel());
+
+            //return new NotFoundViewResult("TicketNotFound");
         }
 
         [HttpPost]
@@ -101,8 +108,18 @@ namespace BilheticaAeronauticaWeb.Controllers
             if (originAirportId > 0 && destinationAirportId > 0)
             {
                 var flights = await _flightRepository.GetFlightsByOriginAndDestination(originAirportId, destinationAirportId);
-               
-                return Json(flights);
+
+                var flightsListItems = flights.Select(flight => new
+                {
+                    id = flight.Id,
+                    name = flight.OriginAirport.Name + "to" + flight.DestinationAirport.Name
+                }).ToList();
+
+                if (flightsListItems != null)
+                {
+                    return Json(flightsListItems);
+                }
+
             }
 
             return Json(Enumerable.Empty<object>());
@@ -116,7 +133,20 @@ namespace BilheticaAeronauticaWeb.Controllers
             {
                 var seats = await _seatRepository.GetSeatsByFlight(flightId);
 
-                return Json(seats); 
+                var seatsAdjusted = await _ticketService.UnholdSeats(seats);
+
+                var seatsFiltered = _ticketService.RemoveHeldSeats(seatsAdjusted);
+
+                var selectListItems = seatsFiltered.Select(seat => new
+                {
+                    value = seat.Id,          
+                    text = "Row " + seat.Row + " Seat " + seat.Column 
+                }).ToList();
+
+                if (selectListItems != null)
+                {
+                    return Json(selectListItems);
+                }
             }
 
             return Json(Enumerable.Empty<SelectListItem>());
@@ -129,17 +159,6 @@ namespace BilheticaAeronauticaWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TicketViewModel model)
         {
-            //if (ModelState.IsValid)
-            //{
-            //    _context.Add(ticket);
-            //    await _context.SaveChangesAsync();
-            //    return RedirectToAction(nameof(Index));
-            //}
-            //ViewData["DestinationAirportId"] = new SelectList(_context.Airports, "Id", "Name", ticket.DestinationAirportId);
-            //ViewData["FlightId"] = new SelectList(_context.Flights, "Id", "Id", ticket.FlightId);
-            //ViewData["OriginAirportId"] = new SelectList(_context.Airports, "Id", "Name", ticket.OriginAirportId);
-            //ViewData["SeatId"] = new SelectList(_context.Seats, "Id", "Id", ticket.SeatId);
-            //return View(ticket);
 
             if (ModelState.IsValid)
             {
@@ -180,10 +199,12 @@ namespace BilheticaAeronauticaWeb.Controllers
             var model = _converterHelper.ToTicketViewModel(ticket);
 
 
-            if (ticket.FlightId.HasValue)
-            {
-                ViewBag.Seats = await _seatRepository.GetSeatsByFlight(ticket.FlightId.Value);
-            }
+            //if (ticket.FlightId.HasValue)
+            //{
+            //    ViewBag.Seats = await _seatRepository.GetSeatsByFlight(ticket.FlightId.Value);
+
+
+            //}
 
 
             return View(model);

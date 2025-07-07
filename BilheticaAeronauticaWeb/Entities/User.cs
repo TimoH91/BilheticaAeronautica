@@ -8,6 +8,8 @@ namespace BilheticaAeronauticaWeb.Entities
 
             public string LastName { get; set; }
 
+            public string Role { get; set; }
+
             //public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 
     }

@@ -149,6 +149,7 @@ namespace BilheticaAeronauticaWeb.Controllers
                         LastName = model.LastName,
                         Email = model.Username,
                         UserName = model.Username,
+                        Role = "Customer"
 
                     };
 

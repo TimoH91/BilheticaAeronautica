@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Runtime.ExceptionServices;
+using System.Threading.Tasks;
 using BilheticaAeronauticaWeb.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,16 @@ namespace BilheticaAeronauticaWeb.Data
                 .Include(a => a.OriginAirport)
                 .Include(a => a.DestinationAirport)
                 .Include(a => a.Layover);
+        }
+
+        public async Task<Flight> GetByIdTrackedAsync(int id)
+        {
+            return await _context.Flights
+             .Include(a => a.Airplane)
+             .Include(a => a.OriginAirport)
+             .Include(a => a.DestinationAirport)
+             .Include(a => a.Layover)
+             .FirstOrDefaultAsync(a => a.Id == id);
         }
 
         public IEnumerable<SelectListItem> GetComboFlights()
@@ -46,21 +57,42 @@ namespace BilheticaAeronauticaWeb.Data
             return list;
         }
 
-        public async Task<IEnumerable<object>> GetFlightsByOriginAndDestination(int originAirportId, int destinationAirportId)
+        public async Task<IEnumerable<Flight>> GetFlightsByOriginAndDestination(int originAirportId, int destinationAirportId)
         {
             var flights = await _context.Flights
                 .Include(f => f.OriginAirport)
                 .Include(f => f.DestinationAirport)
                 .Where(f => f.OriginAirportId == originAirportId && f.DestinationAirportId == destinationAirportId)
-                .Select(f => new {
-                    id = f.Id,
-                    name = f.OriginAirport.Name + " to " + f.DestinationAirport.Name,
-                    price = f.BasePrice
-                })
-                .OrderBy(f => f.name)
+                //.Select(f => new
+                //{
+                //    id = f.Id,
+                //    name = f.OriginAirport.Name + " to " + f.DestinationAirport.Name,
+                //    price = f.BasePrice
+                //})
+                .OrderBy(f => f.Date)
                 .ToListAsync();
 
             return flights;
+        }
+
+        public async Task<IEnumerable<Flight>> GetFlightsByOriginDestinationAndDate(int originAirportId, int destinationAirportId, DateTime date)
+        {
+            {
+                var flights = await _context.Flights
+                    .Include(f => f.OriginAirport)
+                    .Include(f => f.DestinationAirport)
+                    .Where(f => f.OriginAirportId == originAirportId && f.DestinationAirportId == destinationAirportId && f.Date == date)
+                    //.Select(f => new
+                    //{
+                    //    id = f.Id,
+                    //    name = f.OriginAirport.Name + " to " + f.DestinationAirport.Name,
+                    //    price = f.BasePrice
+                    //})
+                    .OrderBy(f => f.Date)
+                    .ToListAsync();
+
+                return flights;
+            }
         }
     }
 }

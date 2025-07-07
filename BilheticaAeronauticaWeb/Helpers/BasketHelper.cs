@@ -3,6 +3,7 @@ using NuGet.ContentModel;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using BilheticaAeronauticaWeb.Models;
+using Org.BouncyCastle.Bcpg;
 
 namespace BilheticaAeronauticaWeb.Helpers
 {
@@ -15,22 +16,40 @@ namespace BilheticaAeronauticaWeb.Helpers
             session.Remove(BasketSessionKey);
         }
 
-        public ShoppingBasket GetBasket(ISession session)
+        //public ShoppingBasket GetBasket(ISession session)
+        //{
+        //    var json = session.GetString(BasketSessionKey);
+
+        //    if (string.IsNullOrEmpty(json))
+        //    {
+        //        return new ShoppingBasket();
+        //    }
+
+        //    return JsonSerializer.Deserialize<ShoppingBasket>(json);
+        //}
+
+        public List<ShoppingBasketTicket> GetBasketTickets(ISession session)
         {
             var json = session.GetString(BasketSessionKey);
 
             if (string.IsNullOrEmpty(json))
             {
-                return new ShoppingBasket();
+                return new List<ShoppingBasketTicket>();
             }
 
-            return JsonSerializer.Deserialize<ShoppingBasket>(json);
+            return JsonSerializer.Deserialize<List<ShoppingBasketTicket>>(json);
         }
 
-        public void SaveBasket(ISession session, ShoppingBasket basket)
+        public void SaveBasketTickets(ISession session, List<ShoppingBasketTicket> Tickets)
         {
-            var json = JsonSerializer.Serialize(basket);
+            var json = JsonSerializer.Serialize(Tickets);
             session.SetString(BasketSessionKey, json);
         }
+
+        //public void SaveBasket(ISession session, ShoppingBasket basket)
+        //{
+        //    var json = JsonSerializer.Serialize(basket);
+        //    session.SetString(BasketSessionKey, json);
+        //}
     }
 }

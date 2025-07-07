@@ -4,6 +4,6 @@ namespace BilheticaAeronauticaWeb.Services
 {
     public interface IOrderService
     {
-        Task ClearShoppingBasket(ShoppingBasket shoppingBasket);
+        Task ClearShoppingBasket(List<ShoppingBasketTicket> ShoppingBasketTickets);
     }
 }
