@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Security.Principal;
 using BilheticaAeronauticaWeb.Entities;
+using EFCore.BulkExtensions;
 
 namespace BilheticaAeronauticaWeb.Data
 {
@@ -53,9 +54,25 @@ namespace BilheticaAeronauticaWeb.Data
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task CreateRangeAsync(IEnumerable<T> entities)
+        public virtual async Task CreateRangeAsync(IEnumerable<T> entities)
         {
             await _context.Set<T>().AddRangeAsync(entities);
+            await SaveAllAsync();
+        }
+
+        public async Task DeleteRangeAsync(IEnumerable<T> entities)
+        {
+            _context.Set<T>().RemoveRange(entities);
+            await SaveAllAsync();
+        }
+
+        public async Task UpdateRangeAsync(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                _context.Set<T>().Update(entity);
+            }
+
             await SaveAllAsync();
         }
     }

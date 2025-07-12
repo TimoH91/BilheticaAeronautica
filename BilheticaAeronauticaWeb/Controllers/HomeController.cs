@@ -33,7 +33,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             if (!flights.Any() || flights == null)
             {
-                return View();
+                RedirectToAction("Index");
             }
 
             return View("Views/Flights/Index.cshtml", flights);
@@ -46,7 +46,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             if (!flights.Any() || flights == null)
             {
-                return View();
+                RedirectToAction("Index");
             }
 
             return View("Views/Flights/Index.cshtml", flights);

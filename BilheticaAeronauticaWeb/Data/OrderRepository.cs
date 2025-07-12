@@ -31,14 +31,38 @@ namespace BilheticaAeronauticaWeb.Data
 
             if (await _userHelper.IsUserInRoleAsync(user, "Customer"))
             {
-                return _context.Orders.
+                return await _context.Orders.
                     Include(o => o.User).
                     Include(o => o.Tickets).
-                    Where(o => o.User == user);
+                    Where(o => o.User == user)
+                    .ToListAsync();
             }
 
             return null;
         }
+
+        //public async Task<IEnumerable<Order>> GetOrdersByUserAsync(string userName)
+        //{
+        //    var orders = new List<Order>();
+        //    var user = await _userHelper.GetUserByEmailAsync(userName);
+
+        //    if (user == null)
+        //    {
+        //        return orders;
+        //    }
+
+        //    if (await _userHelper.IsUserInRoleAsync(user, "Customer"))
+        //    {
+        //        return _context.Orders.
+        //            Include(o => o.User).
+        //            Include(o => o.Tickets).
+        //            Where(o => o.User == user);
+        //    }
+
+        //    return null;
+        //}
+
+
 
         public async Task<Order> GetByIdAsync(int id)
         {

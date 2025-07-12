@@ -30,6 +30,37 @@
                 <span asp-validation-for="FlightId" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                <input asp-for="Type" class="form-control" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OriginAirportId" class="control-label"></label>
+                <input asp-for="OriginAirportId" class="form-control" />
+                <span asp-validation-for="OriginAirportId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DestinationAirportId" class="control-label"></label>
+                <input asp-for="DestinationAirportId" class="form-control" />
+                <span asp-validation-for="DestinationAirportId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ResponsibleAdultTicketId" class="control-label"></label>
+                <input asp-for="ResponsibleAdultTicketId" class="form-control" />
+                <span asp-validation-for="ResponsibleAdultTicketId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OrderId" class="control-label"></label>
+                <input asp-for="OrderId" class="form-control" />
+                <span asp-validation-for="OrderId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
                 <label asp-for="Class" class="control-label"></label>
                 <select asp-for="Class" class="form-control" asp-items="Html.GetEnumSelectList<TicketClass>()">
                     <option value="">Select a class</option>

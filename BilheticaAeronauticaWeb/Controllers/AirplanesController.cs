@@ -10,6 +10,7 @@ using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Models;
 using BilheticaAeronauticaWeb.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using BilheticaAeronauticaWeb.Services;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -19,11 +20,13 @@ namespace BilheticaAeronauticaWeb.Controllers
 
         private readonly IAirplaneRepository _airplaneRepository;
         private readonly IConverterHelper _converterHelper;
+        private readonly IAirplaneService _airplaneService;
 
-        public AirplanesController(IAirplaneRepository airplaneRepository, IConverterHelper converterHelper)
+        public AirplanesController(IAirplaneRepository airplaneRepository, IConverterHelper converterHelper, IAirplaneService airplaneService)
         {
             _airplaneRepository = airplaneRepository;
             _converterHelper = converterHelper;
+            _airplaneService = airplaneService;
         }
 
         // GET: Airplanes
@@ -140,6 +143,10 @@ namespace BilheticaAeronauticaWeb.Controllers
             {
                 try
                 {
+                    
+                    
+                    
+                    
                     //TODO: Change when blobstorage is setup
                     //Guid imageId = model.ImageId;
                     Guid imageId = Guid.NewGuid();
@@ -160,9 +167,18 @@ namespace BilheticaAeronauticaWeb.Controllers
                         //imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "products");
                     }
 
-                    var airplane =  _converterHelper.ToAirplane(model, imageId, false);
+                    var editedAirplane =  _converterHelper.ToAirplane(model, imageId, false);
 
-                    await _airplaneRepository.UpdateAsync(airplane);
+                    var oldAirplane = await _airplaneRepository.GetByIdAsync(model.Id);
+
+                    var canChange = await _airplaneService.AllowAirplaneStatusChange(oldAirplane, editedAirplane);
+
+                    if (canChange)
+                    {
+                        await _airplaneService.ReassignSeats(oldAirplane, editedAirplane);
+
+                        await _airplaneRepository.UpdateAsync(editedAirplane);
+                    }
                 }
 
                 catch (DbUpdateConcurrencyException)
@@ -209,7 +225,13 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             try
             {
-                await _airplaneRepository.DeleteAsync(airplane);
+                bool canDelete = await _airplaneService.AllowAirplaneDeletion(airplane);
+
+                if (canDelete)
+                {
+                    await _airplaneRepository.DeleteAsync(airplane);
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateException ex)

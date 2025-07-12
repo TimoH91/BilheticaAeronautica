@@ -18,17 +18,24 @@ namespace BilheticaAeronauticaWeb.Helpers
 
             AirplaneViewModel ToAirplaneViewModel(Airplane airplane);
 
-            Task<Flight> ToFlight(FlightViewModel model, bool isNew);
+            Flight ToFlight(FlightViewModel model, bool isNew);
 
             FlightViewModel ToFlightViewModel(Flight flight);
 
-            TicketViewModel ToTicketViewModel(Ticket ticket);
+            TicketViewModel ToAdultAndChildTicketViewModel(Ticket ticket);
 
-            Ticket ToTicket(TicketViewModel model, bool isNew);
+            TicketViewModel ToInfantTicketViewModel(InfantTicket ticket);
 
-            ShoppingBasketTicket ToShoppingBasketTicket(TicketViewModel model, bool isNew, Flight flight, Seat? seat);
+            Ticket ToTicket(TicketViewModel model, bool isNew, Flight flight);
 
-            Task<Ticket> BasketToTicket(ShoppingBasketTicket basketTicket);
+            ShoppingBasketTicket ToShoppingBasketTicket(TicketViewModel model, bool isNew);
+
+            Ticket BasketToTicket(ShoppingBasketTicket basketTicket, Flight flight);
+
+            ShoppingBasketTicketViewModel ToShoppingBasketTicketViewModel(ShoppingBasketTicket basketTicket);
+
+            ShoppingBasketTicket ToShoppingBasketTicketFromModel(ShoppingBasketTicketViewModel model, bool isNew);
+
 
             Task<User> ToUser(UserViewModel model, bool isNew);
             Task<UserViewModel> ToUserViewModelAsync(User user);

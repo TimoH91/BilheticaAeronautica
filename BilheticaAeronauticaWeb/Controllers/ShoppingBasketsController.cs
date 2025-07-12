@@ -11,6 +11,7 @@ using BilheticaAeronauticaWeb.Helpers;
 using BilheticaAeronauticaWeb.Models;
 using BilheticaAeronauticaWeb.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -47,37 +48,28 @@ namespace BilheticaAeronauticaWeb.Controllers
         // GET: ShoppingBaskets
         public async Task<IActionResult> Index()
         {
-            var shoppingBasketWithUser = new ShoppingBasketWithUserViewModel();
-
             if (User.Identity.IsAuthenticated)
             {
                 var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
 
                 if (user != null)
                 {
-                    var shoppingBasketTickets = await _shoppingBasketRepository.GetShoppingBasketTicketsAsync(user);
+                    var shoppingBasketTicketsWithUser = await GetRegisteredUserBasketTickets(user);
 
-                    shoppingBasketWithUser.ShoppingBasketTickets = shoppingBasketTickets;
+                    
 
-                    return View("Views/ShoppingBaskets/Index.cshtml", shoppingBasketWithUser);
+                    return View("Views/ShoppingBaskets/Index.cshtml", shoppingBasketTicketsWithUser);
                 }
-
             }
 
-            var shoppingBasketTickets2 = _basketHelper.GetBasketTickets(HttpContext.Session);
+            var shoppingBasketTicketsWithoutUser = await GetUnegisteredUserBasketTickets();
 
-            shoppingBasketWithUser.ShoppingBasketTickets = shoppingBasketTickets2;
-
-            return View("Views/ShoppingBaskets/Index.cshtml", shoppingBasketWithUser);
+            return View("Views/ShoppingBaskets/Index.cshtml", shoppingBasketTicketsWithoutUser);
         }
 
+
+
         ////GET: ShoppingBaskets/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-
-        //    return View();
-        //}
-
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -91,8 +83,6 @@ namespace BilheticaAeronauticaWeb.Controllers
             {
                 return new NotFoundViewResult("TicketNotFound");
             }
-
-            //var ticket = await _ticketRepository.GetTicketBySeatIdAsync(shoppingBasketTicket.SeatId, shoppingBasketTicket.Name, shoppingBasketTicket.Surname);
 
             return View(shoppingBasketTicket);
         }
@@ -112,48 +102,51 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var shoppingBasketTickets = new List<ShoppingBasketTicket>();
-
-                var flight = await _flightRepository.GetByIdTrackedAsync(model.FlightId.Value);  
-                var seat = await _seatRepository.GetByIdTrackedAsync(model.SeatId.Value);
-
-
-                var basketTicket = _converterHelper.ToShoppingBasketTicket(model, true, flight, seat);
-                User? user = null;
-
-                if (User.Identity.IsAuthenticated)
+                if (model.Type == PassengerType.Infant && model.ResponsibleAdultTicketId == null)
                 {
-                    user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
-                    basketTicket.User = user;
+                    ViewBag.Adults = await GetAdultsFromBasket(model);
 
-                    await _shoppingBasketRepository.AddShoppingBasketTicket(basketTicket);
-                    shoppingBasketTickets = await _shoppingBasketRepository.GetShoppingBasketTicketsAsync(user);
+                    return View("ChooseResponsibleForInfant", model);
                 }
-                else
+                else if(model.Type == PassengerType.Infant && model.ResponsibleAdultTicketId != null)
                 {
-                    await _shoppingBasketRepository.AddShoppingBasketTicket(basketTicket);
-
-                    shoppingBasketTickets = _basketHelper.GetBasketTickets(HttpContext.Session);
-                    shoppingBasketTickets.Add(basketTicket);
-                    _basketHelper.SaveBasketTickets(HttpContext.Session, shoppingBasketTickets);
+                    await AssignResponsibleAdult(model);
                 }
-
-                if (basketTicket.Seat != null)
+                
+                if (model.FlightId != null)
                 {
-                    await _ticketService.HoldSeat(basketTicket.Seat);
+                    //var flight = await _flightRepository.GetByIdTrackedAsync(model.FlightId.Value);
+                    //var seat = await _seatRepository.GetByIdTrackedAsync(model.SeatId.Value);
+
+                    //if (flight != null && seat != null)
+                    //{
+                        var basketTicket = _converterHelper.ToShoppingBasketTicket(model, true);
+
+                        if (User.Identity.IsAuthenticated)
+                        {
+                            var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+
+                            if (user != null)
+                            {
+                                await AddBasketTicketWithUser(user, basketTicket);
+                            }
+                        }
+                        else
+                        {
+                            await AddBasketTicketWithoutUser(basketTicket);
+                        }
+
+                        if (basketTicket.Seat != null)
+                        {
+                            await _ticketService.HoldSeat(basketTicket.Seat);
+                        }
+
+                    return RedirectToAction("Index");
                 }
-
-                var shoppingBasketWithUserViewModel = new ShoppingBasketWithUserViewModel
-                {
-                    ShoppingBasketTickets = shoppingBasketTickets,
-                    NewUser = user == null ? new RegisterNewUserViewModel() : null
-                };
-
-                return RedirectToAction("Index");
             }
-
-            return RedirectToAction("Create", "Tickets");
+            return RedirectToAction("Index");
         }
+
 
 
         // POST: ShoppingBaskets/Create
@@ -176,16 +169,14 @@ namespace BilheticaAeronauticaWeb.Controllers
                 shoppingBasketTickets = _basketHelper.GetBasketTickets(HttpContext.Session);
             }
 
-            var shoppingBasketWithUserViewModel = new ShoppingBasketWithUserViewModel
-            {
-                ShoppingBasketTickets = shoppingBasketTickets,
-                NewUser = user == null ? new RegisterNewUserViewModel() : null
-            };
-
             if (!shoppingBasketTickets.Any())
             {
                 return View("NoShoppingBasket");
             }
+
+            var shoppingBasketWithUserViewModel = ConvertToTicketWithUserViewModel(shoppingBasketTickets, user);
+
+            ViewBag.Seats = await GetSeatsViewBag(shoppingBasketWithUserViewModel);
 
             return View(shoppingBasketWithUserViewModel);
 
@@ -267,6 +258,139 @@ namespace BilheticaAeronauticaWeb.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("ShoppingBaskets/GetAdultsFromBasket")]
+        public async Task<List<SelectListItem>> GetAdultsFromBasket(TicketViewModel model)
+        {
+            var shoppingBasketTickets = new List<ShoppingBasketTicket>();
+
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+
+                if (user != null)
+                {
+                    shoppingBasketTickets = await _shoppingBasketRepository.GetShoppingBasketTicketsAsync(user);
+                }
+            }
+            else
+            {
+                shoppingBasketTickets = _basketHelper.GetBasketTickets(HttpContext.Session);
+            }
+
+            var adults = _ticketService.FilterAdults(shoppingBasketTickets, model);
+
+            var selectList = adults.Select(ticket => new SelectListItem
+            {
+                Value = ticket.Id.ToString(),
+                Text = $"Name: {ticket.Name} {ticket.Surname}"
+            }).ToList();
+
+            return selectList;
+        }
+
+        public async Task AddBasketTicketWithUser(User user, ShoppingBasketTicket basketTicket)
+        {
+            user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+            basketTicket.User = user;
+
+            await _shoppingBasketRepository.AddShoppingBasketTicket(basketTicket);
+        }
+
+        public async Task AddBasketTicketWithoutUser(ShoppingBasketTicket basketTicket)
+        {
+            await _shoppingBasketRepository.AddShoppingBasketTicket(basketTicket);
+            var shoppingBasketTickets = _basketHelper.GetBasketTickets(HttpContext.Session);
+            shoppingBasketTickets.Add(basketTicket);
+            _basketHelper.SaveBasketTickets(HttpContext.Session, shoppingBasketTickets);
+        }
+
+
+        public async Task AssignResponsibleAdult(TicketViewModel model)
+        {
+            var responsibleAdultTicket = await _shoppingBasketRepository.GetShoppingBasketTicketAsync(model.ResponsibleAdultTicketId.Value);
+
+            if (responsibleAdultTicket != null)
+            {
+                if (responsibleAdultTicket.Seat != null)
+                {
+                    model.SeatId = responsibleAdultTicket.SeatId;
+                    await _ticketService.MakeResponsibleAdult(responsibleAdultTicket);
+                    _basketHelper.UpdateTicket(HttpContext.Session, responsibleAdultTicket);
+                }
+            }
+        }
+
+        private async Task<ShoppingBasketWithUserViewModel> GetRegisteredUserBasketTickets(User user)
+        {
+            var shoppingBasketWithUser = new ShoppingBasketWithUserViewModel();
+
+            var shoppingBasketTickets = await _shoppingBasketRepository.GetShoppingBasketTicketsAsync(user);
+
+            var shoppingBasketTicketsViewModels = new List<ShoppingBasketTicketViewModel>();
+
+            foreach (var ticket in shoppingBasketTickets)
+            {
+                shoppingBasketTicketsViewModels.Add(_converterHelper.ToShoppingBasketTicketViewModel(ticket));
+            }
+
+            shoppingBasketWithUser.ShoppingBasketTickets = shoppingBasketTicketsViewModels;
+
+            return shoppingBasketWithUser;
+        }
+
+        private async Task<ShoppingBasketWithUserViewModel> GetUnegisteredUserBasketTickets()
+        {
+            var shoppingBasketWithNewUser = new ShoppingBasketWithUserViewModel();
+
+            var shoppingBasketTickets = _basketHelper.GetBasketTickets(HttpContext.Session);
+
+            var shoppingBasketTicketsViewModels = new List<ShoppingBasketTicketViewModel>();
+
+            foreach (var ticket in shoppingBasketTickets)
+            {
+                shoppingBasketTicketsViewModels.Add(_converterHelper.ToShoppingBasketTicketViewModel(ticket));
+            }
+
+            shoppingBasketWithNewUser.ShoppingBasketTickets = shoppingBasketTicketsViewModels;
+
+            shoppingBasketWithNewUser.ShoppingBasketTickets = shoppingBasketTicketsViewModels;
+
+            return shoppingBasketWithNewUser;
+        }
+
+        private ShoppingBasketWithUserViewModel ConvertToTicketWithUserViewModel(List<ShoppingBasketTicket> basketTickets, User? user)
+        {
+            var shoppingBasketTicketsViewModels = new List<ShoppingBasketTicketViewModel>();
+
+            foreach (var ticket in basketTickets)
+            {
+                shoppingBasketTicketsViewModels.Add(_converterHelper.ToShoppingBasketTicketViewModel(ticket));
+            }
+
+            var shoppingBasketWithUserViewModel = new ShoppingBasketWithUserViewModel
+            {
+                ShoppingBasketTickets = shoppingBasketTicketsViewModels,
+                NewUser = user == null ? new RegisterNewUserViewModel() : null
+            };
+
+            return shoppingBasketWithUserViewModel;
+        }
+
+        private async Task<List<SelectListItem>> GetSeatsViewBag(ShoppingBasketWithUserViewModel model)
+        {
+            var seats = await _seatRepository.GetAvailableSeatsByFlight(model.ShoppingBasketTickets[0].FlightId);
+
+            var selectList = seats.Select(seat => new SelectListItem
+            {
+                Value = seat.Id.ToString(),
+                Text = $"Row: {seat.Row} Number: {seat.Column}"
+            }).ToList();
+
+            return selectList;
+        }
+
+        
 
     }
 }

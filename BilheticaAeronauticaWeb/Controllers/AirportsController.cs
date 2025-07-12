@@ -4,6 +4,7 @@ using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Helpers;
 using BilheticaAeronauticaWeb.Models;
+using BilheticaAeronauticaWeb.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,13 +18,18 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly IAirportRepository _airportRepository;
         private readonly ICountryRepository _countryRepository;
         private readonly IConverterHelper _converterHelper;
+        private readonly IAirportService _airportService;
         //private readonly IBlobHelper _blobHelper;
 
-        public AirportsController(IAirportRepository aeroportoRepository, IConverterHelper converterHelper, ICountryRepository countryRepository)
+        public AirportsController(IAirportRepository aeroportoRepository,
+            IConverterHelper converterHelper,
+            ICountryRepository countryRepository,
+            IAirportService airportService)
         {
             _airportRepository = aeroportoRepository;
             _converterHelper = converterHelper;
             _countryRepository = countryRepository;
+            _airportService = airportService;
             //_blobHelper = blobHelper;
         }
 
@@ -130,12 +136,14 @@ namespace BilheticaAeronauticaWeb.Controllers
             {
                 try
                 {
-
                     var airport = await _converterHelper.ToAirport(model, false);
 
-                    await _airportRepository.UpdateAsync(airport);
+                    var canEdit = await _airportService.AllowAirportDeletionOrUpdate(airport);
 
-
+                    if (canEdit)
+                    {
+                        await _airportRepository.UpdateAsync(airport);
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -193,7 +201,13 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             try
             {
-                await _airportRepository.DeleteAsync(airport);
+                var canDelete = await _airportService.AllowAirportDeletionOrUpdate(airport);
+
+                if (canDelete)
+                {
+                    await _airportRepository.DeleteAsync(airport);
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateException ex)

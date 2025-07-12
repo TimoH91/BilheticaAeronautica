@@ -14,8 +14,27 @@ namespace BilheticaAeronauticaWeb.Services
 
         public async Task ClearShoppingBasket(List<ShoppingBasketTicket> shoppingBasketTickets)
         {
-            await _shoppingBasketRepository.DeleteShoppingBasketTickets(shoppingBasketTickets);
+            foreach (var basketTicket in shoppingBasketTickets)
+            {
+                basketTicket.Flight = null;
+                basketTicket.Seat = null;
+                await _shoppingBasketRepository.DeleteAsync(basketTicket);
+            }
             //await _shoppingBasketRepository.DeleteAsync(shoppingBasket);
         }
+
+        public async Task ClearShoppingBasketByUser(User user)
+        {
+            var basketTickets = await _shoppingBasketRepository.GetShoppingBasketTicketsAsync(user);
+
+            foreach (var basketTicket in basketTickets)
+            {
+                //basketTicket.Flight = null;
+                //basketTicket.Seat = null;
+                await _shoppingBasketRepository.DeleteAsync(basketTicket);
+            }
+
+        }
+
     }
 }

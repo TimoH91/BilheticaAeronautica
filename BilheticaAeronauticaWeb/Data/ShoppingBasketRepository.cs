@@ -54,5 +54,13 @@ namespace BilheticaAeronauticaWeb.Data
                 .ToListAsync();
         }
 
+        public async Task<List<ShoppingBasketTicket>> GetTicketsByFlightIdAsync(int flightId)
+        {
+            return await _context.ShoppingBasketTickets
+              .Include(t => t.Flight)
+              .Include(t => t.Seat)
+              .Where(t => t.Flight.Id == flightId)
+              .ToListAsync();
+        }
     }
 }

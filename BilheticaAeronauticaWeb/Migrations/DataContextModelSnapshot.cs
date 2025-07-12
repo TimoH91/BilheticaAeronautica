@@ -251,6 +251,9 @@ namespace BilheticaAeronauticaWeb.Migrations
                     b.Property<int>("FlightId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsResponsibleAdult")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -261,10 +264,10 @@ namespace BilheticaAeronauticaWeb.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("ResponsibleAdultId")
+                    b.Property<int?>("ResponsibleAdultTicketId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SeatId")
+                    b.Property<int?>("SeatId")
                         .HasColumnType("int");
 
                     b.Property<string>("Surname")
@@ -275,6 +278,10 @@ namespace BilheticaAeronauticaWeb.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FlightId");
+
+                    b.HasIndex("SeatId");
 
                     b.HasIndex("UserId");
 
@@ -568,6 +575,9 @@ namespace BilheticaAeronauticaWeb.Migrations
                 {
                     b.HasBaseType("BilheticaAeronauticaWeb.Entities.Ticket");
 
+                    b.Property<bool>("IsResponsibleAdult")
+                        .HasColumnType("bit");
+
                     b.HasDiscriminator().HasValue("Adult");
                 });
 
@@ -582,7 +592,7 @@ namespace BilheticaAeronauticaWeb.Migrations
                 {
                     b.HasBaseType("BilheticaAeronauticaWeb.Entities.Ticket");
 
-                    b.Property<int>("ResponsibleAdultId")
+                    b.Property<int>("ResponsibleAdultTicketId")
                         .HasColumnType("int");
 
                     b.HasDiscriminator().HasValue("Infant");
@@ -672,10 +682,25 @@ namespace BilheticaAeronauticaWeb.Migrations
 
             modelBuilder.Entity("BilheticaAeronauticaWeb.Entities.ShoppingBasketTicket", b =>
                 {
+                    b.HasOne("BilheticaAeronauticaWeb.Entities.Flight", "Flight")
+                        .WithMany()
+                        .HasForeignKey("FlightId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BilheticaAeronauticaWeb.Entities.Seat", "Seat")
+                        .WithMany()
+                        .HasForeignKey("SeatId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("BilheticaAeronauticaWeb.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Flight");
+
+                    b.Navigation("Seat");
 
                     b.Navigation("User");
                 });

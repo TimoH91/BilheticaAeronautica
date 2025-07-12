@@ -16,7 +16,6 @@ namespace BilheticaAeronauticaWeb.Data
 
         Task<List<ShoppingBasketTicket>> GetShoppingBasketTicketsAsync(User user);
 
-
-
+        Task<List<ShoppingBasketTicket>> GetTicketsByFlightIdAsync(int flightId);
     }
 }

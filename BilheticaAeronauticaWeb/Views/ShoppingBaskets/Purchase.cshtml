@@ -5,7 +5,6 @@
 }
 
 <h1>Your Final Order</h1>
-
 <form asp-controller="Orders" asp-action="Purchase" method="post">
     <div asp-validation-summary="ModelOnly"></div>
 
@@ -20,16 +19,58 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.ShoppingBasketTickets)
+            @for (int i = 0; i < Model.ShoppingBasketTickets.Count; i++)
             {
+                var item = Model.ShoppingBasketTickets[i];
                 <tr>
-                    <td>@item.Name</td>
-                    <td>@item.Surname</td>
-                    <td>@item.Class</td>
-                    <td>@item.Flight.Id</td>
-                    <td>@item.Price.ToString("C")</td>
+                    <td>
+                        <input type="hidden" asp-for="ShoppingBasketTickets[@i].Name" />
+                        @item.Name
+                    </td>
+                    <td>
+                        <input type="hidden" asp-for="ShoppingBasketTickets[@i].Surname" />
+                        @item.Surname
+                    </td>
+                    <td>
+                        <input type="hidden" asp-for="ShoppingBasketTickets[@i].Class" />
+                        @item.Class
+                    </td>
+                    <td>
+                        <input type="hidden" asp-for="ShoppingBasketTickets[@i].PassengerType" />
+                        @item.PassengerType
+                    </td>
+                    <td>
+                        <input type="hidden" asp-for="ShoppingBasketTickets[@i].FlightId" />
+                        @item.FlightId
+                    </td>
+                    <td>
+                        <input type="hidden" asp-for="ShoppingBasketTickets[@i].Price" />
+                        @item.Price.ToString("C")
+                    </td>
+                    <td>
+                        @if (item.SeatId == null || item.SeatId == 0)
+                        {
+                            <span class="text-danger">Please choose a seat</span>
+                            <select asp-for="ShoppingBasketTickets[@i].SeatId" class="form-control">
+                                <option value="">Select a seat</option>
+                                @{
+                                    var seatsList = ViewBag.Seats as IEnumerable<SelectListItem>;
+                                }
+                                @foreach (var seat in seatsList)
+                                {
+                                    <option value="@seat.Value">@seat.Text</option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            @item.SeatId
+                            <input type="hidden" asp-for="ShoppingBasketTickets[@i].SeatId" />
+                        }
+                    </td>
                 </tr>
             }
+
         </tbody>
     </table>
 

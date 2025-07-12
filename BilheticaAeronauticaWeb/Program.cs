@@ -27,7 +27,7 @@ builder.Services.AddAuthentication()
                             };
                         });
 
-builder.Services.AddScoped<SeedDb>();
+builder.Services.AddTransient<SeedDb>();
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAirplaneRepository, AirplaneRepository>();
 builder.Services.AddScoped<IFlightRepository, FlightRepository>();
@@ -40,7 +40,8 @@ builder.Services.AddScoped<IShoppingBasketRepository,ShoppingBasketRepository>()
 builder.Services.AddScoped<IFlightService, FlightService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
-
+builder.Services.AddScoped<IAirplaneService, AirplaneService>();
+builder.Services.AddScoped<IAirportService, AirportService>();
 builder.Services.AddScoped<IConverterHelper, ConverterHelper>();
 builder.Services.AddScoped<IUserHelper, UserHelper>();
 builder.Services.AddScoped<IMailHelper, MailHelper>();

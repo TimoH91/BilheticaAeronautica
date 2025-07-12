@@ -26,6 +26,7 @@
                     <th>Class</th>
                     <th>Flight</th>
                     <th>Price</th>
+                    <th>Type</th>
                     <th></th>
                 </tr>
             </thead>
@@ -36,8 +37,9 @@
                         <td>@item.Name</td>
                         <td>@item.Surname</td>
                         <td>@item.Class</td>
-                        <td>@item.Flight.Id</td>
+                        <td>@item.FlightId</td>
                         <td>@item.Price.ToString("C")</td>
+                        <td>@item.PassengerType</td>
                         <td>
                             <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
                             <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

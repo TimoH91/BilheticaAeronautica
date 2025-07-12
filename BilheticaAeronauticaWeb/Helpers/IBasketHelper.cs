@@ -13,5 +13,7 @@ namespace BilheticaAeronauticaWeb.Helpers
         List<ShoppingBasketTicket> GetBasketTickets(ISession session);
 
         void SaveBasketTickets(ISession session, List<ShoppingBasketTicket> Tickets);
+
+        void UpdateTicket(ISession session, ShoppingBasketTicket updatedTicket);
     }
 }

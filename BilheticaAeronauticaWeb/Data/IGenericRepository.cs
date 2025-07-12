@@ -18,5 +18,9 @@ namespace BilheticaAeronauticaWeb.Data
             Task<bool> ExistAsync(int id);
 
             Task CreateRangeAsync(IEnumerable<T> entities);
+
+            Task DeleteRangeAsync(IEnumerable<T> entities);
+
+            Task UpdateRangeAsync(IEnumerable<T> entities);
     }
 }

@@ -1,4 +1,5 @@
-﻿using BilheticaAeronauticaWeb.Entities;
+﻿using System.ComponentModel;
+using BilheticaAeronauticaWeb.Entities;
 
 namespace BilheticaAeronauticaWeb.Models
 {
@@ -19,10 +20,13 @@ namespace BilheticaAeronauticaWeb.Models
 
         //public Payment Payment { get; set; }
 
+        public int? OrderId { get; set; }
+
         public decimal Price { get; set; }
 
         public PassengerType Type { get; set; }
 
-        public int? ResponsibleAdultId { get; set; }
+        [DisplayName("Ticket Id of Responsible Adult")]
+        public int? ResponsibleAdultTicketId { get; set; }
     }
 }

@@ -98,7 +98,7 @@ namespace BilheticaAeronauticaWeb.Helpers
             };
         }
 
-        public async Task<Flight> ToFlight(FlightViewModel model, bool isNew)
+        public Flight ToFlight(FlightViewModel model, bool isNew)
         {
                 return new Flight
                 {
@@ -130,7 +130,26 @@ namespace BilheticaAeronauticaWeb.Helpers
             };
         }
 
-        public TicketViewModel ToTicketViewModel(Ticket ticket) 
+        public TicketViewModel ToAdultAndChildTicketViewModel(Ticket ticket) 
+        {
+                return new TicketViewModel
+                {
+                    Id = ticket.Id,
+                    Name = ticket.Name,
+                    Surname = ticket.Surname,
+                    FlightId = ticket.FlightId,
+                    Class = ticket.Class,
+                    OriginAirportId = ticket.OriginAirportId,
+                    DestinationAirportId = ticket.DestinationAirportId,
+                    SeatId = ticket.SeatId,
+                    //Payment = ticket.Payment,
+                    Price = ticket.Price,
+                    OrderId = ticket.OrderId,
+                    Type = ticket.Type,
+                };
+        }
+
+        public TicketViewModel ToInfantTicketViewModel(InfantTicket ticket)
         {
             return new TicketViewModel
             {
@@ -144,63 +163,71 @@ namespace BilheticaAeronauticaWeb.Helpers
                 SeatId = ticket.SeatId,
                 //Payment = ticket.Payment,
                 Price = ticket.Price,
-                Type = ticket.Type
+                Type = ticket.Type,
+                OrderId = ticket.OrderId,
+                ResponsibleAdultTicketId = ticket.ResponsibleAdultTicketId,
             };
-        
         }
 
-        public Ticket ToTicket(TicketViewModel model, bool isNew)
+
+        public Ticket ToTicket(TicketViewModel model, bool isNew, Flight flight)
         {
-            if (model.Type == PassengerType.Adult)
-            {
-                return new AdultTicket
+                if (model.Type == PassengerType.Adult)
+                {
+                    return new AdultTicket
+                    {
+                        Id = isNew ? 0 : model.Id,
+                        Name = model.Name,
+                        Surname = model.Surname,
+                        FlightId = flight.Id,
+                        Class = model.Class,
+                        OriginAirportId = flight.OriginAirportId,
+                        DestinationAirportId = flight.DestinationAirportId,
+                        SeatId = model.SeatId,
+                        //Payment = model.Payment,
+                        OrderId = model.OrderId.Value,
+                        Price = model.Price,
+                        Type = model.Type,
+                        //IsResponsibleAdult = model.IsResponsibleAdult
+                    };
+                }
+
+                if (model.Type == PassengerType.Child)
+                {
+                    return new ChildTicket
+                    {
+                        Id = isNew ? 0 : model.Id,
+                        Name = model.Name,
+                        Surname = model.Surname,
+                        FlightId = flight.Id,
+                        Class = model.Class,
+                        OriginAirportId = flight.OriginAirportId,
+                        DestinationAirportId = flight.DestinationAirportId,
+                        SeatId = model.SeatId,
+                        //Payment = model.Payment,
+                        OrderId = model.OrderId.Value,
+                        Price = model.Price,
+                        Type = model.Type
+                    };
+                }
+
+                return new InfantTicket
                 {
                     Id = isNew ? 0 : model.Id,
                     Name = model.Name,
                     Surname = model.Surname,
-                    FlightId = model.FlightId,
+                    FlightId = flight.Id,
                     Class = model.Class,
-                    OriginAirportId = model.OriginAirportId,
-                    DestinationAirportId = model.DestinationAirportId,
+                    OriginAirportId = flight.OriginAirportId,
+                    DestinationAirportId = flight.DestinationAirportId,
                     SeatId = model.SeatId,
                     //Payment = model.Payment,
                     Price = model.Price,
-                    Type = model.Type
+                    Type = PassengerType.Infant,
+                    OrderId = model.OrderId.Value,
+                    ResponsibleAdultTicketId = model.ResponsibleAdultTicketId.Value
                 };
-            }
-
-            if (model.Type == PassengerType.Child)
-            {
-                return new ChildTicket
-                {
-                    Id = isNew ? 0 : model.Id,
-                    Name = model.Name,
-                    Surname = model.Surname,
-                    FlightId = model.FlightId,
-                    Class = model.Class,
-                    OriginAirportId = model.OriginAirportId,
-                    DestinationAirportId = model.DestinationAirportId,
-                    SeatId = model.SeatId,
-                    //Payment = model.Payment,
-                    Price = model.Price,
-                    Type = model.Type
-                };
-            }
-
-            return new InfantTicket
-            {
-                Id = isNew ? 0 : model.Id,
-                Name = model.Name,
-                Surname = model.Surname,
-                FlightId = model.FlightId,
-                Class = model.Class,
-                OriginAirportId = model.OriginAirportId,
-                DestinationAirportId = model.DestinationAirportId,
-                SeatId = model.SeatId,
-                //Payment = model.Payment,
-                Price = model.Price,
-                Type = PassengerType.Infant
-            };
+            
         }
 
             public async Task<UserViewModel> ToUserViewModelAsync(User user)
@@ -251,25 +278,41 @@ namespace BilheticaAeronauticaWeb.Helpers
         
         }
 
-        public ShoppingBasketTicket ToShoppingBasketTicket(TicketViewModel model, bool isNew, Flight flight, Seat? seat)
+        public ShoppingBasketTicket ToShoppingBasketTicket(TicketViewModel model, bool isNew)
         {
-            //if (model.FlightId != null || model.SeatId != null)
-            
+            if (model.SeatId != null)
+            {
                 return new ShoppingBasketTicket
                 {
                     Id = isNew ? 0 : model.Id,
                     Name = model.Name,
                     Surname = model.Surname,
-                    Flight = flight,
+                    //Flight = flight,
+                    FlightId = model.FlightId.Value,
                     Class = model.Class,
-                    Seat = seat,
+                    SeatId = model.SeatId.Value,
+                    //Seat = seat,
                     Price = model.Price,
                     PassengerType = model.Type,
-                    ResponsibleAdultId = model.ResponsibleAdultId,
+                    ResponsibleAdultTicketId = model.ResponsibleAdultTicketId,
                 };
+            }
+
+            return new ShoppingBasketTicket
+            {
+                Id = isNew ? 0 : model.Id,
+                Name = model.Name,
+                Surname = model.Surname,
+                FlightId = model.FlightId.Value,
+                Class = model.Class,
+                Price = model.Price,
+                PassengerType = model.Type,
+                ResponsibleAdultTicketId = model.ResponsibleAdultTicketId,
+            };
+
         }
 
-        public async Task<Ticket> BasketToTicket(ShoppingBasketTicket basketTicket)
+        public Ticket BasketToTicket(ShoppingBasketTicket basketTicket, Flight flight)
         {
             //var flight = await _flightRepository.GetByIdAsync(basketTicket.FlightId);
 
@@ -279,14 +322,15 @@ namespace BilheticaAeronauticaWeb.Helpers
                 {
                     Name = basketTicket.Name,
                     Surname = basketTicket.Surname,
-                    Flight = basketTicket.Flight,
+                    FlightId = basketTicket.FlightId,
+                    OriginAirportId = flight.OriginAirportId,
+                    DestinationAirportId = flight.DestinationAirportId,
+                    SeatId = basketTicket.SeatId,
                     Class = basketTicket.Class,
-                    OriginAirport = basketTicket.Flight.OriginAirport,
-                    DestinationAirport = basketTicket.Flight.DestinationAirport,
-                    Seat = basketTicket.Seat,
                     Payment = Payment.Paid,
                     Price = basketTicket.Price,
-                    Type = PassengerType.Adult
+                    Type = PassengerType.Adult,
+                    IsResponsibleAdult = basketTicket.IsResponsibleAdult
                 };
             }
 
@@ -296,14 +340,14 @@ namespace BilheticaAeronauticaWeb.Helpers
                 {
                     Name = basketTicket.Name,
                     Surname = basketTicket.Surname,
-                    Flight = basketTicket.Flight,
+                    FlightId = basketTicket.FlightId,
+                    OriginAirportId = flight.OriginAirportId,
+                    DestinationAirportId = flight.DestinationAirportId,
+                    SeatId = basketTicket.SeatId,
                     Class = basketTicket.Class,
-                    OriginAirport = basketTicket.Flight.OriginAirport,
-                    DestinationAirport = basketTicket.Flight.DestinationAirport,
-                    Seat = basketTicket.Seat,
                     Payment = Payment.Paid,
                     Price = basketTicket.Price,
-                    Type = PassengerType.Child
+                    Type = PassengerType.Child,
                 };
             }
 
@@ -311,15 +355,15 @@ namespace BilheticaAeronauticaWeb.Helpers
                 {
                     Name = basketTicket.Name,
                     Surname = basketTicket.Surname,
-                    Flight = basketTicket.Flight,
+                    FlightId = basketTicket.FlightId,
+                    OriginAirportId = flight.OriginAirportId,
+                    DestinationAirportId = flight.DestinationAirportId,
+                    SeatId = basketTicket.SeatId,
                     Class = basketTicket.Class,
-                    OriginAirport = basketTicket.Flight.OriginAirport,
-                    DestinationAirport = basketTicket.Flight.DestinationAirport,
-                    Seat = basketTicket.Seat,
                     Payment = Payment.Paid,
                     Price = basketTicket.Price,
                     Type = PassengerType.Infant,
-                    ResponsibleAdultId = basketTicket.ResponsibleAdultId.Value,
+                    ResponsibleAdultTicketId = basketTicket.ResponsibleAdultTicketId.Value,
                 };
 
         }
@@ -347,6 +391,40 @@ namespace BilheticaAeronauticaWeb.Helpers
                 Tickets = (List<Ticket>)order.Tickets,
                 TotalPrice = order.TotalPrice,
                 Payment = order.Payment,
+            };
+        }
+
+        public ShoppingBasketTicketViewModel ToShoppingBasketTicketViewModel(ShoppingBasketTicket basketTicket)
+        {
+            return new ShoppingBasketTicketViewModel
+            {
+                Id = basketTicket.Id,
+                FlightId = basketTicket.FlightId,
+                Class = basketTicket.Class,
+                Name = basketTicket.Name,
+                PassengerType = basketTicket.PassengerType,
+                Price = basketTicket.Price,
+                SeatId = basketTicket.SeatId,
+                Surname = basketTicket.Surname,
+                ResponsibleAdultTicketId = basketTicket.ResponsibleAdultTicketId,
+                UserId = basketTicket.UserId
+            };
+        }
+
+        public ShoppingBasketTicket ToShoppingBasketTicketFromModel(ShoppingBasketTicketViewModel model, bool isNew)
+        {
+            return new ShoppingBasketTicket
+            {
+                Id = isNew ? 0 : model.Id,
+                FlightId = model.FlightId,
+                Class = model.Class,
+                Name = model.Name,
+                PassengerType = model.PassengerType,
+                Price = model.Price,
+                SeatId = model.SeatId.Value,
+                Surname = model.Surname,
+                ResponsibleAdultTicketId = model.ResponsibleAdultTicketId,
+                UserId = model.UserId
             };
         }
     }

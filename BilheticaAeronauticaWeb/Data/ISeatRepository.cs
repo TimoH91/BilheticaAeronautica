@@ -7,7 +7,9 @@ namespace BilheticaAeronauticaWeb.Data
     {
         IEnumerable<SelectListItem> GetComboSeats();
 
-        Task<IEnumerable<Seat>> GetSeatsByFlight(int flightId);
+        Task<IEnumerable<Seat>> GetAvailableSeatsByFlight(int flightId);
+
+        Task<IEnumerable<Seat>> GetAllSeatsByFlight(int flightId);
 
         Task<Seat> GetByIdTrackedAsync(int id);
     }

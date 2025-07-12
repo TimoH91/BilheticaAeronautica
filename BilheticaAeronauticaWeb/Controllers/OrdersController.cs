@@ -19,22 +19,24 @@ namespace BilheticaAeronauticaWeb.Controllers
 {
     public class OrdersController : Controller
     {
-        private readonly DataContext _context;
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderService _orderService;
         private readonly IConverterHelper _converterHelper;
         private readonly IShoppingBasketRepository _shoppingBasketRepository;
         private readonly ITicketRepository _ticketRepository;
+        private readonly ISeatRepository _seatRepository;
+        private readonly IFlightRepository _flightRepository;
+        private readonly IAirportRepository _airportRepository;
         private readonly IUserHelper _userHelper;
         private readonly IBasketHelper _basketHelper;
         private readonly IMailHelper _mailHelper;
         private readonly ITicketService _ticketService;
 
-        public OrdersController(DataContext context, IOrderRepository orderRepository, IConverterHelper converterHelper,
+        public OrdersController(IOrderRepository orderRepository, IConverterHelper converterHelper,
             IShoppingBasketRepository shoppingBasketRepository, ITicketRepository ticketRepository, IUserHelper userHelper,
-            IOrderService orderService, IBasketHelper basketHelper, IMailHelper mailHelper, ITicketService ticketService)
+            IOrderService orderService, IBasketHelper basketHelper, IMailHelper mailHelper, ITicketService ticketService,
+            ISeatRepository seatRepository, IAirportRepository airportRepository, IFlightRepository flightRepository)
         {
-            _context = context;
             _orderRepository = orderRepository;
             _converterHelper = converterHelper;
             _shoppingBasketRepository = shoppingBasketRepository;
@@ -44,6 +46,9 @@ namespace BilheticaAeronauticaWeb.Controllers
             _basketHelper = basketHelper;
             _mailHelper = mailHelper;
             _ticketService = ticketService;
+            _seatRepository = seatRepository;
+            _airportRepository = airportRepository;
+            _flightRepository = flightRepository;
         }
 
         // GET: Orders
@@ -92,7 +97,14 @@ namespace BilheticaAeronauticaWeb.Controllers
         public async Task<IActionResult> Purchase(ShoppingBasketWithUserViewModel model)
         {
 
-            model.ShoppingBasketTickets = await GetShoppingBasketTickets(model);
+            foreach (var basketTicket in model.ShoppingBasketTickets)
+            {
+                if (basketTicket.SeatId == null)
+                {
+                    ViewBag.Seats = await GetSeatsViewBag(model);
+                    return View("~/Views/ShoppingBaskets/Purchase.cshtml", model);
+                }
+            }
 
             var user = await GetOrderUser(model);
 
@@ -101,15 +113,21 @@ namespace BilheticaAeronauticaWeb.Controllers
                 return new NotFoundViewResult("UserNotFound");
             }
 
-            var tickets = await ConvertToTickets(model.ShoppingBasketTickets, model, user);
+            var shoppingBasketTickets = ConvertToShoppingBasketTickets(model);
 
-            var order = ConvertToOrder(tickets, user);
+            var order = ConvertToOrder(shoppingBasketTickets, user);
 
             await _orderRepository.CreateAsync(order);
 
-            await AddTicketsAsync(tickets, order);
+            var tickets = await ConvertAdultAndChildTickets(shoppingBasketTickets, model, user);
 
-            await ClearBasket(model);
+            tickets = await AddTicketsAsync(tickets, order);
+
+            var infantTickets = await ConvertInfantTickets(tickets, shoppingBasketTickets, user);
+
+            infantTickets = await AddTicketsAsync(infantTickets, order);
+
+            await ClearBasket(user, model);
 
             return View("ThankyouForBooking");
         }
@@ -235,7 +253,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             }
         }
 
-        public async Task<User> RegisterNewUser(RegisterNewUserViewModel newUser)
+        private async Task<User> RegisterNewUser(RegisterNewUserViewModel newUser)
         {
             User user = new User
             {
@@ -283,25 +301,40 @@ namespace BilheticaAeronauticaWeb.Controllers
             return user;
         }
 
-        public async Task<List<Ticket>> ConvertToTickets(List<ShoppingBasketTicket> shoppingBasketTickets, ShoppingBasketWithUserViewModel model, User user)
+        private List<ShoppingBasketTicket> ConvertToShoppingBasketTickets(ShoppingBasketWithUserViewModel model)
+        {
+            var shoppingBasketTickets = new List<ShoppingBasketTicket>();
+
+            foreach (var ticket in model.ShoppingBasketTickets)
+            {
+                shoppingBasketTickets.Add(_converterHelper.ToShoppingBasketTicketFromModel(ticket, false));
+            }
+
+            return shoppingBasketTickets;
+        }
+
+        private async Task<List<Ticket>> ConvertAdultAndChildTickets(List<ShoppingBasketTicket> shoppingBasketTickets, ShoppingBasketWithUserViewModel model, User user)
         {
             var tickets = new List<Ticket>();
 
-            foreach (ShoppingBasketTicket basketTicket in model.ShoppingBasketTickets)
+            foreach (ShoppingBasketTicket basketTicket in shoppingBasketTickets)
             {
-                var ticket = await _converterHelper.BasketToTicket(basketTicket);
-                ticket.UserId = user.Id;
-                tickets.Add(ticket);
+                if (basketTicket.PassengerType == PassengerType.Adult)
+                {
+                    var flight = await _flightRepository.GetByIdTrackedAsync(basketTicket.FlightId);
+                    var ticket = _converterHelper.BasketToTicket(basketTicket, flight);
+                    ticket.UserId = user.Id;
+                    tickets.Add(ticket);
+                }
             }
-
             return tickets;
         }
 
-        public decimal TotalPrice(List<Ticket> tickets)
+        private decimal TotalPrice(List<ShoppingBasketTicket> tickets)
         {
             decimal total = 0;
 
-            foreach (Ticket ticket in tickets)
+            foreach (var ticket in tickets)
             {
                 total += ticket.Price;
             }
@@ -309,7 +342,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             return total;
         }
 
-        public async Task<User> GetOrderUser(ShoppingBasketWithUserViewModel model)
+        private async Task<User> GetOrderUser(ShoppingBasketWithUserViewModel model)
         {
             User user;
 
@@ -323,33 +356,77 @@ namespace BilheticaAeronauticaWeb.Controllers
             }
         }
 
-        public Order ConvertToOrder(List<Ticket> tickets, User user)
+        private Order ConvertToOrder(List<ShoppingBasketTicket> basketTickets, User user)
         {
             Order order = new Order();
 
-            order.TotalPrice = TotalPrice(tickets);
+            order.TotalPrice = TotalPrice(basketTickets);
             order.User = user;
             order.OrderDate = DateTime.Now;
 
             return order;
         }
 
-        public async Task AddTicketsAsync(List<Ticket> tickets, Order order)
+        //private async Task<IActionResult>AddSeatsIfMissing(List<Ticket> tickets)
+        //{
+
+        //}
+        private async Task<List<Ticket>> AddTicketsAsync(List<Ticket> tickets, Order order)
         {
             foreach (Ticket ticket in tickets)
             {
-                ticket.Order = order;
-                await _ticketService.OccupySeats(ticket.Seat);
+                if (ticket is AdultTicket || ticket is ChildTicket)
+                {
+                    ticket.Order = order;
+                    await _ticketService.OccupySeats(ticket.SeatId.Value);
+                    await _ticketRepository.CreateAsync(ticket);
+                }
+                else
+                {
+                    ticket.Order = order;
+                    await _ticketRepository.CreateAsync(ticket);
+                }
             }
 
-            await _ticketRepository.CreateRangeAsync(tickets);
+            return tickets;
         }
 
-        public async Task ClearBasket(ShoppingBasketWithUserViewModel model)
+        private async Task<List<Ticket>> ConvertInfantTickets(List<Ticket> tickets, List<ShoppingBasketTicket> shoppingBasketTickets, User user)
+        {
+
+            var infantTickets = new List<Ticket>();
+
+            foreach (ShoppingBasketTicket basketTicket in shoppingBasketTickets)
+            {
+                if (basketTicket.PassengerType == PassengerType.Infant)
+                {
+                    foreach (var ticket in tickets.OfType<AdultTicket>())
+                    {
+                        if (basketTicket.SeatId == ticket.SeatId)
+                        {
+                            basketTicket.ResponsibleAdultTicketId = AssignResponsibleAdults(ticket.Id);
+                            var flight = await _flightRepository.GetByIdTrackedAsync(basketTicket.FlightId);
+                            var infantTicket = _converterHelper.BasketToTicket(basketTicket, flight);
+                            infantTicket.UserId = user.Id;
+                            infantTickets.Add(infantTicket);
+                        }
+                    }
+                }
+            }
+
+            return infantTickets;
+        }
+
+        private int AssignResponsibleAdults(int id)
+        {
+            return id;
+        }
+
+        private async Task ClearBasket(User user, ShoppingBasketWithUserViewModel model)
         {
             if (model.NewUser == null)
             {
-                await _orderService.ClearShoppingBasket(model.ShoppingBasketTickets);
+                await _orderService.ClearShoppingBasketByUser(user);
             }
             else
             {
@@ -357,12 +434,17 @@ namespace BilheticaAeronauticaWeb.Controllers
             }
         }
 
-        public async Task<List<ShoppingBasketTicket>> GetShoppingBasketTickets(ShoppingBasketWithUserViewModel model)
+        private async Task<List<ShoppingBasketTicket>> GetShoppingBasketTickets(ShoppingBasketWithUserViewModel model)
         {
+            var shoppingBasketTickets = new List<ShoppingBasketTicket>();
+
+
             if (User.Identity.IsAuthenticated)
             {
                 var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
-                return model.ShoppingBasketTickets = await _shoppingBasketRepository.GetShoppingBasketTicketsAsync(user);
+
+                return shoppingBasketTickets = await _shoppingBasketRepository.GetShoppingBasketTicketsAsync(user);
+      
             }
             else
             {
@@ -378,6 +460,17 @@ namespace BilheticaAeronauticaWeb.Controllers
             }
         }
 
+        private async Task<List<SelectListItem>> GetSeatsViewBag(ShoppingBasketWithUserViewModel model)
+        {
+            var seats = await _seatRepository.GetAvailableSeatsByFlight(model.ShoppingBasketTickets[0].FlightId);
 
+            var selectList = seats.Select(seat => new SelectListItem
+            {
+                Value = seat.Id.ToString(),
+                Text = $"Row: {seat.Row} Number: {seat.Column}"
+            }).ToList();
+
+            return selectList;
+        }
     }
 }

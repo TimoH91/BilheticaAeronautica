@@ -1,0 +1,148 @@
+﻿@using BilheticaAeronauticaWeb.Entities;
+@model BilheticaAeronauticaWeb.Models.TicketViewModel
+
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Ticket</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-controller="ShoppingBaskets" asp-action="CreateShoppingBasketTicket" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Surname" class="control-label"></label>
+                <input asp-for="Surname" class="form-control" />
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FlightId" class="control-label">Flight</label>
+                <input asp-for="FlightId" id="FlightId" />
+                <span asp-validation-for="FlightId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Class" class="control-label"></label>
+                <select asp-for="Class" class="form-control" asp-items="Html.GetEnumSelectList<TicketClass>()">
+                    <option value="">Select a class</option>
+                </select>
+                <span asp-validation-for="Class" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SeatId" class="control-label">Seat</label>
+                <select asp-for="SeatId" id="SeatId" class="form-control" asp-items="ViewBag.Seats">
+                    <option value="">Select a seat</option>
+                </select>
+                <span asp-validation-for="SeatId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OriginAirportId" class="control-label"></label>
+                <input asp-for="OriginAirportId" class="form-control" />
+                <span asp-validation-for="OriginAirportId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DestinationAirportId" class="control-label"></label>
+                <input asp-for="DestinationAirportId" class="form-control" />
+                <span asp-validation-for="DestinationAirportId" class="text-danger"></span>
+            </div>
+            @*             <div class="form-group">
+                <label asp-for="Payment" class="control-label"></label>
+                <select asp-for="Payment" class="form-control" asp-items="Html.GetEnumSelectList<Payment>()">
+                <option value="">Select payment status</option>
+                </select>
+                <span asp-validation-for="Payment" class="text-danger"></span>
+
+            </div> *@
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                <select asp-for="Type" class="form-control" asp-items="Html.GetEnumSelectList<PassengerType>()" id="PassengerType">
+                    <option value="">Select a type</option>
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add to basket" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        function updateSeats() {
+            var flightId = $("#FlightId").val();
+
+            if (flightId) {
+                $("#SeatId").empty();
+
+                $.ajax({
+                    url: '@Url.Action("GetSeatsByFlight", "Tickets")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        flightId: flightId,
+                    },
+                    success: function (seats) {
+                        $("#SeatId").append('<option value="">Select a seat</option>');
+                        $.each(seats, function (i, seat) {
+                            $("#SeatId").append('<option value="' + seat.value + '">' + seat.text + '</option>');
+
+                        });
+                    },
+                    error: function () {
+                        alert("Failed to load seats.");
+                    }
+                });
+            }
+        }
+
+            updateSeats();
+
+        $("#FlightId").change(function () {
+            updateSeats();
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const passengerTypeSelect = document.getElementById("PassengerType");
+        const seatSelect = document.getElementById("SeatId");
+
+        function toggleSeatSelect() {
+            const selectedValue = passengerTypeSelect.options[passengerTypeSelect.selectedIndex].text;
+            if (selectedValue.toLowerCase() === "infant") {
+                seatSelect.disabled = true;
+                seatSelect.value = ""; // Optional: clear selection
+            } else {
+                seatSelect.disabled = false;
+            }
+        }
+
+        // Initial check in case the form is pre-filled
+        toggleSeatSelect();
+
+        // Listen for changes
+        passengerTypeSelect.addEventListener("change", toggleSeatSelect);
+    });
+</script>
+}

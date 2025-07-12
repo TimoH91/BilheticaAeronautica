@@ -14,5 +14,9 @@ namespace BilheticaAeronauticaWeb.Data
         //IQueryable<Flight> GetFlightsByOriginAndDestination(int originAirportId, int destinationAirportId);
 
         Task<Flight> GetByIdTrackedAsync(int id);
+
+        Task<IEnumerable<Flight>> GetFlightsByAirplane(int airplaneId);
+
+        Task<bool> IsAirportUsedInAnyFlightAsync(int airportId);
     }
 }

@@ -12,7 +12,6 @@ namespace BilheticaAeronauticaWeb.Models
 
         public int? SeatId { get; set; }
 
-
         public int FlightId { get; set; }
 
         public PassengerType PassengerType { get; set; }
@@ -21,7 +20,7 @@ namespace BilheticaAeronauticaWeb.Models
 
         public decimal Price { get; set; }
 
-        public int? ResponsibleAdultId { get; set; }
+        public int? ResponsibleAdultTicketId { get; set; }
 
         public string? UserId { get; set; }
     }

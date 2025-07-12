@@ -16,18 +16,6 @@ namespace BilheticaAeronauticaWeb.Helpers
             session.Remove(BasketSessionKey);
         }
 
-        //public ShoppingBasket GetBasket(ISession session)
-        //{
-        //    var json = session.GetString(BasketSessionKey);
-
-        //    if (string.IsNullOrEmpty(json))
-        //    {
-        //        return new ShoppingBasket();
-        //    }
-
-        //    return JsonSerializer.Deserialize<ShoppingBasket>(json);
-        //}
-
         public List<ShoppingBasketTicket> GetBasketTickets(ISession session)
         {
             var json = session.GetString(BasketSessionKey);
@@ -46,10 +34,17 @@ namespace BilheticaAeronauticaWeb.Helpers
             session.SetString(BasketSessionKey, json);
         }
 
-        //public void SaveBasket(ISession session, ShoppingBasket basket)
-        //{
-        //    var json = JsonSerializer.Serialize(basket);
-        //    session.SetString(BasketSessionKey, json);
-        //}
+        public void UpdateTicket(ISession session, ShoppingBasketTicket updatedTicket)
+        {
+            var tickets = GetBasketTickets(session);
+
+            var index = tickets.FindIndex(t => t.Id == updatedTicket.Id); 
+
+            if (index != -1)
+            {
+                tickets[index] = updatedTicket;
+                SaveBasketTickets(session, tickets);
+            }
+        }
     }
 }

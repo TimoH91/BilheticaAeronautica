@@ -79,7 +79,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var flight = await _converterHelper.ToFlight(model, true);
+                var flight = _converterHelper.ToFlight(model, true);
 
                 try
                 {
@@ -136,9 +136,11 @@ namespace BilheticaAeronauticaWeb.Controllers
             {
                 try
                 {
-                    var flight = await _converterHelper.ToFlight(model, false);
+                    var flight = _converterHelper.ToFlight(model, false);
 
                     await _flightRepository.UpdateAsync(flight);
+
+                    await _flightService.ReattributeSeats(flight);
                 }
 
                 catch (DbUpdateConcurrencyException)

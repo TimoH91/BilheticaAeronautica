@@ -59,14 +59,22 @@ namespace BilheticaAeronauticaWeb.Data
         //        .ToListAsync();
         //}
 
-        public async Task<IEnumerable<Seat>> GetSeatsByFlight(int flightId)
+        public async Task<IEnumerable<Seat>> GetAvailableSeatsByFlight(int flightId)
         {
             return await _context.Seats
-                .Where(f => f.FlightId == flightId && f.Occupied == false)
+                .AsNoTracking()
+                .Where(f => f.Flight.Id == flightId && f.Occupied == false)
                 .OrderBy(f => f.Id)
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Seat>> GetAllSeatsByFlight(int flightId)
+        {
+            return await _context.Seats
+                .Where(f => f.Flight.Id == flightId)
+                .OrderBy(f => f.Id)
+                .ToListAsync();
+        }
 
 
     }

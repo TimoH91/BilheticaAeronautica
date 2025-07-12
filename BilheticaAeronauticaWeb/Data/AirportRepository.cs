@@ -29,6 +29,14 @@ namespace BilheticaAeronauticaWeb.Data
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 
+        public Task<Airport> GetByIdTrackedAsync(int id)
+        {
+            return _context.Airports
+                .Include(a => a.City)
+                .Include(a => a.Country)
+                .FirstOrDefaultAsync(a => a.Id == id);
+        }
+
         public IEnumerable<SelectListItem> GetComboAirports()
         {
             var list = _context.Airports.Select(a => new SelectListItem

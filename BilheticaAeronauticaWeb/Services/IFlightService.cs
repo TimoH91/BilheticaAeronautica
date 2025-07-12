@@ -9,15 +9,7 @@ namespace BilheticaAeronauticaWeb.Services
     {
         Task<List<Seat>> CreateSeatsForFlightAsync(Flight flight);
 
-        //ReattributeSeats(Flight flight);
+        Task ReattributeSeats(Flight flight);
 
-        //RemoveSeatsAndTickets(List<Ticket> tickets, Flight flight);
-
-        //MatchSeatsWithTickets(List<Ticket> tickets, List<Seat> newSeats);
-
-        //MatchSeatsWithInfantTickets(List<Ticket> tickets);
-
-        //RemoveSeatsFromTickets(List<Ticket> tickets);
-        
     }
 }

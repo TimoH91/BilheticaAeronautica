@@ -1,4 +1,5 @@
 ﻿using BilheticaAeronauticaWeb.Entities;
+using BilheticaAeronauticaWeb.Models;
 
 namespace BilheticaAeronauticaWeb.Services
 {
@@ -8,8 +9,8 @@ namespace BilheticaAeronauticaWeb.Services
 
         //Task UnoccupySeats(List<Ticket> Tickets);
 
-
-        Task OccupySeats(Seat seat);
+        List<ShoppingBasketTicket> FilterAdults(List<ShoppingBasketTicket> tickets, TicketViewModel ticket);
+        Task OccupySeats(int seatId);
 
         Task UnoccupySeats(Seat seat);
         Task<IEnumerable<Seat>> UnholdSeats(IEnumerable<Seat> seats);
@@ -19,6 +20,10 @@ namespace BilheticaAeronauticaWeb.Services
         List<Seat> RemoveHeldSeats(IEnumerable<Seat> seats);
 
         Task HoldSeat(Seat seat);
+
+        Task MakeResponsibleAdult(ShoppingBasketTicket ticket);
+
+        Task<bool> AllowTicketChanges(TicketViewModel model);
 
     }
 }

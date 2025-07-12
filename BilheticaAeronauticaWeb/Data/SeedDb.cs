@@ -55,7 +55,8 @@ namespace BilheticaAeronauticaWeb.Data
             }
 
             var user = await _userHelper.GetUserByEmailAsync("timothyharris04@gmail.com"); 
-            var user2 = await _userHelper.GetUserByEmailAsync("johnSmith@gmail.com");
+            var user2 = await _userHelper.GetUserByEmailAsync("johnSmith@yopmail.com");
+            var user3 = await _userHelper.GetUserByEmailAsync("sarahparker@yopmail.com");
 
             if (user == null)
             {
@@ -89,8 +90,8 @@ namespace BilheticaAeronauticaWeb.Data
                 {
                     FirstName = "John",
                     LastName = "Smith",
-                    Email = "johnSmith@gmail.com",
-                    UserName = "johnSmith@gmail.com",
+                    Email = "johnSmith@yopmail.com",
+                    UserName = "johnSmith@yopmail.com",
                     PhoneNumber = "1234567890",
                     Role = "Customer"
 
@@ -109,8 +110,35 @@ namespace BilheticaAeronauticaWeb.Data
 
             }
 
+            if (user3 == null)
+            {
+                user3 = new User
+                {
+                    FirstName = "Sarah",
+                    LastName = "Parker",
+                    Email = "sarahparker@yopmail.com",
+                    UserName = "sarahparker@yopmail.com",
+                    PhoneNumber = "1234567890",
+                    Role = "Staff"
+
+                };
+
+                var result = await _userHelper.AddUserAsync(user3, "123456");
+
+                if (result != IdentityResult.Success)
+                {
+                    throw new InvalidOperationException("Could not create the user in seeder");
+                }
+
+                await _userHelper.AddUserToRoleAsync(user3, "Staff");
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user3);
+                await _userHelper.ConfirmEmailAsync(user3, token);
+
+            }
+
             var isInRole1 = await _userHelper.IsUserInRoleAsync(user, "Admin");
             var isInRole2 = await _userHelper.IsUserInRoleAsync(user2, "Customer");
+            var isInRole3 = await _userHelper.IsUserInRoleAsync(user3, "Staff");
 
             if (!isInRole1)
             {
@@ -122,6 +150,10 @@ namespace BilheticaAeronauticaWeb.Data
                 await _userHelper.AddUserToRoleAsync(user2, "Customer");
             }
 
+            if (!isInRole3)
+            {
+                await _userHelper.AddUserToRoleAsync(user3, "Staff");
+            }
 
             var englandCountry = _context.Countries.Include(c => c.Cities).FirstOrDefault(c => c.Name == "England");
 
@@ -174,8 +206,8 @@ namespace BilheticaAeronauticaWeb.Data
 
                 var flight = new Flight
                 {
-                    Date = DateTime.Now.Date,
-                    Time = DateTime.Now.TimeOfDay,
+                    Date = DateTime.Today.AddYears(1),
+                    Time = new TimeSpan(13, 0, 0),
                     Duration = 60,
                     BasePrice = 50,
                     OriginAirport = originAirport,

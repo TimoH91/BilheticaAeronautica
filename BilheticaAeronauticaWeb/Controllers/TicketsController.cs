@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Data;
 using Microsoft.AspNetCore.Identity;
 using BilheticaAeronauticaWeb.Services;
+using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -101,7 +102,32 @@ namespace BilheticaAeronauticaWeb.Controllers
             //return new NotFoundViewResult("TicketNotFound");
         }
 
-        [HttpPost]
+        public async Task<IActionResult> CreateSpecificTicket(int? id)
+        {
+            if (id != null)
+            {
+                var flight = await _flightRepository.GetByIdAsync(id.Value);
+
+                var model = new TicketViewModel 
+                {
+                    Id = 0,
+                    Name = "John",
+                    Surname = "Smith",
+                    FlightId = flight.Id,
+                    OriginAirportId = flight.OriginAirportId,
+                    DestinationAirportId = flight.DestinationAirportId,
+                    Class = TicketClass.Economic,
+                    Price = flight.BasePrice,
+                    Type = Entities.PassengerType.Adult,
+                };
+
+                return View(model);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+            [HttpPost]
         [Route("Tickets/GetFlightsByRoute")]
         public async Task<JsonResult> GetFlightsByRoute(int originAirportId, int destinationAirportId)
         {
@@ -131,7 +157,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (flightId > 0)
             {
-                var seats = await _seatRepository.GetSeatsByFlight(flightId);
+                var seats = await _seatRepository.GetAvailableSeatsByFlight(flightId);
 
                 var seatsAdjusted = await _ticketService.UnholdSeats(seats);
 
@@ -162,22 +188,27 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             if (ModelState.IsValid)
             {
-                
-                var ticket = _converterHelper.ToTicket(model, true);
-
-                try
+                if (model.FlightId != null)
                 {
-                    await _ticketRepository.CreateAsync(ticket);
-                    //await _flightService.CreateSeatsForFlightAsync(flight);
+                    var flight = await _flightRepository.GetByIdAsync(model.FlightId.Value);
 
-                    return RedirectToAction(nameof(Index));
+                    var ticket = _converterHelper.ToTicket(model, true, flight);
 
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.ToString());
+                    try
+                    {
+                        await _ticketRepository.CreateAsync(ticket);
+                        //await _flightService.CreateSeatsForFlightAsync(flight);
+
+                        return RedirectToAction(nameof(Index));
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.ToString());
+                    }
                 }
             }
+
             return View(model);
         }
 
@@ -196,18 +227,20 @@ namespace BilheticaAeronauticaWeb.Controllers
                 return new NotFoundViewResult("TicketNotFound");
             }
 
-            var model = _converterHelper.ToTicketViewModel(ticket);
-
-
-            //if (ticket.FlightId.HasValue)
-            //{
-            //    ViewBag.Seats = await _seatRepository.GetSeatsByFlight(ticket.FlightId.Value);
-
-
-            //}
-
+            var model = ConvertToModel(ticket);
 
             return View(model);
+        }
+
+        private TicketViewModel ConvertToModel(Ticket ticket)
+        {
+            if (ticket is InfantTicket infantTicket)
+            {
+               return _converterHelper.ToInfantTicketViewModel(infantTicket);
+            }
+
+            return _converterHelper.ToAdultAndChildTicketViewModel(ticket);
+
         }
 
         // POST: Tickets/Edit/5
@@ -219,25 +252,37 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                try
-                {
-                    var ticket =  _converterHelper.ToTicket(model, false);
+                var canEdit = await _ticketService.AllowTicketChanges(model);
 
-                    await _ticketRepository.UpdateAsync(ticket);
-                }
-
-                catch (DbUpdateConcurrencyException)
+                if (model.FlightId != null && canEdit)
                 {
-                    if (!await _ticketRepository.ExistAsync(model.Id))
+                    try
                     {
-                        return new NotFoundViewResult("TicketNotFound"); ;
+                        var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+
+                        var flight = await _flightRepository.GetByIdAsync(model.FlightId.Value);
+
+                        var ticket = _converterHelper.ToTicket(model, false, flight);
+
+                        ticket.UserId = user.Id;
+
+                        await _ticketRepository.UpdateAsync(ticket);
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+
+                        if (!await _ticketRepository.ExistAsync(model.Id))
+                        {
+                            return new NotFoundViewResult("TicketNotFound"); ;
+                        }
+                        else
+                        {
+                            throw;
+                        }
+
                     }
+                    return RedirectToAction("Index", "Orders");
                 }
-                return RedirectToAction(nameof(Index));
             }
             return View(model);
         }

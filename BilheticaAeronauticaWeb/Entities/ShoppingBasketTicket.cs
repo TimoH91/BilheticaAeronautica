@@ -7,8 +7,6 @@ namespace BilheticaAeronauticaWeb.Entities
     {
         public int Id { get; set; }
 
-        //public int ShoppingBasketId { get; set; }
-
         [Required]
         public string Name { get; set; }
 
@@ -21,11 +19,15 @@ namespace BilheticaAeronauticaWeb.Entities
         //[Required]
         //public int DestinationAirportId { get; set; }
 
-        [Required]
+        public int? SeatId { get; set; }
+
         public Seat? Seat { get; set; }
 
         [Required]
         public Flight Flight { get; set; }
+
+
+        public int FlightId { get; set; }
 
         [Required]
         public PassengerType PassengerType { get; set; }
@@ -36,7 +38,11 @@ namespace BilheticaAeronauticaWeb.Entities
         [Required]
         public decimal Price { get; set; }
 
-        public int? ResponsibleAdultId { get; set; }
+        public int? ResponsibleAdultTicketId { get; set; }
+
+        public bool IsResponsibleAdult { get; set; }
+
+        public string? UserId { get; set; }
 
         public User? User { get; set; }
 
