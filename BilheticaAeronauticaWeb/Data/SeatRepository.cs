@@ -46,18 +46,6 @@ namespace BilheticaAeronauticaWeb.Data
             return list;
         }
         
-        //public async Task<IEnumerable<SelectListItem>> GetSeatsByFlight(int flightId)
-        //{
-        //    return await _context.Seats
-        //        .Where(f => f.FlightId == flightId && f.Occupied == false)
-        //        .OrderBy(f => f.Id)
-        //        .Select(f => new SelectListItem
-        //        {
-        //            Value = f.Id.ToString(),
-        //            Text = $"{f.Row} + {f.Column}"
-        //        })
-        //        .ToListAsync();
-        //}
 
         public async Task<IEnumerable<Seat>> GetAvailableSeatsByFlight(int flightId)
         {

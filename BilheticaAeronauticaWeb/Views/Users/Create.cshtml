@@ -1,12 +1,13 @@
-﻿@model BilheticaAeronauticaWeb.Models.UserViewModel
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model BilheticaAeronauticaWeb.Models.UserViewModel
 
 @{
     ViewData["Title"] = "Create";
 }
+<br/>
+<h1>Add new user</h1>
 
-<h1>Create</h1>
-
-<h4>UserViewModel</h4>
+<h4></h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -18,17 +19,17 @@
                 <span asp-validation-for="Id" class="text-danger"></span>
             </div> *@
             <div class="form-group">
-                <label asp-for="UserName" class="control-label"></label>
+                <label asp-for="UserName" class="control-label">User name</label>
                 <input asp-for="UserName" class="form-control" />
                 <span asp-validation-for="UserName" class="text-danger"></span>
             </div>           
             <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
+                <label asp-for="FirstName" class="control-label">First name</label>
                 <input asp-for="FirstName" class="form-control" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>            
             <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
+                <label asp-for="LastName" class="control-label">Last name</label>
                 <input asp-for="LastName" class="form-control" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
@@ -39,7 +40,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="Role" class="control-label"></label>
-                <input asp-for="Role" class="form-control" />
+
+                <select asp-for="Role"
+                        class="form-control"
+                        asp-items="@(new SelectList(new[] { "Admin", "Customer", "Staff" }))">
+                </select>
+
                 <span asp-validation-for="Role" class="text-danger"></span>
             </div>
             <div class="form-group">

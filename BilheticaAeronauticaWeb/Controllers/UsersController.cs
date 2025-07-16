@@ -15,34 +15,25 @@ namespace BilheticaAeronauticaWeb.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly UserManager<User> _userManager;
+        private readonly IUserHelper _userHelper;
         private readonly IConverterHelper _converterHelper;
+        private readonly IMailHelper _mailHelper;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UsersController(IUserRepository userRepository, UserManager<User> userManager, IConverterHelper converterHelper)
+        public UsersController(IUserRepository userRepository,UserManager<User> userManager,
+            IConverterHelper converterHelper,IUserHelper userHelper,IMailHelper mailHelper, RoleManager<IdentityRole> roleManager)
         {
             _userRepository = userRepository;
             _userManager = userManager;
             _converterHelper = converterHelper;
+            _userHelper = userHelper;
+            _mailHelper = mailHelper;
+            _roleManager = roleManager;
         }
 
         public async Task<IActionResult> Index()
         {
-            //var users = _userRepository.GetAll().OrderBy(u => u.UserName).ToList();
-
             var users = await _userRepository.GetAllWithRoles();
-
-           // var userViewModels = new List<UserViewModel>();
-
-           // foreach (var user in users)
-           // {
-           //     var roles = await _userManager.GetRolesAsync(user);
-           //     userViewModels.Add(new UserViewModel
-           //     {
-           //         //Id = user.Id,
-           //         UserName = user.UserName,
-           //         Email = user.Email,
-           //         Role = roles.FirstOrDefault() ?? "No role"
-           //     });
-           //}
 
             return View(users);
         }
@@ -88,6 +79,8 @@ namespace BilheticaAeronauticaWeb.Controllers
                 {
                     await _userRepository.CreateAsync(user, model.Role, model.Password);
 
+                    await MailNewUser(user);
+
                     return RedirectToAction(nameof(Index));
 
                 }
@@ -129,13 +122,25 @@ namespace BilheticaAeronauticaWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UserViewModel model)
         {
+            //if (!string.IsNullOrEmpty(model.Id))
+            //{
+            //    var user = await _userRepository.GetByIdAsync(model.Id);
+            //    model.Password = user.PasswordHash;
+            //}
+
+            ModelState.Remove("Password");
+
             if (ModelState.IsValid)
-            {
+             {
                 try
                 {
+                    var oldUser = await _userRepository.GetByIdAsync(model.Id);
+
+                    await UpdateRole(model, oldUser);
+
                     var user = await _converterHelper.ToUser(model, false);
 
-                    await _userRepository.UpdateAsync(user);
+                    await _userHelper.UpdateUserAsync(user);
                 }
 
                 catch (DbUpdateConcurrencyException)
@@ -206,6 +211,50 @@ namespace BilheticaAeronauticaWeb.Controllers
                     ErrorTitle = "Erro de base de dados",
                     ErrorMessage = "Ocorreu um erro inesperado ao tentar apagar o aeroporto."
                 });
+
+            }
+        }
+
+        private async Task MailNewUser(User newUser)
+        {
+
+            string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(newUser);
+            string tokenLink = Url.Action("ConfirmEmail", "Account", new
+            {
+                userid = newUser.Id,
+                token = myToken
+            }, protocol: HttpContext.Request.Scheme);
+
+            Response response = _mailHelper.SendEmail(newUser.Email, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                                                                     $"To allow the user, " +
+                                                                    $"please click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
+
+
+            if (response.IsSuccess)
+            {
+
+                ViewBag.Message = "The instructions to allow you user has been sent to email";
+                //return View(model);
+            }
+
+
+            ModelState.AddModelError(string.Empty, "The user couldn't be logged.");
+        }
+
+
+        private async Task UpdateRole(UserViewModel model, User oldUser)
+        {
+            if (model.Role != oldUser.Role)
+            {
+                try
+                {
+                    await _userManager.RemoveFromRoleAsync(oldUser, oldUser.Role);
+                    await _userHelper.AddUserToRoleAsync(oldUser, model.Role);
+                }
+                catch (DbUpdateException ex)
+                {
+
+                }
 
             }
         }

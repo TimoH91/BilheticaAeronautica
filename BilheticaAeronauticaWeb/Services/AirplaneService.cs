@@ -225,7 +225,7 @@ namespace BilheticaAeronauticaWeb.Services
 
         public async Task<bool> AllowAirplaneStatusChange(Airplane airplane, Airplane editedAirplane)
         {
-            bool canEdit = false;
+            bool canEdit = true;
 
             if (airplane.Status != editedAirplane.Status)
             {
@@ -247,10 +247,9 @@ namespace BilheticaAeronauticaWeb.Services
 
                 if (futureFlightsWithAirplane.Any())
                 {
-                    return canEdit;
+                   canEdit = false;
                 }
 
-                canEdit = true;
             }
 
             return canEdit;

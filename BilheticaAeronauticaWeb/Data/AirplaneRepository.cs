@@ -1,5 +1,8 @@
-﻿using BilheticaAeronauticaWeb.Entities;
+﻿using System.Runtime.InteropServices;
+using AspNetCoreGeneratedDocument;
+using BilheticaAeronauticaWeb.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace BilheticaAeronauticaWeb.Data
 {
@@ -28,6 +31,22 @@ namespace BilheticaAeronauticaWeb.Data
             });
 
             return list;
+        }
+
+        public async Task<IEnumerable<Airplane>> GetAvailableAirplanes(Flight flight)
+        {
+            var unavailableAirplaneIds = await _context.Flights.
+                Where(f => f.Date == flight.Date && f.Id != flight.Id)
+                .Select(f => f.AirplaneId)
+                .Distinct()
+                .ToListAsync();
+
+            var availableAirplanes = await _context.Airplanes.
+                Where(a => a.Status != false && !unavailableAirplaneIds.Contains(a.Id))
+                .ToListAsync();
+
+            return availableAirplanes;
+
         }
     }
 }

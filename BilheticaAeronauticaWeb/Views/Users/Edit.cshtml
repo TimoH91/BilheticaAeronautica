@@ -1,12 +1,12 @@
-﻿@model BilheticaAeronauticaWeb.Models.UserViewModel
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model BilheticaAeronauticaWeb.Models.UserViewModel
 
 @{
     ViewData["Title"] = "Edit";
 }
+</br>
+<h1>Edit user</h1>
 
-<h1>Edit</h1>
-
-<h4>UserViewModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -39,7 +39,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="Role" class="control-label"></label>
-                <input asp-for="Role" class="form-control" />
+
+                <select asp-for="Role"
+                        class="form-control"
+                        asp-items="@(new SelectList(new[] { "Admin", "Customer", "Staff" }))">
+                </select>
+
                 <span asp-validation-for="Role" class="text-danger"></span>
             </div>
             <div class="form-group">

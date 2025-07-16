@@ -34,15 +34,17 @@ namespace BilheticaAeronauticaWeb.Services
                 await _seatRepository.UpdateAsync(seat);
         }
 
-        public async Task UnoccupySeats(Seat seat)
+        public async Task UnoccupySeats(int seatId)
         {
+                var seat = await _seatRepository.GetByIdAsync(seatId);
                 seat.Occupied = false;
                 await _seatRepository.UpdateAsync(seat);
         }
 
 
-        public async Task HoldSeat(Seat seat)
+        public async Task HoldSeat(int seatId)
         {
+                var seat = await _seatRepository.GetByIdAsync(seatId);
                 seat.IsHeld = true;
                 seat.HoldingTime = DateTime.Now;
                 await _seatRepository.UpdateAsync(seat);

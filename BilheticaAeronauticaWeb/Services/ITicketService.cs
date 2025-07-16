@@ -12,14 +12,14 @@ namespace BilheticaAeronauticaWeb.Services
         List<ShoppingBasketTicket> FilterAdults(List<ShoppingBasketTicket> tickets, TicketViewModel ticket);
         Task OccupySeats(int seatId);
 
-        Task UnoccupySeats(Seat seat);
+        Task UnoccupySeats(int seatId);
         Task<IEnumerable<Seat>> UnholdSeats(IEnumerable<Seat> seats);
 
         Task UnholdSeat(Seat seat);
 
         List<Seat> RemoveHeldSeats(IEnumerable<Seat> seats);
 
-        Task HoldSeat(Seat seat);
+        Task HoldSeat(int seatId);
 
         Task MakeResponsibleAdult(ShoppingBasketTicket ticket);
 

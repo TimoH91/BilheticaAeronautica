@@ -136,9 +136,9 @@ namespace BilheticaAeronauticaWeb.Controllers
                             await AddBasketTicketWithoutUser(basketTicket);
                         }
 
-                        if (basketTicket.Seat != null)
+                        if (basketTicket.SeatId != null)
                         {
-                            await _ticketService.HoldSeat(basketTicket.Seat);
+                            await _ticketService.HoldSeat(basketTicket.SeatId.Value);
                         }
 
                     return RedirectToAction("Index");

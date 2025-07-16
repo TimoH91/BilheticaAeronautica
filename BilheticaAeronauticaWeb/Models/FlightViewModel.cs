@@ -7,6 +7,7 @@ namespace BilheticaAeronauticaWeb.Models
     {
         public int Id { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
 
         public TimeSpan Time { get; set; }

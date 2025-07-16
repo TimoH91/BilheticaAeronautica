@@ -241,6 +241,7 @@ namespace BilheticaAeronauticaWeb.Helpers
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     Email = user.Email,
+                    Password = user.PasswordHash,
                     Role = roles.FirstOrDefault() ?? "No role"
                 };
             }

@@ -117,7 +117,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             var model = _converterHelper.ToFlightViewModel(flight);
 
-            ViewBag.Airplanes = _airplaneRepository.GetComboAirplanes();
+            ViewBag.Airplanes = await GetAirplanesViewBag(flight);
             ViewBag.Airports = _airportRepository.GetComboAirports();
 
             return View(model);
@@ -217,9 +217,18 @@ namespace BilheticaAeronauticaWeb.Controllers
             }
         }
 
-        //private bool FlightExists(int id)
-        //{
-        //    //return _context.Flights.Any(e => e.Id == id);
-        //}
+        private async Task<List<SelectListItem>> GetAirplanesViewBag(Flight flight)
+        {
+            var airplanes = await _airplaneRepository.GetAvailableAirplanes(flight);
+
+            var selectList = airplanes.Select(airplane => new SelectListItem
+            {
+                Value = airplane.Id.ToString(),
+                Text = $"Model: {airplane.Name} Manufacturer: {airplane.Manufacturer}"
+            }).ToList();
+
+            return selectList;
+        }
+
     }
 }

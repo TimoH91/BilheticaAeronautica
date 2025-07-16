@@ -92,6 +92,7 @@
                                 @if (User.Identity.IsAuthenticated && this.User.IsInRole("Staff"))
                                 {
                                     <a class="nav-link" asp-area="" asp-controller="Flights" asp-action="Index">Manage</a>
+                                    <a class="nav-link" asp-action="Create" asp-controller="Flights" asp-action="Index">Create</a>
                                 }
                             </nav>
                         </div>
