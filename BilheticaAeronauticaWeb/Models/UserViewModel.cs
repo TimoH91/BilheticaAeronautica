@@ -1,4 +1,5 @@
-﻿using Microsoft.Identity.Client;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.Identity.Client;
 
 namespace BilheticaAeronauticaWeb.Models
 {
@@ -18,6 +19,7 @@ namespace BilheticaAeronauticaWeb.Models
 
         public string Password { get; set; }
 
-        //public string ConfirmPassword { get; set; }
+        [Display(Name = "Photo")]
+        public IFormFile ImageFile { get; set; }
     }
 }

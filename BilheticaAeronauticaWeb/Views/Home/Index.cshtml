@@ -35,10 +35,10 @@
                                onkeydown="return false">
                     </div>
                     <div class="form-group col-md align-items-start flex-column">
-                        <label for="returndate" class="d-inline-flex">Return</label>
+                            <label for="returnDate" class="d-inline-flex">Return</label>
                         <input type="date" placeholder="One way" value=""
-                               onChange="this.setAttribute('value', this.value)" class="form-control" id="returndate"
-                               name="returndate">
+                               onChange="this.setAttribute('value', this.value)" class="form-control" id="returnDate"
+                                   name="returnDate">
                     </div>
                 </div>
 @*                 <div class="row">
@@ -100,7 +100,7 @@
                             <option value="BUSINESS">Business</option>
                         </select>
                     </div>
-                    <div class="form-group col-lg-6 align-items-start flex-column pt-lg-4">
+                    @* <div class="form-group col-lg-6 align-items-start flex-column pt-lg-4">
                         <div class="form-check form-switch">
                             <input class="form-check-input align-self-center" type="checkbox" id="directFlights">
                             <label class="form-check-label d-inline-flex align-self-center" for="directFlights">
@@ -108,7 +108,7 @@
                                 flights
                             </label>
                         </div>
-                    </div>
+                    </div> *@
                 </div>
                 <div class="row">
                     <div class="text-left col-auto">
@@ -127,13 +127,18 @@
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.getElementById("flight-form");
             const departureDateInput = document.getElementById("departureDate");
+            const returnDateInput = document.getElementById("returnDate");
 
             form.addEventListener("submit", function (e) {
-                const hasDate = departureDateInput.value !== "";
+                const hasDepartureDate = departureDateInput.value !== "";
+                const hasReturnDate = returnDateInput.value !== "";
 
-                if (hasDate) {
-                    form.action = "/Home/SearchFlightsWithAirportsAndDate"; // Adjust controller name if needed
-                } else {
+                if (hasDepartureDate && hasReturnDate) {
+                    form.action = "/Home/SearchFlightsWithAirportsAndReturn";
+                } else if (hasDepartureDate) {
+                    form.action = "/Home/SearchFlightsWithAirportsAndDate";
+                }
+                else {
                     form.action = "/Home/SearchFlightsWithAirports";
                 }
             });

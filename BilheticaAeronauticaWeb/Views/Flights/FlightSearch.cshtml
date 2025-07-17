@@ -1,0 +1,142 @@
+﻿@model BilheticaAeronauticaWeb.Models.RoundTripFlightViewModel
+
+</br>
+
+@if (Model.OutboundFlights != null && Model.OutboundFlights.Any())
+{
+    <h2>Departure Flights</h2>
+    <br />
+    <div class="card mb-4">
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().Date)</th>
+                        <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().Time)</th>
+                        <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().Duration)</th>
+                        <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().BasePrice)</th>
+                        <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().Airplane)</th>
+                        <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().OriginAirport)</th>
+                        <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().DestinationAirport)</th>
+                        <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().Layover)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OutboundFlights)
+                    {
+                        <tr>
+                            <td>@item.Date.ToShortDateString()</td>
+                            <td>@item.Time.ToString(@"hh\:mm")</td>
+                            <td>@item.Duration</td>
+                            <td>@item.BasePrice.ToString("C")</td>
+                            <td>@item.Airplane?.Name</td>
+                            <td>@item.OriginAirport?.Name</td>
+                            <td>@item.DestinationAirport?.Name</td>
+                            <td>@item.Layover?.Name</td>
+                            <td>
+                                @if (User.Identity.IsAuthenticated && User.IsInRole("Customer") || !User.Identity.IsAuthenticated)
+                                {
+                                    <a asp-controller="Tickets" asp-action="CreateSpecificTicket" asp-route-id="@item.Id" class="btn btn-success">Buy Ticket</a>
+                                }
+                                @if (User.Identity.IsAuthenticated && User.IsInRole("Staff"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-info">Edit</a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-light">Details</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-dark">Delete</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <p> No departure flights</p>
+    <br />
+}
+
+@if (Model.ReturnFlights != null && Model.ReturnFlights.Any())
+{
+    <h2>Return Flights</h2>
+    <br />
+    <div class="card mb-4">
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().Date)</th>
+                        <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().Time)</th>
+                        <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().Duration)</th>
+                        <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().BasePrice)</th>
+                        <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().Airplane)</th>
+                        <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().OriginAirport)</th>
+                        <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().DestinationAirport)</th>
+                        <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().Layover)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ReturnFlights)
+                    {
+                        <tr>
+                            <td>@item.Date.ToShortDateString()</td>
+                            <td>@item.Time.ToString(@"hh\:mm")</td>
+                            <td>@item.Duration</td>
+                            <td>@item.BasePrice.ToString("C")</td>
+                            <td>@item.Airplane?.Name</td>
+                            <td>@item.OriginAirport?.Name</td>
+                            <td>@item.DestinationAirport?.Name</td>
+                            <td>@item.Layover?.Name</td>
+                            <td>
+                                @if (User.Identity.IsAuthenticated && User.IsInRole("Customer") || !User.Identity.IsAuthenticated)
+                                {
+                                    <a asp-controller="Tickets" asp-action="CreateSpecificTicket" asp-route-id="@item.Id" class="btn btn-success">Buy Ticket</a>
+                                }
+                                @if (User.Identity.IsAuthenticated && User.IsInRole("Staff"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-info">Edit</a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-light">Details</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-dark">Delete</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <p> No return flights</p>
+}
+
+
+
+
+
+
+        @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Staff"))
+        {
+            <p>
+                <a asp-action="Create" class="btn btn-info">Create New</a>
+            </p>
+        }
+
+        @section Scripts {
+            <script>
+                $(document).ready(function () {
+                    $('#datatablesSimple').DataTable({
+                        pageLength: 10,
+                        language: {
+                    search: "Search flights: ",
+                    lengthMenu: "_MENU_" // Just the dropdown, no label
+                        }
+                    });
+                });
+            </script>
+        }

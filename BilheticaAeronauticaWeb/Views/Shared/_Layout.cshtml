@@ -45,9 +45,9 @@
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     @if (User.Identity.IsAuthenticated)
                     {
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="ChangeUser">Account</a></li>
-                    @*                     <li><a class="dropdown-item" href="#">Settings</a></li> *@
-                    <li><hr class="dropdown-divider" /></li>
+                        <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="ChangeUser">Account</a></li>
+                        @*                     <li><a class="dropdown-item" href="#">Settings</a></li> *@
+                        <li><hr class="dropdown-divider" /></li>
 
                         <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a></li>
                     }
@@ -82,7 +82,7 @@
 
                         <div class="sb-sidenav-menu-heading">Menu</div>
                         <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFlights" aria-expanded="false" aria-controls="collapseFlights">
-                            <div class="sb-nav-link-icon"><i class="fas fa-plane"></i></div>
+                            <div class="sb-nav-link-icon"><i class="fas fa-plane-departure"></i></div>
                             Flights
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
@@ -100,7 +100,7 @@
                         @if (User.Identity.IsAuthenticated && this.User.IsInRole("Admin"))
                         {
                             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAirplanes" aria-expanded="false" aria-controls="collapseAirplanes">
-                                <div class="sb-nav-link-icon"><i class="fas fa-fighter-jet"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-plane"></i></div>
                                 Airplanes
                                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                             </a>
@@ -114,7 +114,7 @@
                         @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Admin"))
                         {
                             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAirports" aria-expanded="false" aria-controls="collapseAirports">
-                                <div class="sb-nav-link-icon"><i class="fas fa-fighter-jet"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-globe"></i></div>
                                 Airports
                                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                             </a>
@@ -195,8 +195,10 @@
 
         <div id="layoutSidenav_content">
             <main>
-                <div class="container-fluid px-4">
-                    @RenderBody()
+                <div class="container d-flex justify-content-center">
+                    <div class="w-100" style="max-width: 3000px;">
+                        @RenderBody()
+                    </div>
                 </div>
             </main>
             <footer class="py-4 bg-light mt-auto">
@@ -221,4 +223,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-

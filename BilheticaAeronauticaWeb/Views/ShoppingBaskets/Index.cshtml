@@ -57,4 +57,10 @@
 }
 
 
-<a asp-controller="flights" asp-action="Index" class="btn btn-primary">Add tickets</a>
+@if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Customer"))
+{
+    <div class="text-center mt-3">
+        <a asp-controller="Flights" asp-action="Index" class="btn btn-primary">Add tickets</a>
+    </div>
+}
+

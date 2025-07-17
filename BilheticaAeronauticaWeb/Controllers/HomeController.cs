@@ -29,27 +29,55 @@ namespace BilheticaAeronauticaWeb.Controllers
 
         public async Task<IActionResult> SearchFlightsWithAirports(int originAirportId, int destinationAirportId)
         {
-            IEnumerable<Flight> flights = await _flightRepository.GetFlightsByOriginAndDestination(originAirportId, destinationAirportId);
+            //IEnumerable<Flight> flights = await _flightRepository.GetFlightsByOriginAndDestination(originAirportId, destinationAirportId);
 
-            if (!flights.Any() || flights == null)
+            var flights = new RoundTripFlightViewModel
             {
-                RedirectToAction("Index");
-            }
+                OutboundFlights = await _flightRepository.GetFlightsByOriginAndDestination(originAirportId, destinationAirportId)
+            };
 
-            return View("Views/Flights/Index.cshtml", flights);
+            //if (!flights.Any() || flights == null)
+            //{
+            //    RedirectToAction("Index");
+            //}
+
+            return View("Views/Flights/FlightSearch.cshtml", flights);
 
         }
 
         public async Task<IActionResult> SearchFlightsWithAirportsAndDate(int originAirportId, int destinationAirportId, DateTime departureDate)
         {
-            IEnumerable<Flight> flights = await _flightRepository.GetFlightsByOriginDestinationAndDate(originAirportId, destinationAirportId, departureDate);
+            //IEnumerable<Flight> flights = await _flightRepository.GetFlightsByOriginDestinationAndDate(originAirportId, destinationAirportId, departureDate);
 
-            if (!flights.Any() || flights == null)
+            //if (!flights.Any() || flights == null)
+            //{
+            //    RedirectToAction("Index");
+            //}
+
+            var flights = new RoundTripFlightViewModel
             {
-                RedirectToAction("Index");
-            }
+                OutboundFlights = await _flightRepository.GetFlightsByOriginDestinationAndDate(originAirportId, destinationAirportId, departureDate)
+            };
 
-            return View("Views/Flights/Index.cshtml", flights);
+            return View("Views/Flights/FlightSearch.cshtml", flights);
+
+        }
+
+
+        public async Task<IActionResult> SearchFlightsWithAirportsAndReturn(int originAirportId, int destinationAirportId, DateTime departureDate, DateTime returnDate)
+        {
+            var roundTrip = new RoundTripFlightViewModel
+            {
+                OutboundFlights = await _flightRepository.GetFlightsByOriginDestinationAndDate(originAirportId, destinationAirportId, departureDate),
+                ReturnFlights = await _flightRepository.GetFlightsByOriginDestinationAndDate(destinationAirportId, originAirportId, returnDate)
+            };
+
+            //if (!roundTrip.OutboundFlights.Any() || roundTrip == null)
+            //{
+            //    RedirectToAction("Index");
+            //}
+
+            return View("Views/Flights/FlightSearch.cshtml", roundTrip);
 
         }
 

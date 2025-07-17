@@ -2,8 +2,11 @@
 @{
     ViewData["Title"] = "ChangeUser";
 }
+</br>
 
-<h1>ChangeUser</h1>
+<h1>Profile Page</h1>
+
+</br>
 
 <div class="row">
     <div class="col-md-4 offset-md-4">
@@ -21,8 +24,13 @@
                 <span asp-validation-for="LastName" class="text-warning"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Update" class="btn btn-primary">
+                <input type="submit" value="Update" class="btn btn-primary me-2">
                 <a asp-action="ChangePassword" class="btn btn-success">Change Password</a>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImageFile" class="control-label"></label>
+                <input asp-for="ImageFile" class="form-control" type="file" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
 
             <div class="text-success">@ViewBag.UserMessage</div>
