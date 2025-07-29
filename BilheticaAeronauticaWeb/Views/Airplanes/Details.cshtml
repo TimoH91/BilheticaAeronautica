@@ -3,60 +3,37 @@
 @{
     ViewData["Title"] = "Details";
 }
-
-<h1>Details</h1>
-
-<div>
-    <h4>Airplane</h4>
+<br />
+<div class="container">
+    <h1 class="text-center mb-4">Details</h1>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Manufacturer)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Manufacturer)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Rows)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Rows)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SeatsPerRow)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SeatsPerRow)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageId)
-        </dt>
-        <dd class = "col-sm-10">
-            @if (!string.IsNullOrEmpty(Model.ImageFullPath))
-            {
-                <img src="@Url.Content(Model.ImageFullPath)" alt="Image" style="width:100px; height:auto; max-width:100%;" />
-            }
-            else
-            {
-                <span>No image available</span>
-            }
-        </dd>
-    </dl>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <p><strong>@Html.DisplayNameFor(model => model.Name):</strong> @Html.DisplayFor(model => model.Name)</p>
+            <p><strong>@Html.DisplayNameFor(model => model.Manufacturer):</strong> @Html.DisplayFor(model => model.Manufacturer)</p>
+            <p><strong>@Html.DisplayNameFor(model => model.Rows):</strong> @Html.DisplayFor(model => model.Rows)</p>
+            <p><strong>@Html.DisplayNameFor(model => model.SeatsPerRow):</strong> @Html.DisplayFor(model => model.SeatsPerRow)</p>
+            <p><strong>@Html.DisplayNameFor(model => model.Status):</strong> @Html.DisplayFor(model => model.Status)</p>
+            <p>
+                <strong>@Html.DisplayNameFor(model => model.ImageId):</strong>
+                @if (!string.IsNullOrEmpty(Model.ImageFullPath))
+                {
+                    <br />
+                    <img src="@Url.Content(Model.ImageFullPath)" alt="Image" style="width:100px; height:auto; max-width:100%;" />
+                }
+                else
+                {
+                    <span> No image available</span>
+                }
+            </p>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-info me-2">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
 

@@ -8,7 +8,7 @@ namespace BilheticaAeronauticaWeb.Helpers
             string guid = Guid.NewGuid().ToString();
             string file = $"{guid}.jpg";
 
-            string path = Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot\\images\\flags", $"{guid}.jpg");
+            string path = Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot\\images\\{folder}", $"{guid}.jpg");
 
             using (FileStream stream = new FileStream(path, FileMode.Create))
             {

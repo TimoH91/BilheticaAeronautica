@@ -17,12 +17,17 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly IUserHelper _userHelper;
         private readonly IConfiguration _configuration;
         private readonly IMailHelper _mailHelper;
+        private readonly IBlobHelper _blobHelper;
 
-        public AccountController(IUserHelper userHelper, IConfiguration configuration, IMailHelper mailHelper)
+        public AccountController(IUserHelper userHelper,
+            IConfiguration configuration,
+            IMailHelper mailHelper,
+            IBlobHelper blobHelper)
         {
             _userHelper = userHelper;
             _configuration = configuration;
             _mailHelper = mailHelper;
+            _blobHelper = blobHelper;
         }
 
         [HttpPost] 
@@ -42,6 +47,7 @@ namespace BilheticaAeronauticaWeb.Controllers
                         var claims = new[]
                         {
                             new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                            new Claim(ClaimTypes.Name, user.Email),
                             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                         };
 
@@ -137,18 +143,29 @@ namespace BilheticaAeronauticaWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterNewUserViewModel model)
         {
+            ModelState.Remove("ImageFile");
+
             if (ModelState.IsValid)
             {
                 var user = await _userHelper.GetUserByEmailAsync(model.Username);
                
                 if (user == null)
                 {
+                    Guid imageId = Guid.Empty;
+
+                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
+                        imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "users");
+
+                    }
+
                     user = new User
                     {
                         FirstName = model.FirstName,
                         LastName = model.LastName,
                         Email = model.Username,
                         UserName = model.Username,
+                        ImageId = imageId,
                         Role = "Customer"
 
                     };
@@ -200,45 +217,60 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
             var model = new ChangeUserViewModel();
+
             if (user != null)
             {
                 model.FirstName = user.FirstName;
                 model.LastName = user.LastName;
+                model.ImageId = user.ImageId;
             }
 
             return View(model);
         }
 
-            [HttpPost]
+        [HttpPost]
 
-            public async Task<IActionResult> ChangeUser(ChangeUserViewModel model)
+        public async Task<IActionResult> ChangeUser(ChangeUserViewModel model)
+        {
+            ModelState.Remove("ImageFile");
+
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+
+                Guid imageId = model.ImageId;
+
+                if (model.ImageFile != null && model.ImageFile.Length > 0)
                 {
-                    var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-                    if (user != null)
-                    {
-                        user.FirstName = model.FirstName;
-                        user.LastName = model.LastName;
-                        var response = await _userHelper.UpdateUserAsync(user);
-                        if (response.Succeeded)
-                        {
-                            ViewBag.UserMessage = "User updated!";
-                        }
-                        else
-                        {
-                            ModelState.AddModelError(string.Empty, response.Errors.FirstOrDefault().Description);
-                        }
-                    }
+                    imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "users");
                 }
 
-                return View(model);
+
+                if (user != null)
+                {
+                    user.FirstName = model.FirstName;
+                    user.LastName = model.LastName;
+                    user.ImageId = imageId;
+
+                    var response = await _userHelper.UpdateUserAsync(user);
+                    if (response.Succeeded)
+                    {
+                        ViewBag.UserMessage = "User updated!";
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, response.Errors.FirstOrDefault().Description);
+                    }
+                }
             }
 
-            public IActionResult ChangePassword()
-            {
-                return View();
-            }
+            return View(model);
+        }
+
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)

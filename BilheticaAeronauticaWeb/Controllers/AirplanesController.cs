@@ -21,12 +21,15 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly IAirplaneRepository _airplaneRepository;
         private readonly IConverterHelper _converterHelper;
         private readonly IAirplaneService _airplaneService;
+        private readonly IBlobHelper _blobHelper;
 
-        public AirplanesController(IAirplaneRepository airplaneRepository, IConverterHelper converterHelper, IAirplaneService airplaneService)
+        public AirplanesController(IAirplaneRepository airplaneRepository, IConverterHelper converterHelper,
+            IAirplaneService airplaneService, IBlobHelper blobHelper)
         {
             _airplaneRepository = airplaneRepository;
             _converterHelper = converterHelper;
             _airplaneService = airplaneService;
+            _blobHelper = blobHelper;
         }
 
         // GET: Airplanes
@@ -69,33 +72,14 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-
-                
-                //TODO this will be empty as the blob helper creates the guid, when I change it
-                Guid imageId = Guid.NewGuid();
-
-
-                //TODO when blob container is set up, remove file stream and use the blobhelper
-                //if (model.ImageFile != null && model.ImageFile.Length > 0)
-                //{
-                //    imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "products");
-
-                //}
+                Guid imageId = Guid.Empty;
 
                 if (model.ImageFile != null && model.ImageFile.Length > 0)
                 {
-                    var destinationPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "airplanes", $"{imageId}.jpg");
-
-                    Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
-
-                    using (var stream = new FileStream(destinationPath, FileMode.Create))
-                    {
-                        await model.ImageFile.CopyToAsync(stream);
-                    }
+                    imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "airplanes");
                 }
 
                 var airplane = _converterHelper.ToAirplane(model, imageId, true);
-
 
                 try
                 {
@@ -139,32 +123,18 @@ namespace BilheticaAeronauticaWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(AirplaneViewModel model)
         {
+            ModelState.Remove("ImageFile");
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    
-                    
-                    
-                    
-                    //TODO: Change when blobstorage is setup
-                    //Guid imageId = model.ImageId;
-                    Guid imageId = Guid.NewGuid();
 
+                    Guid imageId = model.ImageId;
 
                     if (model.ImageFile != null && model.ImageFile.Length > 0)
                     {
-
-                            var destinationPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "airplanes", $"{imageId}.jpg");
-
-                            Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
-
-                            using (var stream = new FileStream(destinationPath, FileMode.Create))
-                            {
-                                await model.ImageFile.CopyToAsync(stream);
-                            }                     
-                        //TODO uncomment code below when blob helper is setup
-                        //imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "products");
+                        imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "airplanes");
                     }
 
                     var editedAirplane =  _converterHelper.ToAirplane(model, imageId, false);

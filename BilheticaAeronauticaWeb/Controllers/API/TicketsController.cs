@@ -1,4 +1,5 @@
 ﻿using BilheticaAeronauticaWeb.Data;
+using BilheticaAeronauticaWeb.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,17 +14,27 @@ namespace BilheticaAeronauticaWeb.Controllers.API
     public class TicketsController : Controller
     {
             private readonly ITicketRepository _ticketRepository;
+            private readonly IUserHelper _userHelper;
 
-            public TicketsController(ITicketRepository ticketRepository)
+            public TicketsController(ITicketRepository ticketRepository
+                ,IUserHelper userHelper)
             {
                 _ticketRepository = ticketRepository;
+                _userHelper = userHelper;
             }
 
 
             [HttpGet]
-            public IActionResult GetTickets()
+            public async Task<IActionResult> GetTickets()
             {
-                return Ok(_ticketRepository.GetAll());
+                var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+
+                if (user == null)
+                {
+                    return Unauthorized();
+            }
+
+                return Ok(await _ticketRepository.GetFutureTickets(user));
             }
     
         }

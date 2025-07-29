@@ -1,4 +1,5 @@
 ﻿using BilheticaAeronauticaWeb.Entities;
+using System.ComponentModel;
 
 namespace BilheticaAeronauticaWeb.Models
 {
@@ -14,6 +15,7 @@ namespace BilheticaAeronauticaWeb.Models
 
         public int FlightId { get; set; }
 
+        [DisplayName("Passenger type")]
         public PassengerType PassengerType { get; set; }
 
         public TicketClass Class { get; set; }

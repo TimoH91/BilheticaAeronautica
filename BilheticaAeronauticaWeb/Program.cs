@@ -46,6 +46,7 @@ builder.Services.AddScoped<IConverterHelper, ConverterHelper>();
 builder.Services.AddScoped<IUserHelper, UserHelper>();
 builder.Services.AddScoped<IMailHelper, MailHelper>();
 builder.Services.AddScoped<IBasketHelper, BasketHelper>();
+builder.Services.AddScoped<IBlobHelper, BlobHelper>();
 
 
 builder.Services.AddDistributedMemoryCache();
@@ -61,6 +62,10 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+var licenseKey = builder.Configuration["Syncfusion:LicenseKey"];
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(licenseKey);
+
 
 builder.Services.AddIdentity<User, IdentityRole>(cfg =>
 {

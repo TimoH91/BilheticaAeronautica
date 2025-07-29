@@ -3,39 +3,33 @@
 @{
     ViewData["Title"] = "Details";
 }
-</br>
-<h1>User details</h1>
 
-<div>
+</br>
+<div class="container">
+    <h1 class="text-center mb-4">User Details</h1>
 
     <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Id</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Id)</dd>
+    <div class="row justify-content-center">
+        <div class="col-md-6">  <!-- centered block -->
+            <!-- Left-aligned text inside this centered container -->
+            <p><strong>Id:</strong> @Model.Id</p>
+            <p><strong>First Name:</strong> @Model.FirstName</p>
+            <p><strong>Last Name:</strong> @Model.LastName</p>
+            <p><strong>Email:</strong> @Model.Email</p>
+            <p><strong>Username:</strong> @Model.UserName</p>
+            <p><strong>Role:</strong> @Model.Role</p>
+            <p><strong>Phone Number:</strong> @Model.PhoneNumber</p>
 
-        <dt class="col-sm-2">First name</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.FirstName)</dd>
+            @if (!string.IsNullOrEmpty(Model.ImageFullPath))
+            {
+                <p><strong>Image:</strong></p>
+                <img src="@Url.Content(Model.ImageFullPath)" alt="User Image" style="width:100px; height:auto;" />
+            }
+        </div>
+    </div>
 
-        <dt class="col-sm-2">Last name</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.LastName)</dd>
-
-        <dt class="col-sm-2">Email</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Email)</dd>
-
-        <dt class="col-sm-2">Username</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.UserName)</dd>
-
-
-        <dt class="col-sm-2">Role</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Role)</dd>
-
-
-        <dt class="col-sm-2">Username</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.UserName)</dd>
-
-        <dt class="col-sm-2">Phone number</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.PhoneNumber)</dd>
-    </dl>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="text-center mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-info me-2">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    </div>
 </div>

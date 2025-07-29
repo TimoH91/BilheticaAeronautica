@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Syncfusion.EJ2;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -36,7 +38,13 @@ namespace BilheticaAeronauticaWeb.Controllers
         // GET: Airports
         public async Task<IActionResult> Index()
         {
-            return View(_airportRepository.GetAll().OrderBy(a => a.Name));
+            ViewBag.countryData = await _airportRepository.GetAirportCountriesForMapAsync();
+
+            ViewBag.worldmap = GetWorldMap();
+
+            var airports = _airportRepository.GetAll().OrderBy(a => a.Name).ToList();
+
+            return View(airports);
         }
 
         // GET: Airports/Details/5
@@ -240,5 +248,12 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             return View();
         }
+
+        public object GetWorldMap()
+        {
+            string allText = System.IO.File.ReadAllText("./wwwroot/maps/worldmap.json");
+            return JsonConvert.DeserializeObject(allText);
+        }
+
     }
 }

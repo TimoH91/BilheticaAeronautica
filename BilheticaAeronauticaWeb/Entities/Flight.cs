@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace BilheticaAeronauticaWeb.Entities
@@ -9,6 +10,7 @@ namespace BilheticaAeronauticaWeb.Entities
 
 
         [Required(ErrorMessage = "The field {0} is required.")]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
 
 
@@ -20,13 +22,15 @@ namespace BilheticaAeronauticaWeb.Entities
 
         [Required(ErrorMessage = "The field {0} is required.")]
         [DisplayFormat(DataFormatString = "{0:C2}", ApplyFormatInEditMode = false)]
+        [DisplayName("Base Price")]
         public decimal BasePrice { get; set; }
 
         public Airplane Airplane { get; set; }
 
+        [DisplayName("Origin")]
         public Airport OriginAirport { get; set; }
 
-
+        [DisplayName("Destination")]
         public Airport DestinationAirport { get; set; }
 
         public Airport? Layover { get; set; }

@@ -1,4 +1,5 @@
 ﻿using BilheticaAeronauticaWeb.Entities;
+using BilheticaAeronauticaWeb.Migrations;
 using Microsoft.EntityFrameworkCore;
 
 namespace BilheticaAeronauticaWeb.Data
@@ -54,27 +55,24 @@ namespace BilheticaAeronauticaWeb.Data
               .ToListAsync();
         }
 
-        //public override async Task CreateRangeAsync(IEnumerable<Ticket> tickets)
-        //{
-        //    foreach (var ticket in tickets)
-        //    {
-        //        // This ensures no tracking conflict — assumes Flight is already in DB
-        //        if (ticket.Flight != null)
-        //        {
-        //            _context.Entry(ticket.Flight).State = EntityState.Unchanged;
-        //            ticket.FlightId = ticket.Flight.Id; // optional but explicit
-        //            ticket.Flight = null; // prevent EF from thinking it's a new entity
-        //        }
+        public IQueryable GetAllWithUsers()
+        {
+            return _context.Tickets.Include(p => p.User);
+        }
 
-        //        if (ticket.Order != null)
-        //        {
-        //            _context.Entry(ticket.Order).State = EntityState.Unchanged;
-        //            ticket.OrderId = ticket.Order.Id;
-        //            ticket.Order = null;
-        //        }
-        //    }
+        public async Task<IEnumerable<Ticket>> GetFutureTickets(User user)
+        {
+             var tickets = await _context.Tickets
+            .Include(t => t.Flight)
+            .Where(t => t.UserId == user.Id)
+            .ToListAsync();
 
-        //    await base.CreateRangeAsync(tickets); // calls your generic implementation
-        //}
+            var futureTickets = tickets.Where(f => f.Flight != null && f.Flight.Date > DateTime.Now.Date
+            || f.Flight != null && f.Flight.Date == DateTime.Now.Date && f.Flight.Time > DateTime.Now.TimeOfDay).ToList();
+
+            return futureTickets;
+        }
     }
+
+    
 }

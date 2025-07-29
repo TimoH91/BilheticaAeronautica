@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace BilheticaAeronauticaWeb.Models
 {
@@ -23,6 +24,12 @@ namespace BilheticaAeronauticaWeb.Models
         [Required]
         [Compare("Password")]
         public string Confirm { get; set; }
+
+        [Display(Name = "Photo")]
+        public IFormFile ImageFile { get; set; }
+
+        [DisplayName("Photo")]
+        public Guid ImageId { get; set; }
     }
 
 }

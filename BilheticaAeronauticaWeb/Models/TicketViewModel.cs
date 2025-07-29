@@ -14,8 +14,10 @@ namespace BilheticaAeronauticaWeb.Models
 
         public int? SeatId { get; set; }
 
+        [DisplayName("Origin")]
         public int OriginAirportId { get; set; }
 
+        [DisplayName("Destination")]
         public int DestinationAirportId { get; set; }
 
         //public Payment Payment { get; set; }

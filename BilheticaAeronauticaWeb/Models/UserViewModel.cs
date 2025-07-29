@@ -20,6 +20,6 @@ namespace BilheticaAeronauticaWeb.Models
         public string Password { get; set; }
 
         [Display(Name = "Photo")]
-        public IFormFile ImageFile { get; set; }
+        public IFormFile? ImageFile { get; set; }
     }
 }

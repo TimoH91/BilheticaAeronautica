@@ -40,12 +40,15 @@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
+
         </form>
         </div>
     </div>
 </div>
 
 <div>
+    <a asp-action="Create" asp-controller="Countries" class="btn btn-primary">Add Country</a>    
+    <a href="#" class="btn btn-primary" id="addCityBtn">Add City</a>
     <a asp-action="Index">Back to List</a>
 </div>
 
@@ -80,6 +83,20 @@
                 });
                 return false;
             })
+        });
+    </script>
+
+    <script>
+        document.getElementById("addCityBtn").addEventListener("click", function (e) {
+            const countryId = document.getElementById("CountryId").value;
+
+            if (!countryId) {
+                alert("Please select a country first.");
+                e.preventDefault();
+                return;
+            }
+
+            window.location.href = `/Countries/AddCity?countryId=${countryId}`;
         });
     </script>
 

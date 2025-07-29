@@ -17,10 +17,16 @@ namespace BilheticaAeronauticaWeb.Controllers
     public class CountriesController : Controller
     {
         private readonly ICountryRepository _countryRepository;
+        private readonly IConverterHelper _converterHelper;
+        private readonly IBlobHelper _blobHelper;
 
-        public CountriesController(ICountryRepository countryRepository)
+        public CountriesController(ICountryRepository countryRepository,
+            IConverterHelper converterHelper,
+            IBlobHelper blobHelper)
         {
             _countryRepository = countryRepository;
+            _converterHelper = converterHelper;
+            _blobHelper = blobHelper;
         }
 
         public async Task<IActionResult> Index()
@@ -79,14 +85,14 @@ namespace BilheticaAeronauticaWeb.Controllers
             return this.View(city);
         }
 
-        public async Task<IActionResult> AddCity(int? id)
+        public async Task<IActionResult> AddCity(int? countryId)
         {
-            if (id == null)
+            if (countryId == null)
             {
                 return new NotFoundViewResult("CityNotFound");
             }
 
-            var country = await _countryRepository.GetByIdAsync(id.Value);
+            var country = await _countryRepository.GetByIdAsync(countryId.Value);
 
             if (country == null)
             {
@@ -129,22 +135,24 @@ namespace BilheticaAeronauticaWeb.Controllers
 
         public async Task<IActionResult> Create()
         {
-            //ViewBag.Countries = new SelectList(_countryRepository.GetComboCountries());
-
-            //ViewBag.Cities = new List<SelectListItem>
-            //{
-            //    new SelectListItem { Text = "(Select a country first...)", Value = "0" }
-            //};
-
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Country country)
+        public async Task<IActionResult> Create(CountryViewModel model)
         {
             if (ModelState.IsValid)
             {
+                Guid imageId = Guid.Empty;
+
+                if (model.ImageFile != null && model.ImageFile.Length > 0)
+                {
+                    imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "countries");
+                }
+
+                var country = _converterHelper.ToCountry(model, imageId, true);
+
                 try
                 {
                     await _countryRepository.CreateAsync(country);
@@ -154,11 +162,9 @@ namespace BilheticaAeronauticaWeb.Controllers
                 {
                     //_flashMessage.Danger("This country already exists!");
                 }
-
-                return View(country);
             }
 
-            return View(country);
+            return View(model);
         }
 
         public async Task<IActionResult> Edit(int? id)

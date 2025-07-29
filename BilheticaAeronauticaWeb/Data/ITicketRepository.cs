@@ -1,4 +1,5 @@
 ﻿using BilheticaAeronauticaWeb.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BilheticaAeronauticaWeb.Data
 {
@@ -9,5 +10,10 @@ namespace BilheticaAeronauticaWeb.Data
         Task<List<Ticket>> GetTicketByOrderAsync(Order order);
 
         Task<List<Ticket>> GetTicketsByFlightIdAsync(int flightId);
+
+        IQueryable GetAllWithUsers();
+
+        Task<IEnumerable<Ticket>> GetFutureTickets(User user);
+
     }
 }

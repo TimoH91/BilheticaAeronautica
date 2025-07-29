@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.ComponentModel;
+using Newtonsoft.Json;
 using NuGet.ContentModel;
 
 namespace BilheticaAeronauticaWeb.Entities
@@ -24,23 +25,6 @@ namespace BilheticaAeronauticaWeb.Entities
     public abstract class Ticket : IEntity
     {
 
-        //public Ticket(string name, string surname, int? flightId, Flight flight, TicketClass ticketClass, int? seatId, Seat seat, int originAirportId, Airport originAirport, int destinationAirportId, Airport destinationAirport, Payment payment, decimal price)
-        //{
-        //    Name = name;
-        //    Surname = surname;
-        //    FlightId = flightId;
-        //    Flight = flight;
-        //    Class = ticketClass;
-        //    SeatId = seatId;
-        //    Seat = seat;
-        //    OriginAirportId = originAirportId;
-        //    OriginAirport = originAirport;
-        //    DestinationAirportId = destinationAirportId;
-        //    DestinationAirport = destinationAirport;
-        //    Payment = payment;
-        //    Price = price;
-        //}
-
         public string UserId { get; set; }
         public User User { get; set; }
 
@@ -57,8 +41,10 @@ namespace BilheticaAeronauticaWeb.Entities
 
         public Seat? Seat { get; set; }
 
+        [DisplayName("Origin")]
         public Airport OriginAirport { get; set; }
 
+        [DisplayName("Destination")]
         public Airport DestinationAirport { get; set; }
 
         public int OriginAirportId { get; set; }

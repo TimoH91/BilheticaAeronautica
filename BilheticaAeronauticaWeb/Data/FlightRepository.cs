@@ -34,6 +34,17 @@ namespace BilheticaAeronauticaWeb.Data
              .FirstOrDefaultAsync(a => a.Id == id);
         }
 
+        public override async Task<Flight> GetByIdAsync(int id)
+        {
+            return await _context.Flights
+             .Include(a => a.Airplane)
+             .Include(a => a.OriginAirport)
+             .Include(a => a.DestinationAirport)
+             .Include(a => a.Layover)
+             .AsNoTracking()
+             .FirstOrDefaultAsync(a => a.Id == id);
+        }
+
         public IEnumerable<SelectListItem> GetComboFlights()
         {
             var list = _context.Flights

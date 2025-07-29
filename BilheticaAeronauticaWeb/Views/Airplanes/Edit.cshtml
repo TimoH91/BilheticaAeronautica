@@ -3,16 +3,15 @@
 @{
     ViewData["Title"] = "Edit";
 }
-
+<br />
 <h1>Edit</h1>
-
-<h4>Airplane</h4>
 <hr />
-<div class="row">
+<div class="row justify-content-center">
     <div class="col-md-4">
         <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ImageId" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -40,18 +39,25 @@
             </div>
             <div class="form-group">
                 <label asp-for="ImageFile" class="control-label"></label>
-                <input asp-for="ImageFile" class="form-control" type="file" />
+                <input asp-for="ImageFile" class="form-control" type="file" data-val="false" />
                 <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
+
+            @if (!string.IsNullOrEmpty(Model.ImageFullPath))
+            {
+                <div class="form-group mt-3">
+                    <img src="@Url.Content(Model.ImageFullPath)"
+                         alt="Current image"
+                         class="img-thumbnail"
+                         style="width: 150px; height: auto; display: block;" />
+                </div>
+            }
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-info me-2" />
+                <a asp-action="Index" class="btn btn-danger btn-dark">Back</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

@@ -1,8 +1,16 @@
-﻿@model IEnumerable<BilheticaAeronauticaWeb.Entities.Airport>
+﻿@using Newtonsoft.Json
+@using Syncfusion.EJ2.Maps;
+@model IEnumerable<BilheticaAeronauticaWeb.Entities.Airport>
+
 
 @{
-    ViewData["Title"] = "Index";
+    var propertyPath = new[] { "name" };
+
+
+    var countryDataJson = ViewBag.countryData;
+    var map = ViewBag.worldmap;
 }
+
 
 <div class="card mb-4">
     <div class="card-header">
@@ -21,7 +29,7 @@
                         @Html.DisplayNameFor(model => model.Country.Name)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Country.FlagImageFullPath)
+                        @Html.DisplayNameFor(model => model.Country.ImageFullPath)
                     </th>
                     <th></th>
                 </tr>
@@ -40,10 +48,10 @@
                             @Html.DisplayFor(modelItem => item.Country.Name)
                         </td>
                         <td>
-                            @if (!string.IsNullOrEmpty(item.Country.FlagImageFullPath))
+                            @if (item.Country != null && !string.IsNullOrEmpty(item.Country.ImageFullPath))
 
                             {
-                                <img src="@Url.Content(item.Country.FlagImageFullPath)" alt="Image" style="width:100px;height:150px;max-width:100%;height:auto;" />
+                                <img src="@Url.Content(item.Country.ImageFullPath)" alt="Image" style="width:100px;height:150px;max-width:100%;height:auto;" />
                             }
                         </td>
                         <td>
@@ -60,6 +68,23 @@
             <a asp-action="Create" class="btn btn-info">Add airport</a>
 </p>
 
+@*         <div id="container" style="height:400px"></div> *@
+
+        <ejs-maps id="maps">
+            <e-maps-titlesettings text="Currently flying in these countries"></e-maps-titlesettings>
+            <e-maps-layers>
+                <e-maps-layer shapeData="@(map)"
+                              shapeDataPath="Country"
+                              shapePropertyPath="propertyPath"
+                              dataSource='@countryDataJson'>
+                    <e-layersettings-shapesettings colorValuePath="Color"
+                                                   fill="#E5E5E5">
+                    </e-layersettings-shapesettings>
+                </e-maps-layer>
+            </e-maps-layers>
+        </ejs-maps>
+
+
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -71,6 +96,7 @@
                 }
             });
         });
-    </script>
+    // </script>
+
             }
 

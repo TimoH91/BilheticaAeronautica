@@ -54,5 +54,19 @@ namespace BilheticaAeronauticaWeb.Data
 
             return list;
         }
+
+        public async Task<object[]> GetAirportCountriesForMapAsync()
+        {
+            var countries = await _context.Airports
+                .Select(a => a.Country)
+                .Distinct()
+                .ToListAsync();
+
+            return countries.Select(c => new
+            {
+                Country = c.Name,
+                Color = "#4caf50" 
+            }).ToArray();
+        }
     }
 }

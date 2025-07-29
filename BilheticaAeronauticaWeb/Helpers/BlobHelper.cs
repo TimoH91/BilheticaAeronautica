@@ -11,7 +11,6 @@ namespace BilheticaAeronauticaWeb.Helpers
         public BlobHelper(IConfiguration configuration)
         {
             string connectionString = configuration["Blob:ConnectionString"];
-            //string keys = configuration["Blob:ConnectionString"];
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
             _blobclient = storageAccount.CreateCloudBlobClient();
         }
@@ -39,6 +38,7 @@ namespace BilheticaAeronauticaWeb.Helpers
         {
             Guid name = Guid.NewGuid();
             CloudBlobContainer container = _blobclient.GetContainerReference(containerName);
+            await container.CreateIfNotExistsAsync();
             CloudBlockBlob blockBlob = container.GetBlockBlobReference($"{name}");
             await blockBlob.UploadFromStreamAsync(stream);
             return name;

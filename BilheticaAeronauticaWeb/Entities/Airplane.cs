@@ -30,10 +30,8 @@ namespace BilheticaAeronauticaWeb.Entities
         [DisplayName("Photo")]
         public Guid ImageId { get; set; }
 
-        //TODO: get another 30 days on azure and get blob storage link
-
         public string ImageFullPath => ImageId == Guid.Empty
             ? "~/images/noimage.jpg"
-        : $"~/images/airplanes/{ImageId}.jpg";
+        : $"https://brisa.blob.core.windows.net/airplanes/{ImageId}";
     }
 }

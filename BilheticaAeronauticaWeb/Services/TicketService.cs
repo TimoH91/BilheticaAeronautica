@@ -98,7 +98,7 @@ namespace BilheticaAeronauticaWeb.Services
         public List<ShoppingBasketTicket> FilterAdults(List<ShoppingBasketTicket> tickets, TicketViewModel model)
         {
             return tickets
-                .Where(ticket => ticket.PassengerType == PassengerType.Adult && ticket.Flight.Id == model.FlightId && ticket.IsResponsibleAdult == false)
+                .Where(ticket => ticket.PassengerType == PassengerType.Adult && ticket.FlightId == model.FlightId && ticket.IsResponsibleAdult == false)
                 .ToList();
         }
 

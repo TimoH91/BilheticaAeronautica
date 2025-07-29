@@ -8,5 +8,7 @@ namespace BilheticaAeronauticaWeb.Data
         IEnumerable<SelectListItem> GetComboAirports();
 
         Task<Airport> GetByIdTrackedAsync(int id);
+
+        Task<object[]> GetAirportCountriesForMapAsync();
     }
 }

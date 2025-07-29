@@ -195,6 +195,18 @@ namespace BilheticaAeronauticaWeb.Data
                 };
 
                 _context.Airplanes.Add(airplane);
+
+                var airplane2 = new Airplane
+                {
+                    Name = "737",
+                    Manufacturer = "Boeing",
+                    SeatsPerRow = 7,
+                    Rows = 28,
+                    ImageId = imageId,
+                    Status = true
+                };
+
+                _context.Airplanes.Add(airplane2);
                 await _context.SaveChangesAsync();
             }
 
@@ -203,6 +215,7 @@ namespace BilheticaAeronauticaWeb.Data
                 var originAirport = _context.Airports.FirstOrDefault(a => a.Id == 1);
                 var destinationAirport = _context.Airports.FirstOrDefault(a => a.Id == 3);
                 var airplane = _context.Airplanes.FirstOrDefault(a => a.Id == 1);
+                var airplane2 = _context.Airplanes.FirstOrDefault(a => a.Id == 2);
 
                 var flight = new Flight
                 {
@@ -216,19 +229,47 @@ namespace BilheticaAeronauticaWeb.Data
                 };
 
                 _context.Flights.Add(flight);
+
+                var flight2 = new Flight
+                {
+                    Date = DateTime.Today.AddMonths(2),
+                    Time = new TimeSpan(1, 0, 0),
+                    Duration = 60,
+                    BasePrice = 120,
+                    OriginAirport = originAirport,
+                    DestinationAirport = destinationAirport,
+                    Airplane = airplane
+                };
+
+                _context.Flights.Add(flight2);
+
+                var flight3 = new Flight
+                {
+                    Date = DateTime.Today.AddDays(26),
+                    Time = new TimeSpan(17, 0, 0),
+                    Duration = 60,
+                    BasePrice = 150,
+                    OriginAirport = destinationAirport,
+                    DestinationAirport = originAirport,
+                    Airplane = airplane2
+                };
+
+                _context.Flights.Add(flight3);
                 await _context.SaveChangesAsync();
             }
 
             if (!_context.Seats.Any() && _context.Flights.Any())
             {
                 var airplane = _context.Airplanes.FirstOrDefault(a => a.Id == 1);
+                var airplane2 = _context.Airplanes.FirstOrDefault(a => a.Id == 2);
                 var flight = _context.Flights.FirstOrDefault(a => a.Id == 1);
+                var flight2 = _context.Flights.FirstOrDefault(a => a.Id == 2);
 
-                if (airplane == null)
+                if (airplane == null || airplane2 == null)
                 {
                     throw new Exception("Airplane not found.");
                 }
-                if (flight == null)
+                if (flight == null || flight2 == null)
                 {
                     throw new Exception("Flight not found.");
                 }
@@ -250,6 +291,25 @@ namespace BilheticaAeronauticaWeb.Data
                 }
 
                 _context.Seats.AddRange(seats);
+
+
+                var seats2 = new List<Seat>();
+
+                for (int row = 1; row <= airplane2.Rows; row++)
+                {
+                    for (int col = 1; col <= airplane2.SeatsPerRow; col++)
+                    {
+                        seats2.Add(new Seat
+                        {
+                            Flight = flight2,
+                            Row = row,
+                            Column = col,
+                            Occupied = false
+                        });
+                    }
+                }
+
+                _context.Seats.AddRange(seats2);
                 await _context.SaveChangesAsync();
             }
 
