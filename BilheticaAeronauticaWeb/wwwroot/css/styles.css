@@ -11348,3 +11348,13 @@ input[type="date"] {
 .custom-bg {
     background-color: #F7F7F9;
 }
+
+.black-text {
+    color: black;
+}
+
+input[type="date"] {
+    color: black !important;
+    -webkit-text-fill-color: black !important; /* Chrome/Safari */
+    background-color: white !important; /* Optional */
+}

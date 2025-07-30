@@ -38,6 +38,8 @@ namespace BilheticaAeronauticaWeb.Data
                 .ThenInclude(a => a.DestinationAirport)
                  .Include(a => a.Flight)
                 .ThenInclude(a => a.OriginAirport)
+                .Include(a => a.Flight)
+                 .ThenInclude(a => a.Layover)
                 .Include(a => a.Seat)
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
@@ -50,6 +52,8 @@ namespace BilheticaAeronauticaWeb.Data
                 .ThenInclude(a => a.DestinationAirport)
                  .Include(a => a.Flight)
                 .ThenInclude(a => a.OriginAirport)
+                 .Include(a => a.Flight)
+                 .ThenInclude(a => a.Layover)
                 .Include(a => a.Seat)
                 .ToListAsync();
         }

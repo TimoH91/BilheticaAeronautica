@@ -15,5 +15,7 @@ namespace BilheticaAeronauticaWeb.Data
 
         Task<IEnumerable<Ticket>> GetFutureTickets(User user);
 
+        Task<bool> IsAirportOnTicketAsync(int airportId);
+
     }
 }

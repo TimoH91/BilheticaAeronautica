@@ -121,6 +121,7 @@
                             <div class="collapse" id="collapseAirports" aria-labelledby="headingAirports" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
                                     <a class="nav-link" asp-area="" asp-controller="Airports" asp-action="Index">Manage</a>
+                                    <a class="nav-link" asp-area="" asp-controller="Countries" asp-action="Index">Registered countries</a>
                                 </nav>
                             </div>
                         }
@@ -180,10 +181,10 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
                                 Manage Reservations
                             </a>
-                            <a class="nav-link" href="@Url.Content("~/tables.html")">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+@*                             <a class="nav-link" href="@Url.Content("~/tables.html")">
+                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Check-in
-                            </a>
+                            </a>  *@
                         }
                     </div>
                 </div>

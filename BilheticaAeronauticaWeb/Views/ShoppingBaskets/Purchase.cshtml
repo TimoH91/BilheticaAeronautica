@@ -17,7 +17,9 @@
                 <th>Surname</th>
                 <th>Class</th>
                 <th>Passenger type</th>
-                <th>Flight</th>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Layover</th>
                 <th>Price</th>
                 <th>Seat</th>
             </tr>
@@ -44,9 +46,28 @@
                         @item.PassengerType
                     </td>
                     <td>
-                        <input type="hidden" asp-for="ShoppingBasketTickets[@i].FlightId" />
-                        @item.FlightId
+                        <input type="hidden" asp-for="ShoppingBasketTickets[@i].Flight.OriginAirport.Name" />
+                        @item.Flight.OriginAirport.Name
                     </td>
+                    <td>
+                        <input type="hidden" asp-for="ShoppingBasketTickets[@i].Flight.DestinationAirport.Name" />
+                        @item.Flight.DestinationAirport.Name
+                    </td>
+                    <td>
+                        @if (item.Flight.Layover != null)
+                        {
+                            <input type="hidden" asp-for="ShoppingBasketTickets[@i].Flight.Layover.Name" />
+                            @item.Flight.Layover.Name
+                        }
+                        else
+                        {
+                            <p>N/A</p>
+                        }
+
+                    </td>
+
+                        <input type="hidden" asp-for="ShoppingBasketTickets[@i].FlightId" />
+
                     <td>
                         <input type="hidden" asp-for="ShoppingBasketTickets[@i].Price" />
                         @item.Price.ToString("C")
@@ -105,11 +126,13 @@
         </div>
 
         <div class="form-group">
-            <label asp-for="NewUser.Confirm">Confirm</label>
+            <label asp-for="NewUser.Confirm">Confirm Password</label>
             <input asp-for="NewUser.Confirm" type="password" class="form-control" />
             <span asp-validation-for="NewUser.Confirm" class="text-warning"></span>
         </div>
     }
 
-    <button type="submit" class="btn btn-success">Confirm</button>
+    <div class="text-center mt-3">
+        <button type="submit" class="btn btn-success">Confirm</button>
+    </div>
 </form>

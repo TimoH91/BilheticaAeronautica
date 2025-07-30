@@ -30,6 +30,7 @@ namespace BilheticaAeronauticaWeb.Data
                 .Include(t => t.DestinationAirport)
                 .Include(t => t.OriginAirport)
                 .Include(t => t.Flight)
+                .ThenInclude(t => t.Layover)
                 .Include(t => t.Seat)
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
@@ -71,6 +72,13 @@ namespace BilheticaAeronauticaWeb.Data
             || f.Flight != null && f.Flight.Date == DateTime.Now.Date && f.Flight.Time > DateTime.Now.TimeOfDay).ToList();
 
             return futureTickets;
+        }
+
+        public async Task<bool> IsAirportOnTicketAsync(int airportId)
+        {
+            return await _context.Tickets
+         .AnyAsync(f => f.OriginAirportId == airportId || f.DestinationAirportId == airportId);
+
         }
     }
 

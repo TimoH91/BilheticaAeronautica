@@ -24,7 +24,9 @@
                     <th>Name</th>
                     <th>Surname</th>
                     <th>Class</th>
-                    <th>Flight</th>
+                    <th>Origin</th>
+                    <th>Destination</th>
+                    <th>Layover</th>
                     <th>Price</th>
                     <th>Type</th>
                     <th></th>
@@ -37,8 +39,17 @@
                         <td>@item.Name</td>
                         <td>@item.Surname</td>
                         <td>@item.Class</td>
-                        <td>@item.FlightId</td>
-                        <td>@item.Price.ToString("C")</td>
+                        <td>@item.Flight.OriginAirport.Name</td>
+                        <td>@item.Flight.DestinationAirport.Name</td>
+                            @if (item.Flight.Layover != null)
+                            {
+                                <td>@item.Flight.Layover.Name</td>
+                            }
+                            else
+                            {
+                                <td>N/A</td>
+                            }
+                            <td>@item.Price.ToString("C")</td>
                         <td>@item.PassengerType</td>
                         <td>
                                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Info</a>
@@ -57,10 +68,5 @@
 }
 
 
-@if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Customer"))
-{
-    <div class="text-center mt-3">
-        <a asp-controller="Flights" asp-action="Index" class="btn btn-primary">Add tickets</a>
-    </div>
-}
+
 

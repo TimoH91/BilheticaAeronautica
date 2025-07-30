@@ -15,6 +15,8 @@ namespace BilheticaAeronauticaWeb.Models
 
         public int FlightId { get; set; }
 
+        public Flight Flight { get; set; }
+
         [DisplayName("Passenger type")]
         public PassengerType PassengerType { get; set; }
 

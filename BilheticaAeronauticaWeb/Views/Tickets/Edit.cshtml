@@ -4,16 +4,17 @@
 @{
     ViewData["Title"] = "Edit";
 }
-
-<h1>Edit</h1>
-
-<h4>Ticket</h4>
+<br />
+<h1>Edit ticket</h1>
 <hr />
-<div class="row">
+<div class="row justify-content-center">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="FlightId" />
+            <input type="hidden" asp-for="ResponsibleAdultTicketId" />
+            <input type="hidden" asp-for="OrderId" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -25,41 +26,25 @@
                 <span asp-validation-for="Surname" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="FlightId" class="control-label"></label>
-                <input asp-for="FlightId" class="form-control" />
-                <span asp-validation-for="FlightId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
+                <input asp-for="Price" class="form-control-plaintext bg-light" readonly />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Type" class="control-label"></label>
-                <input asp-for="Type" class="form-control" />
+                <input asp-for="Type" class="form-control-plaintext bg-light" readonly />
                 <span asp-validation-for="Type" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="OriginAirportId" class="control-label"></label>
-                <input asp-for="OriginAirportId" class="form-control" />
+                <div class="form-control-plaintext bg-light" readonly>@ViewBag.Origin</div>
                 <span asp-validation-for="OriginAirportId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DestinationAirportId" class="control-label"></label>
-                <input asp-for="DestinationAirportId" class="form-control" />
+                <div class="form-control-plaintext bg-light" readonly>@ViewBag.Destination </div>
                 <span asp-validation-for="DestinationAirportId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ResponsibleAdultTicketId" class="control-label"></label>
-                <input asp-for="ResponsibleAdultTicketId" class="form-control" />
-                <span asp-validation-for="ResponsibleAdultTicketId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="OrderId" class="control-label"></label>
-                <input asp-for="OrderId" class="form-control" />
-                <span asp-validation-for="OrderId" class="text-danger"></span>
-            </div>
-
             <div class="form-group">
                 <label asp-for="Class" class="control-label"></label>
                 <select asp-for="Class" class="form-control" asp-items="Html.GetEnumSelectList<TicketClass>()">
@@ -68,7 +53,7 @@
                 <span asp-validation-for="Class" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="SeatId" class="control-label"></label>
+                <label asp-for="SeatId" class="control-label">Seat</label>
                 <select asp-for="SeatId" id="SeatId" class="form-control" asp-items="ViewBag.Seats"> 
                     <option value="">Select a seat</option>
                     </select>
@@ -76,15 +61,13 @@
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-info me-2" />
+                <a asp-controller="Orders" asp-action="Index" class="btn btn-warning btn-dark">Back to order</a>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{

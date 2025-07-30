@@ -3,20 +3,23 @@
 @{
     ViewData["Title"] = "Index";
 }
+<br/>
+<h1>Registered Countries</h1>
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
+<br/>
+<div class="card mb-4">
+    <div class="card-header">
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple" class="table table-bordered">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FlagImageId)
+                Flag
+
             </th>
             <th></th>
         </tr>
@@ -26,6 +29,7 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
+              <input type="hidden" value="@item.Id" />
             </td>
                 <td>
                     @if (!string.IsNullOrEmpty(item.ImageFullPath))
@@ -34,12 +38,18 @@
                         <img src="@Url.Content(item.ImageFullPath)" alt="Image" style="width:100px;height:150px;max-width:100%;height:auto;" />
                     }
                 </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
+                        <td class="text-center">
+                            <div class="d-inline-flex gap-2">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-light">Edit</a>
+                                <a asp-action="AddCity" asp-route-countryId="@item.Id" class="btn btn-danger btn-dark">Add City</a>
+
+                            </div>
+                        </td>
         </tr>
 }
     </tbody>
 </table>
+
+        <p>
+            <a asp-action="Create" class="btn btn-info">Add Country</a>
+        </p>

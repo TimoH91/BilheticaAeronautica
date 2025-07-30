@@ -105,8 +105,12 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             ViewBag.Airplanes = _airplaneRepository.GetComboAirplanes();
             ViewBag.Airports = _airportRepository.GetComboAirports();
+            
+            return View(new FlightViewModel
+            {
+                Date = DateTime.Today
+            });
 
-            return View();
         }
 
         // POST: Flights/Create
@@ -224,37 +228,43 @@ namespace BilheticaAeronauticaWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var flight = await _flightRepository.GetByIdAsync(id);
+            var flight = await _flightRepository.GetByIdTrackedAsync(id);
 
-            try
+            if (_flightService.AllowDeletion(flight))
             {
-                await _flightRepository.DeleteAsync(flight);
-                return RedirectToAction(nameof(Index));
-            }
-            catch (DbUpdateException ex)
-            {
-
-                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                try
                 {
-                    var errorModel = new ErrorViewModel
-                    {
-                        ErrorTitle = $"{flight.Id} provavelmente está a ser usado!!",
-                        ErrorMessage = $"{flight.Id} não pode ser apagado visto haverem encomendas que o usam.<br/><br/>" +
-                                      $"Experimente primeiro apagar todas as encomendas que o estão a usar," +
-                                      $"e torne novamente a apagá-lo"
-                    };
-
-                    return View("Error", errorModel);
+                    await _flightService.AlterSeatsAndTickets(flight);
+                    await _flightRepository.DeleteAsync(flight);
+                    return RedirectToAction(nameof(Index));
                 }
-
-
-                return View("Error", new ErrorViewModel
+                catch (DbUpdateException ex)
                 {
-                    ErrorTitle = "Erro de base de dados",
-                    ErrorMessage = "Ocorreu um erro inesperado ao tentar apagar o aeroporto."
-                });
 
+                    if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE"))
+                    {
+                        var errorModel = new ErrorViewModel
+                        {
+                            ErrorTitle = $"Flight {flight.Id} provavelmente está a ser usado!!",
+                            ErrorMessage = $"Flight {flight.Id} não pode ser apagado visto haverem encomendas que o usam.<br/><br/>" +
+                                          $"Experimente primeiro apagar todas as encomendas que o estão a usar," +
+                                          $"e torne novamente a apagá-lo"
+                        };
+
+                        return View("Error", errorModel);
+                    }
+
+
+                    return View("Error", new ErrorViewModel
+                    {
+                        ErrorTitle = "Erro de base de dados",
+                        ErrorMessage = "Ocorreu um erro inesperado ao tentar apagar o aeroporto."
+                    });
+
+                }
             }
+
+            return RedirectToAction(nameof(Index));
         }
 
         private async Task<List<SelectListItem>> GetAirplanesViewBag(Flight flight)

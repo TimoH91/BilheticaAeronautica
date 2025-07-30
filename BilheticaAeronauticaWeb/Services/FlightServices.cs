@@ -167,5 +167,36 @@ namespace BilheticaAeronauticaWeb.Services
                 await _ticketRepository.UpdateAsync(ticket);
             }
         }
+
+        public async Task AlterSeatsAndTickets(Flight flight)
+        {
+            var seats = await _seatRepository.GetAllSeatsByFlight(flight.Id);
+            var tickets = await _ticketRepository.GetTicketsByFlightIdAsync(flight.Id);
+            var shoppingBasketTickets = await _shoppingBasketRepository.GetTicketsByFlightIdAsync(flight.Id);
+
+            foreach (var ticket in tickets)
+            {
+                ticket.FlightId = null;
+                ticket.Flight = null;
+                ticket.SeatId = null;
+                ticket.Seat = null;
+                await _ticketRepository.UpdateAsync(ticket);
+            }
+
+            await _shoppingBasketRepository.DeleteRangeAsync(shoppingBasketTickets);
+
+            await _seatRepository.DeleteRangeAsync(seats);
+        }
+
+
+        public bool AllowDeletion(Flight flight)
+        {          
+            if (flight.Date < DateTime.Now.Date || (flight.Date == DateTime.Now.Date && flight.Time < DateTime.Now.TimeOfDay))
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

@@ -15,7 +15,6 @@
                         <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().Time)</th>
                         <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().Duration)</th>
                         <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().BasePrice)</th>
-                        <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().Airplane)</th>
                         <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().OriginAirport)</th>
                         <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().DestinationAirport)</th>
                         <th>@Html.DisplayNameFor(model => model.OutboundFlights.FirstOrDefault().Layover)</th>
@@ -30,7 +29,6 @@
                             <td>@item.Time.ToString(@"hh\:mm")</td>
                             <td>@item.Duration</td>
                             <td>@item.BasePrice.ToString("C")</td>
-                            <td>@item.Airplane?.Name</td>
                             <td>@item.OriginAirport?.Name</td>
                             <td>@item.DestinationAirport?.Name</td>
                             <td>@item.Layover?.Name</td>
@@ -55,8 +53,12 @@
 }
 else
 {
-    <p> No departure flights</p>
     <br />
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h3>No departure flights</h3>
+        </div>
+    </div>
 }
 
 @if (Model.ReturnFlights != null && Model.ReturnFlights.Any())
@@ -72,7 +74,6 @@ else
                         <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().Time)</th>
                         <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().Duration)</th>
                         <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().BasePrice)</th>
-                        <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().Airplane)</th>
                         <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().OriginAirport)</th>
                         <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().DestinationAirport)</th>
                         <th>@Html.DisplayNameFor(model => model.ReturnFlights.FirstOrDefault().Layover)</th>
@@ -87,7 +88,6 @@ else
                             <td>@item.Time.ToString(@"hh\:mm")</td>
                             <td>@item.Duration</td>
                             <td>@item.BasePrice.ToString("C")</td>
-                            <td>@item.Airplane?.Name</td>
                             <td>@item.OriginAirport?.Name</td>
                             <td>@item.DestinationAirport?.Name</td>
                             <td>@item.Layover?.Name</td>
@@ -112,7 +112,12 @@ else
 }
 else
 {
-    <p> No return flights</p>
+    <br />
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h3>No return flights</h3>
+        </div>
+    </div>
 }
 
 

@@ -11,5 +11,9 @@ namespace BilheticaAeronauticaWeb.Services
 
         Task ReattributeSeats(Flight flight);
 
+        Task AlterSeatsAndTickets(Flight flight);
+
+        bool AllowDeletion(Flight flight);
+
     }
 }

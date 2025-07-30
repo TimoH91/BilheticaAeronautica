@@ -3,11 +3,10 @@
 @{
     ViewData["Title"] = "Details";
 }
-
+<br />
 <h1>Details</h1>
 
 <div>
-    <h4>Order</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -29,18 +28,54 @@
             @Html.DisplayFor(model => model.Payment)
         </dd>
     </dl>
-        <h5>Tickets</h5>
-        <ul>
-            @foreach (var ticket in Model.Tickets)
-            {
-                <li>@ticket.Name @ticket.Surname</li>
-                <a asp-controller="Tickets" asp-action="Edit" asp-route-id="@ticket.Id">Edit</a>
-            }
-        
-        </ul>
 
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+
+<div class="card mb-4">
+    <div class="card-header">
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Surname
+                    </th>
+                    <th>
+                        Passenger Type
+                    </th>
+                    <th>
+                       Class
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ticket in Model.Tickets)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => ticket.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => ticket.Surname)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => ticket.Type)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => ticket.Class)
+                        </td>
+
+                        <td class="text-center">
+                            <a asp-controller="Tickets" asp-action="Details" asp-route-id="@ticket.Id" class="btn btn-info me-2"> Details </a>
+                            <a asp-controller="Tickets" asp-action="Edit" asp-route-id="@ticket.Id" class="btn btn-warning btn-dark">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>

@@ -24,14 +24,9 @@
                 <input asp-for="Surname" class="form-control" />
                 <span asp-validation-for="Surname" class="text-danger"></span>
             </div>
-@*             <div class="form-group">
-                <label asp-for="FlightId" class="control-label">Flight</label>
-                <input asp-for="FlightId" id="FlightId" />
-                <span asp-validation-for="FlightId" class="text-danger"></span>
-            </div> *@
             <div class="form-group">
                 <label asp-for="Class" class="control-label"></label>
-                <select asp-for="Class" class="form-control" asp-items="Html.GetEnumSelectList<TicketClass>()">
+                <select asp-for="Class" class="form-control" asp-items="Html.GetEnumSelectList<TicketClass>()" id="ticketClass">
                     <option value="">Select a class</option>
                 </select>
                 <span asp-validation-for="Class" class="text-danger"></span>
@@ -45,26 +40,28 @@
             </div>
             <div class="form-group">
                 <label asp-for="OriginAirportId" class="control-label"></label>
-                <input asp-for="OriginAirportId" class="form-control" />
+                <div class="form-control">@ViewBag.Origin</div>
                 <span asp-validation-for="OriginAirportId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DestinationAirportId" class="control-label"></label>
-                <input asp-for="DestinationAirportId" class="form-control" />
+                <div class="form-control">@ViewBag.Destination</div>
                 <span asp-validation-for="DestinationAirportId" class="text-danger"></span>
             </div>
-            @*             <div class="form-group">
-                <label asp-for="Payment" class="control-label"></label>
-                <select asp-for="Payment" class="form-control" asp-items="Html.GetEnumSelectList<Payment>()">
-                <option value="">Select payment status</option>
-                </select>
-                <span asp-validation-for="Payment" class="text-danger"></span>
-
-            </div> *@
+            @if (!string.IsNullOrEmpty(ViewBag.Layover))
+            {
+                <div class="form-group">
+                    <label class="label">Layover</label>
+                    <div class="form-control">@ViewBag.Layover</div>
+                </div>
+            }
             <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
+                <span class="form-control-plaintext" id="displayPrice">
+                    @Model.Price.ToString("0.00")
+                </span>
+                <input type="hidden" asp-for="Price" id="Price" />
+                <input type="hidden" id="basePrice" value="@Model.Price.ToString("0.00")" />
             </div>
             <div class="form-group">
                 <label asp-for="Type" class="control-label"></label>
@@ -131,17 +128,51 @@
             const selectedValue = passengerTypeSelect.options[passengerTypeSelect.selectedIndex].text;
             if (selectedValue.toLowerCase() === "infant") {
                 seatSelect.disabled = true;
-                seatSelect.value = ""; // Optional: clear selection
+                seatSelect.value = "";
             } else {
                 seatSelect.disabled = false;
             }
         }
 
-        // Initial check in case the form is pre-filled
         toggleSeatSelect();
 
-        // Listen for changes
         passengerTypeSelect.addEventListener("change", toggleSeatSelect);
     });
 </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const ticketClass = document.getElementById('ticketClass');
+            const displayPrice = document.getElementById('displayPrice');
+            const priceInput = document.getElementById('Price');
+            const basePriceInput = document.getElementById('basePrice');
+
+            if (!ticketClass || !basePriceInput || !priceInput || !displayPrice) {
+                console.warn("Some required elements are missing!");
+                return;
+            }
+
+            ticketClass.addEventListener('change', function () {
+                const classValue = this.value;
+                const basePrice = parseFloat(basePriceInput.value);
+                let finalPrice = basePrice;
+
+                switch (parseInt(classValue)) {
+                    case 0:
+                        finalPrice = basePrice;
+                        break;
+                    case 1:
+                        finalPrice = basePrice * 1.5;
+                        break;
+                    default:
+                        finalPrice = basePrice;
+                        break;
+                }
+
+                displayPrice.textContent = finalPrice.toFixed(2);
+                priceInput.value = finalPrice.toFixed(2);
+            });
+        });
+    </script>
+
 }

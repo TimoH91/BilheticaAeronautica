@@ -56,8 +56,6 @@ namespace BilheticaAeronauticaWeb.Controllers
                 {
                     var shoppingBasketTicketsWithUser = await GetRegisteredUserBasketTickets(user);
 
-                    
-
                     return View("Views/ShoppingBaskets/Index.cshtml", shoppingBasketTicketsWithUser);
                 }
             }
@@ -106,7 +104,14 @@ namespace BilheticaAeronauticaWeb.Controllers
                 {
                     ViewBag.Adults = await GetAdultsFromBasket(model);
 
-                    return View("ChooseResponsibleForInfant", model);
+                    if (ViewBag.Adults.Count == 0)
+                    {
+                        return View("AddAdults");
+                    }
+                    else
+                    {
+                        return View("ChooseResponsibleForInfant", model);
+                    }
                 }
                 else if(model.Type == PassengerType.Infant && model.ResponsibleAdultTicketId != null)
                 {
@@ -115,11 +120,6 @@ namespace BilheticaAeronauticaWeb.Controllers
                 
                 if (model.FlightId != null)
                 {
-                    //var flight = await _flightRepository.GetByIdTrackedAsync(model.FlightId.Value);
-                    //var seat = await _seatRepository.GetByIdTrackedAsync(model.SeatId.Value);
-
-                    //if (flight != null && seat != null)
-                    //{
                         var basketTicket = _converterHelper.ToShoppingBasketTicket(model, true);
 
                         if (User.Identity.IsAuthenticated)
@@ -167,6 +167,11 @@ namespace BilheticaAeronauticaWeb.Controllers
             else
             {
                 shoppingBasketTickets = _basketHelper.GetBasketTickets(HttpContext.Session);
+
+                foreach (var ticket in shoppingBasketTickets)
+                {
+                    ticket.Flight = await _flightRepository.GetByIdAsync(ticket.FlightId);
+                }
             }
 
             if (!shoppingBasketTickets.Any())
@@ -344,6 +349,11 @@ namespace BilheticaAeronauticaWeb.Controllers
             var shoppingBasketWithNewUser = new ShoppingBasketWithUserViewModel();
 
             var shoppingBasketTickets = _basketHelper.GetBasketTickets(HttpContext.Session);
+
+            foreach (var ticket in shoppingBasketTickets)
+            {
+                ticket.Flight = await _flightRepository.GetByIdAsync(ticket.FlightId);
+            }
 
             var shoppingBasketTicketsViewModels = new List<ShoppingBasketTicketViewModel>();
 

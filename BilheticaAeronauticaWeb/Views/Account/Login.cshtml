@@ -21,17 +21,16 @@
                     <span asp-validation-for="Password" class="text-warning"></span>
                 </div>
                 <div class="form-group text-left">
-                    <div class="form-check">
-                        <input asp-for="RememberMe" class="form-check-input" />
-                        <label asp-for="RememberMe" class="form-check-label">Remember me?</label>
+                    <div class="form-check d-flex align-items-center">
+                        <input asp-for="RememberMe" class="form-check-input me-2" />
+                        <label asp-for="RememberMe" class="form-check-label mb-0">Remember me?</label>
                     </div>
                     <span asp-validation-for="RememberMe" class="text-warning"></span>
                 </div>
-                <div class="form-group text-center">
-                    <input type="submit" value="Login" class="btn btn-dark" /> 
-                    <br />
-                    <a asp-action="Register" class="btn btn-info">Register New User</a>
-                    <a asp-action="RecoverPassword" class="btn btn-link">Forgot your password?</a>
+                <div class="d-flex justify-content-center flex-wrap gap-2">
+                    <input type="submit" value="Login" class="btn btn-info" />
+                    <a asp-action="Register" class="btn btn-warning btn-light">Register New User</a>
+                    <a asp-action="RecoverPassword" class="btn btn-danger btn-dark">Forgot your password?</a>
                 </div>
             </form>
         </div>

@@ -10,19 +10,19 @@
         <div class="container d-flex justify-content-center align-items-center" style="min-height: 600px;">
             <div class="card custom-bg w-75 p-4">
                 <div class="row">
-                    <div class="pb-3 h3 text-left">Flight Search &#128747;</div>
+                    <div class="pb-3 h3 text-left" style="color: black;">Flight Search</div>
                 </div>
                 <form id="flight-form" asp-action="SearchFlightsWithAirports" method="get">
                 <div class="row">
                         <div class="form-group col-md align-items-start flex-column">
-                            <label for="originAirportId" class="d-inline-flex">From</label>
+                            <label for="originAirportId" class="d-inline-flex" style="color: black;">From</label>
                             <select class="form-select" id="originAirportId" name="originAirportId" asp-items="ViewBag.Airports" required>
                                 <option value="">Select an airport</option>
                             </select>
                         </div>
 
                         <div class="form-group col-md align-items-start flex-column">
-                            <label for="destinationAirportId" class="d-inline-flex">To</label>
+                            <label for="destinationAirportId" class="d-inline-flex" style="color: black;">To</label>
                             <select class="form-select" id="destinationAirportId" name="destinationAirportId" asp-items="ViewBag.Airports" required>
                                 <option value="">Select an airport</option>
                             </select>
@@ -30,12 +30,12 @@
                 </div>
                 <div class="row">
                     <div class="form-group col-md align-items-start flex-column">
-                        <label for="departureDate" class=" d-inline-flex">Depart</label>
+                            <label for="departureDate" class=" d-inline-flex" style="color: black;">Depart</label>
                         <input type="date" class="form-control" id="departureDate" name="departureDate"
                                onkeydown="return false">
                     </div>
                     <div class="form-group col-md align-items-start flex-column">
-                            <label for="returnDate" class="d-inline-flex">Return</label>
+                            <label for="returnDate" class="d-inline-flex" style="color: black;">Return</label>
                         <input type="date" placeholder="One way" value=""
                                onChange="this.setAttribute('value', this.value)" class="form-control" id="returnDate"
                                    name="returnDate">
@@ -94,7 +94,7 @@
                 </div> *@
                 <div class="row">
                     <div class="form-group col-lg-6 align-items-start flex-column">
-                        <label for="cabin" class="d-inline-flex">Cabin</label>
+                            <label for="cabin" class="d-inline-flex" style="color: black;">Ticket type</label>
                         <select class="form-select" id="cabin">
                             <option value="ECONOMY">Economy</option>
                             <option value="BUSINESS">Business</option>

@@ -59,7 +59,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             return View(_ticketRepository.GetAll().OrderBy(a => a.Id));
         }
 
-        [Authorize(Roles = "Staff")]
+        //[Authorize(Roles = "Staff")]
         // GET: Tickets/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -98,8 +98,6 @@ namespace BilheticaAeronauticaWeb.Controllers
             ViewBag.Airports = _airportRepository.GetComboAirports();
 
             return View(new TicketViewModel());
-
-            //return new NotFoundViewResult("TicketNotFound");
         }
 
         public async Task<IActionResult> CreateSpecificTicket(int? id)
@@ -121,8 +119,16 @@ namespace BilheticaAeronauticaWeb.Controllers
                     Type = Entities.PassengerType.Adult,
                 };
 
+
+                ViewBag.Origin = flight.OriginAirport.Name;
+                ViewBag.Destination = flight.DestinationAirport.Name;
+                ViewBag.Layover = flight.Layover?.Name;
+
+
                 return View(model);
             }
+
+
 
             return RedirectToAction("Index");
         }
@@ -228,6 +234,12 @@ namespace BilheticaAeronauticaWeb.Controllers
             }
 
             var model = ConvertToModel(ticket);
+
+            if (ticket.Flight != null)
+            {
+                ViewBag.Origin = ticket.Flight.OriginAirport.Name;
+                ViewBag.Destination = ticket.Flight.DestinationAirport.Name;
+            }
 
             return View(model);
         }
@@ -342,10 +354,5 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             }
         }
-
-        //private bool TicketExists(int id)
-        //{
-        //    return _context.Tickets.Any(e => e.Id == id);
-        //}
     }
 }

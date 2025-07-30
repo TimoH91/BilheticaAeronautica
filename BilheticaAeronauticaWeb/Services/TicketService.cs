@@ -44,7 +44,7 @@ namespace BilheticaAeronauticaWeb.Services
 
         public async Task HoldSeat(int seatId)
         {
-                var seat = await _seatRepository.GetByIdAsync(seatId);
+                var seat = await _seatRepository.GetByIdTrackedAsync(seatId);
                 seat.IsHeld = true;
                 seat.HoldingTime = DateTime.Now;
                 await _seatRepository.UpdateAsync(seat);

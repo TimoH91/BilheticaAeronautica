@@ -18,39 +18,40 @@
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CountryId" class="control-label">Country</label>
-                <select asp-for="CountryId" id="CountryId" asp-items="ViewBag.Countries" class="form-control">
-                    <option value="">Select a country</option>
-                </select>
-                <span asp-validation-for="CountryId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CityId" class="control-label">City</label>
-                <select asp-for="CityId" id="CityId" asp-items="ViewBag.Cities" class="form-control">
-                    <option value="">Select a city</option>
-                </select>
-                <span asp-validation-for="CityId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                @*             <label asp-for="FlagImageFile" class="control-label"></label>
-            <input asp-for="FlagImageFile" class="form-control" type="file" />
-            <span asp-validation-for="FlagImageFile" class="text-danger"></span> *@
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
+                <div class="form-group d-flex align-items-center">
+                    <div class="flex-grow-1 me-2">
+                        <label asp-for="CountryId" class="control-label">Country</label>
+                        <select asp-for="CountryId" id="CountryId" asp-items="ViewBag.Countries" class="form-control">
+                            <option value="">Select a country</option>
+                        </select>
+                        <span asp-validation-for="CountryId" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <a asp-action="Create" asp-controller="Countries" class="btn btn-warning btn-light mt-4">Add</a>
+                    </div>
+                </div>
+
+                <div class="form-group d-flex align-items-center">
+                    <div class="flex-grow-1 me-2">
+                        <label asp-for="CityId" class="control-label">City</label>
+                        <select asp-for="CityId" id="CityId" asp-items="ViewBag.Cities" class="form-control">
+                            <option value="">Select a city</option>
+                        </select>
+                        <span asp-validation-for="CityId" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <a href="#" class="btn btn-warning btn-light mt-4" id="addCityBtn">Add</a>
+                    </div>
+                </div>
+                <div class="form-group justify-content-center">
+                    <input type="submit" value="Create" class="btn btn-info me-2" />
+                </div>
 
         </form>
         </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Create" asp-controller="Countries" class="btn btn-primary">Add Country</a>    
-    <a href="#" class="btn btn-primary" id="addCityBtn">Add City</a>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{

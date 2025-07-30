@@ -4,75 +4,50 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<br />
+<h1 class="text-center">Details</h1>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-md-6">
 
-<div>
-    <h4>Ticket</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Surname)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Surname)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Flight)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Flight.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Class)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Class)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Seat)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Seat.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OriginAirport)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OriginAirport.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DestinationAirport)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DestinationAirport.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Payment)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Payment)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Type)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Type)
-        </dd>
-    </dl>
+        <p><strong>@Html.DisplayNameFor(model => model.Name):</strong> @Html.DisplayFor(model => model.Name)</p>
+        <p><strong>@Html.DisplayNameFor(model => model.Surname):</strong> @Html.DisplayFor(model => model.Surname)</p>
+@*         <p><strong>@Html.DisplayNameFor(model => model.Flight):</strong> @Html.DisplayFor(model => model.Flight.Id)</p> *@
+        <p><strong>@Html.DisplayNameFor(model => model.Class):</strong> @Html.DisplayFor(model => model.Class)</p>
+        @if (Model.Seat != null)
+        {
+            <p><strong>@Html.DisplayNameFor(model => model.Seat.Row):</strong> @Html.DisplayFor(model => model.Seat.Row)</p>
+            <p><strong>@Html.DisplayNameFor(model => model.Seat.Column):</strong> @Html.DisplayFor(model => model.Seat.Column)</p>
+        }
+        else
+        {
+            <p><strong>Seat:</strong> Not assigned</p>
+        }
+        <p><strong>@Html.DisplayNameFor(model => model.OriginAirport):</strong> @Html.DisplayFor(model => model.OriginAirport.Name)</p>
+        <p><strong>@Html.DisplayNameFor(model => model.DestinationAirport):</strong> @Html.DisplayFor(model => model.DestinationAirport.Name)</p>
+
+        @if (Model.Flight!= null)
+        {
+            @if (Model.Flight.Layover != null)
+            {
+                <p><strong>@Html.DisplayNameFor(model => model.Flight.Layover.Name):</strong> @Html.DisplayFor(model => model.Flight.Layover.Name)</p>
+            }
+            else
+            {
+                <p><strong>Layover:</strong> N/A</p>
+            }
+           
+        }
+        
+        <p><strong>@Html.DisplayNameFor(model => model.Payment):</strong> @Html.DisplayFor(model => model.Payment)</p>
+        <p><strong>@Html.DisplayNameFor(model => model.Price):</strong> @Html.DisplayFor(model => model.Price)</p>
+        <p><strong>@Html.DisplayNameFor(model => model.Type):</strong> @Html.DisplayFor(model => model.Type)</p>
+
+        <div class="mt-4">
+            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-info me-2">Edit</a>
+            <a asp-controller="Orders" asp-action="Index" class="btn btn-warning btn-dark">Back to order</a>
+        </div>
+
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+

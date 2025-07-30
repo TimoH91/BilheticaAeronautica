@@ -110,7 +110,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             {
                 await _countryRepository.AddCityAsync(model);
 
-                return RedirectToAction("Details", new { id = model.CountryId });
+                return RedirectToAction("Index", new { id = model.CountryId });
             }
 
             return this.View(model);

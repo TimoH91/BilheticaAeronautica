@@ -19,12 +19,22 @@
         @Html.DisplayFor(model => model.Flight.OriginAirport.Name) to @Html.DisplayFor(model => model.Flight.DestinationAirport.Name)
     </p>
     <p><strong>@Html.DisplayNameFor(model => model.Class):</strong> @Html.DisplayFor(model => model.Class)</p>
-    <p><strong>@Html.DisplayNameFor(model => model.Seat):</strong> @Html.DisplayFor(model => model.Seat)</p>
+        @if (Model.Seat != null)
+        {
+            <p><strong>@Html.DisplayNameFor(model => model.Seat.Row):</strong> @Html.DisplayFor(model => model.Seat.Row)</p>
+            <p><strong>@Html.DisplayNameFor(model => model.Seat.Column):</strong> @Html.DisplayFor(model => model.Seat.Column)</p>
+        }
+        else
+        {
+            <p><strong>Seat:</strong> Not assigned</p>
+        }
     <p><strong>@Html.DisplayNameFor(model => model.Price):</strong> @Html.DisplayFor(model => model.Price)</p>
-    <p><strong>@Html.DisplayNameFor(model => model.PassengerType):</strong> @Html.DisplayFor(model => model.PassengerType)</p>
+        <p><strong>Passenger Type:</strong> @Html.DisplayFor(model => model.PassengerType)</p>
 
     <div class="mt-4">
-        <a asp-action="Delete" asp-route-id="@Model?.Id" class="btn btn-danger me-2">Delete</a>
+            <form asp-action="Delete" asp-route-id="@Model?.Id" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger btn-dark me-2">Delete</button>
+            </form>
         <a asp-action="Index" class="btn btn-secondary">Back</a>
     </div>
 

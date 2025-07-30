@@ -401,6 +401,7 @@ namespace BilheticaAeronauticaWeb.Helpers
             {
                 Id = basketTicket.Id,
                 FlightId = basketTicket.FlightId,
+                Flight = basketTicket.Flight,
                 Class = basketTicket.Class,
                 Name = basketTicket.Name,
                 PassengerType = basketTicket.PassengerType,
