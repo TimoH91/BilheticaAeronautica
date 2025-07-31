@@ -29,17 +29,11 @@ namespace BilheticaAeronauticaWeb.Controllers
 
         public async Task<IActionResult> SearchFlightsWithAirports(int originAirportId, int destinationAirportId)
         {
-            //IEnumerable<Flight> flights = await _flightRepository.GetFlightsByOriginAndDestination(originAirportId, destinationAirportId);
 
             var flights = new RoundTripFlightViewModel
             {
                 OutboundFlights = await _flightRepository.GetFlightsByOriginAndDestination(originAirportId, destinationAirportId)
             };
-
-            //if (!flights.Any() || flights == null)
-            //{
-            //    RedirectToAction("Index");
-            //}
 
             return View("Views/Flights/FlightSearch.cshtml", flights);
 
@@ -47,12 +41,6 @@ namespace BilheticaAeronauticaWeb.Controllers
 
         public async Task<IActionResult> SearchFlightsWithAirportsAndDate(int originAirportId, int destinationAirportId, DateTime departureDate)
         {
-            //IEnumerable<Flight> flights = await _flightRepository.GetFlightsByOriginDestinationAndDate(originAirportId, destinationAirportId, departureDate);
-
-            //if (!flights.Any() || flights == null)
-            //{
-            //    RedirectToAction("Index");
-            //}
 
             var flights = new RoundTripFlightViewModel
             {
@@ -71,11 +59,6 @@ namespace BilheticaAeronauticaWeb.Controllers
                 OutboundFlights = await _flightRepository.GetFlightsByOriginDestinationAndDate(originAirportId, destinationAirportId, departureDate),
                 ReturnFlights = await _flightRepository.GetFlightsByOriginDestinationAndDate(destinationAirportId, originAirportId, returnDate)
             };
-
-            //if (!roundTrip.OutboundFlights.Any() || roundTrip == null)
-            //{
-            //    RedirectToAction("Index");
-            //}
 
             return View("Views/Flights/FlightSearch.cshtml", roundTrip);
 
@@ -97,6 +80,11 @@ namespace BilheticaAeronauticaWeb.Controllers
         }
 
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        public IActionResult Terms()
         {
             return View();
         }

@@ -7,6 +7,8 @@ using BilheticaAeronauticaWeb.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using BilheticaAeronauticaWeb.Services;
+using Vereyon.Web;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -19,9 +21,13 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly IConverterHelper _converterHelper;
         private readonly IMailHelper _mailHelper;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IUserService _userService;
+        private readonly IFlashMessage _flashMessage;
 
         public UsersController(IUserRepository userRepository,UserManager<User> userManager,
-            IConverterHelper converterHelper,IUserHelper userHelper,IMailHelper mailHelper, RoleManager<IdentityRole> roleManager)
+            IConverterHelper converterHelper,IUserHelper userHelper,
+            IMailHelper mailHelper, RoleManager<IdentityRole> roleManager,
+            IUserService userservice, IFlashMessage flashMessage)
         {
             _userRepository = userRepository;
             _userManager = userManager;
@@ -29,6 +35,8 @@ namespace BilheticaAeronauticaWeb.Controllers
             _userHelper = userHelper;
             _mailHelper = mailHelper;
             _roleManager = roleManager;
+            _userService = userservice;
+            _flashMessage = flashMessage;
         }
 
         public async Task<IActionResult> Index()
@@ -80,6 +88,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
                     await MailNewUser(user);
 
+                    _flashMessage.Info("User added successfully!");
                     return RedirectToAction(nameof(Index));
 
                 }
@@ -121,12 +130,6 @@ namespace BilheticaAeronauticaWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UserViewModel model)
         {
-            //if (!string.IsNullOrEmpty(model.Id))
-            //{
-            //    var user = await _userRepository.GetByIdAsync(model.Id);
-            //    model.Password = user.PasswordHash;
-            //}
-
             ModelState.Remove("Password");
 
             if (ModelState.IsValid)
@@ -150,9 +153,11 @@ namespace BilheticaAeronauticaWeb.Controllers
                     }
                     else
                     {
-                        throw;
+                        _flashMessage.Danger("User edit failed");
                     }
                 }
+
+                _flashMessage.Info("Changes to user saved!");
                 return RedirectToAction(nameof(Index));
             }
             return View(model);
@@ -166,14 +171,22 @@ namespace BilheticaAeronauticaWeb.Controllers
                 return new NotFoundViewResult("UserNotFound");
             }
 
-            var flight = await _userRepository.GetByIdAsync(id);
+            var user = await _userRepository.GetByIdAsync(id);
 
-            if (flight == null)
+            if (user == null)
             {
                 return new NotFoundViewResult("UserNotFound");
             }
 
-            return View(flight);
+            if (await _userService.AllowUserDeletion(user))
+            {
+                return View(user);
+            }
+            else
+            {
+                _flashMessage.Danger("User cannot be deleted");
+            }
+            return RedirectToAction("Index");
         }
 
         //POST: Users/Delete/5

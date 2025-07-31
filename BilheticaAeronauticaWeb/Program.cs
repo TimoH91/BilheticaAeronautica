@@ -6,6 +6,8 @@ using BilheticaAeronauticaWeb.Helpers;
 using BilheticaAeronauticaWeb.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Vereyon.Web;
+using Microsoft.Extensions.Azure;
 
 
 
@@ -27,6 +29,8 @@ builder.Services.AddAuthentication()
                             };
                         });
 
+builder.Services.AddFlashMessage();
+
 builder.Services.AddTransient<SeedDb>();
 builder.Services.AddScoped<IAirportRepository, AirportRepository>();
 builder.Services.AddScoped<IAirplaneRepository, AirplaneRepository>();
@@ -47,6 +51,7 @@ builder.Services.AddScoped<IUserHelper, UserHelper>();
 builder.Services.AddScoped<IMailHelper, MailHelper>();
 builder.Services.AddScoped<IBasketHelper, BasketHelper>();
 builder.Services.AddScoped<IBlobHelper, BlobHelper>();
+builder.Services.AddScoped<IUserService, UserService>();    
 
 
 builder.Services.AddDistributedMemoryCache();
@@ -88,6 +93,12 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/NotAuthorized";
     options.AccessDeniedPath = "/Account/Not/Authorized";
+});
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["Blob:ConnectionString1:blobServiceUri"]!).WithName("Blob:ConnectionString1");
+    clientBuilder.AddQueueServiceClient(builder.Configuration["Blob:ConnectionString1:queueServiceUri"]!).WithName("Blob:ConnectionString1");
+    clientBuilder.AddTableServiceClient(builder.Configuration["Blob:ConnectionString1:tableServiceUri"]!).WithName("Blob:ConnectionString1");
 });
 
 var app = builder.Build();

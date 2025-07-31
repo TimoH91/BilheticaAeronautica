@@ -2,7 +2,6 @@
     ViewData["Title"] = "Home Page";
 }
 
-
 <br />
 <body>
 
@@ -31,67 +30,16 @@
                 <div class="row">
                     <div class="form-group col-md align-items-start flex-column">
                             <label for="departureDate" class=" d-inline-flex" style="color: black;">Depart</label>
-                        <input type="date" class="form-control" id="departureDate" name="departureDate"
-                               onkeydown="return false">
+                            <input type="date" class="form-control" id="departureDate" name="departureDate"
+                                   min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                   onkeydown="return false" />
                     </div>
                     <div class="form-group col-md align-items-start flex-column">
                             <label for="returnDate" class="d-inline-flex" style="color: black;">Return</label>
-                        <input type="date" placeholder="One way" value=""
-                               onChange="this.setAttribute('value', this.value)" class="form-control" id="returnDate"
-                                   name="returnDate">
+                            <input type="date" class="form-control" id="returnDate" name="returnDate" disabled>
                     </div>
                 </div>
-@*                 <div class="row">
-                    <div class="form-group col-lg-3 align-items-start flex-column">
-                        <label for="adults" class="d-inline-flex col-auto">
-                            Adults <span class="sublabel">
-                                12+
-                            </span>
-                        </label>
-                        <select class="form-select" id="adults"
-                                onchange="javascript: dynamicDropDown(this.options[this.selectedIndex].value);">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                        </select>
-                    </div>
-                    <div class="form-group col-lg-3 align-items-start flex-column">
-                        <label for="children" class="d-inline-flex col-auto">
-                            Children <span class="sublabel">
-                                2-11
-                            </span>
-                        </label>
-                        <select class="form-select" id="children">
-                            <option value="0">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                        </select>
-                    </div>
-                    <div class="form-group col-lg-3 align-items-start flex-column">
-                        <label for="infants" class="d-inline-flex col-auto">
-                            Infants <span class="sublabel">
-                                less than
-                                2
-                            </span>
-                        </label>
-                        <select class="form-select" id="infants">
-                            <option value="0">0</option>
-                            <option value="1">1</option>
-                        </select>
-                    </div>
-                </div> *@
+
                 <div class="row">
                     <div class="form-group col-lg-6 align-items-start flex-column">
                             <label for="cabin" class="d-inline-flex" style="color: black;">Ticket type</label>
@@ -130,15 +78,83 @@
             const returnDateInput = document.getElementById("returnDate");
 
             form.addEventListener("submit", function (e) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); 
                 const hasDepartureDate = departureDateInput.value !== "";
                 const hasReturnDate = returnDateInput.value !== "";
+
+                const departureDate = new Date(departureDateInput.value);
+                const returnDate = new Date(returnDateInput.value);
+
+
+                if (hasDepartureDate && departureDate < today) {
+                    alert("Departure date must be in the future.");
+                    e.preventDefault();
+                    return;
+                }
+
+                if (hasReturnDate && returnDate < today) {
+                    alert("Return date must be in the future.");
+                    e.preventDefault();
+                    return;
+                }
 
                 if (hasDepartureDate && hasReturnDate) {
                     form.action = "/Home/SearchFlightsWithAirportsAndReturn";
                 } else if (hasDepartureDate) {
                     form.action = "/Home/SearchFlightsWithAirportsAndDate";
+                } else {
+                    form.action = "/Home/SearchFlightsWithAirports";
                 }
-                else {
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("flight-form");
+            const departureDateInput = document.getElementById("departureDate");
+            const returnDateInput = document.getElementById("returnDate");
+
+            returnDateInput.disabled = true;
+
+            departureDateInput.addEventListener("change", function () {
+                if (departureDateInput.value) {
+                    const departureDate = new Date(departureDateInput.value);
+                    departureDate.setDate(departureDate.getDate() + 1); 
+
+                    returnDateInput.min = departureDate.toISOString().split("T")[0];
+                    returnDateInput.disabled = false;
+                } else {
+                    returnDateInput.value = "";
+                    returnDateInput.disabled = true;
+                }
+            });
+
+            form.addEventListener("submit", function (e) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const departure = new Date(departureDateInput.value);
+                const returnDate = new Date(returnDateInput.value);
+
+                if (departureDateInput.value && departure < today) {
+                    alert("Departure date must be in the future.");
+                    e.preventDefault();
+                    return;
+                }
+
+                if (returnDateInput.value && returnDate < departure) {
+                    alert("Return date must be after departure date.");
+                    e.preventDefault();
+                    return;
+                }
+
+                if (departureDateInput.value && returnDateInput.value) {
+                    form.action = "/Home/SearchFlightsWithAirportsAndReturn";
+                } else if (departureDateInput.value) {
+                    form.action = "/Home/SearchFlightsWithAirportsAndDate";
+                } else {
                     form.action = "/Home/SearchFlightsWithAirports";
                 }
             });

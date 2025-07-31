@@ -60,9 +60,19 @@
                 <span asp-validation-for="SeatId" class="text-danger"></span>
             </div>
 
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-info me-2" />
-                <a asp-controller="Orders" asp-action="Index" class="btn btn-warning btn-dark">Back to order</a>
+
+                @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Customer"))
+                {
+                    <a asp-controller="Orders" asp-action="Index" class="btn btn-warning btn-dark">Back to order</a>
+                }
+                @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Staff"))
+                {
+                    <a asp-controller="Orders" asp-action="CustomerOrders" class="btn btn-warning btn-dark">Back</a>
+                }
+               
             </div>
         </form>
     </div>
@@ -73,39 +83,52 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-<script type="text/javascript">
-    $(document).ready(function () {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var selectedSeatId = '@Model.SeatId'; // Razor injects current seat ID here
+
         function updateSeats() {
             var flightId = $("#FlightId").val();
 
-            if (flightId) {
-                $("#SeatId").empty();
+            if (!flightId) return;
 
-                $.ajax({
-                    url: '@Url.Action("GetSeatsByFlight", "Tickets")',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        flightId: flightId,
-                    },
-                    success: function (seats) {
-                        $("#SeatId").append('<option value="">Select a seat</option>');
-                        $.each(seats, function (i, seat) {
-                            $("#SeatId").append('<option value="' + seat.value + '">' + seat.text + '</option>');
+            $("#SeatId").empty();
 
-                        });
-                    },
-                    error: function () {
-                        alert("Failed to load seats.");
-                    }
-                });
+            $.ajax({
+                url: '@Url.Action("GetSeatsByFlight", "Tickets")',
+                type: 'POST',
+                dataType: 'json',
+                data: { flightId: flightId },
+                success: function (seats) {
+                    $("#SeatId").append('<option value="">Select a seat</option>');
+
+                    $.each(seats, function (i, seat) {
+                        var option = $('<option>')
+                            .val(seat.value)
+                            .text(seat.text);
+
+                        if (seat.value.toString() === selectedSeatId.toString()) {
+                            option.prop('selected', true); 
+                        }
+
+                        $("#SeatId").append(option);
+                    });
+                },
+                error: function () {
+                    alert("Failed to load seats.");
+                }
+            });
+        
+
             }
-        }
-              updateSeats();
 
-        $("#FlightId").change(function () {
             updateSeats();
+
+            $("#FlightId").change(function () {
+                selectedSeatId = ''; 
+                updateSeats();
+            });
         });
-    });
-</script>
+    </script>
+
 }

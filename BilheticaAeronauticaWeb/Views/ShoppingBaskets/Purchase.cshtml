@@ -76,7 +76,9 @@
                         @if (item.SeatId == null || item.SeatId == 0)
                         {
                             <span class="text-danger">Please choose a seat</span>
-                            <select asp-for="ShoppingBasketTickets[@i].SeatId" class="form-control">
+                            <select asp-for="ShoppingBasketTickets[@i].SeatId"
+                                    class="form-control seat-dropdown"
+                                    data-index="@i">
                                 <option value="">Select a seat</option>
                                 @{
                                     var seatsList = ViewBag.Seats as IEnumerable<SelectListItem>;
@@ -136,3 +138,49 @@
         <button type="submit" class="btn btn-success">Confirm</button>
     </div>
 </form>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const seatDropdowns = document.querySelectorAll('.seat-dropdown');
+            const allSeatOptions = {};
+
+            // Save the original options
+            seatDropdowns.forEach(dropdown => {
+                const index = dropdown.dataset.index;
+                allSeatOptions[index] = Array.from(dropdown.options).map(option => option.cloneNode(true));
+            });
+
+            seatDropdowns.forEach(dropdown => {
+                dropdown.addEventListener('change', function () {
+                    const selectedSeat = this.value;
+
+                    // Rebuild all dropdowns
+                    seatDropdowns.forEach(innerDropdown => {
+                        const innerIndex = innerDropdown.dataset.index;
+
+                        const currentValue = innerDropdown.value;
+
+                        // Clear all options
+                        innerDropdown.innerHTML = '';
+
+                        // Restore from original list
+                        allSeatOptions[innerIndex].forEach(option => {
+                            if (
+                                option.value === '' ||                    // keep placeholder
+                                option.value === currentValue ||          // keep its own selection
+                                option.value !== selectedSeat             // exclude seat selected by someone else
+                            ) {
+                                innerDropdown.appendChild(option.cloneNode(true));
+                            }
+                        });
+
+                        // Re-apply the user's selection
+                        innerDropdown.value = currentValue;
+                    });
+                });
+            });
+        });
+    </script>
+}

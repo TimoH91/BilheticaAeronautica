@@ -70,6 +70,26 @@ namespace BilheticaAeronauticaWeb.Controllers
 
         }
 
+        // GET: Orders
+        [Authorize(Roles = "Staff")]
+        public async Task<IActionResult> CustomerOrders()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var orders = _orderRepository.GetAll();
+
+                if (orders == null)
+                {
+                    return new NotFoundViewResult("NoBookings");
+                }
+
+                return View(orders);
+            }
+
+            return new NotFoundViewResult("NoBookings");
+
+        }
+
         // GET: Orders/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -133,7 +153,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         }
 
         // GET: Orders/Edit/5
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -156,7 +176,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         // POST: Orders/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Staff")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(OrderViewModel model)
@@ -195,7 +215,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         }
 
         // GET: Orders/Delete/5
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -214,7 +234,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         }
 
         // POST: Orders/Delete/5
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Staff")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -319,7 +339,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             foreach (ShoppingBasketTicket basketTicket in shoppingBasketTickets)
             {
-                if (basketTicket.PassengerType == PassengerType.Adult)
+                if (basketTicket.PassengerType == PassengerType.Adult || basketTicket.PassengerType == PassengerType.Child)
                 {
                     var flight = await _flightRepository.GetByIdTrackedAsync(basketTicket.FlightId);
                     var ticket = _converterHelper.BasketToTicket(basketTicket, flight);

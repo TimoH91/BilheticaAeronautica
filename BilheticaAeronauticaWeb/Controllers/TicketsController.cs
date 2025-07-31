@@ -16,6 +16,7 @@ using System.Data;
 using Microsoft.AspNetCore.Identity;
 using BilheticaAeronauticaWeb.Services;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
+using Vereyon.Web;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -30,6 +31,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly IConverterHelper _converterHelper;
         private readonly IUserHelper _userHelper;
         private readonly ITicketService _ticketService;
+        private readonly IFlashMessage _flashMessage;
 
 
 
@@ -40,7 +42,8 @@ namespace BilheticaAeronauticaWeb.Controllers
             ISeatRepository seatRepository,
             IConverterHelper converterHelper,
             IUserHelper userHelper,
-            ITicketService ticketService)
+            ITicketService ticketService,
+            IFlashMessage flashMessage)
         {
             _context = context;
             _ticketRepository = ticketRepository;
@@ -50,6 +53,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             _converterHelper = converterHelper;
             _userHelper = userHelper;
             _ticketService = ticketService;
+            _flashMessage = flashMessage;
         }
 
         [Authorize(Roles = "Staff")]
@@ -233,15 +237,25 @@ namespace BilheticaAeronauticaWeb.Controllers
                 return new NotFoundViewResult("TicketNotFound");
             }
 
+           
             var model = ConvertToModel(ticket);
 
-            if (ticket.Flight != null)
+            if(await _ticketService.AllowTicketChanges(model))
             {
-                ViewBag.Origin = ticket.Flight.OriginAirport.Name;
-                ViewBag.Destination = ticket.Flight.DestinationAirport.Name;
+                if (ticket.Flight != null)
+                {
+                    ViewBag.Origin = ticket.Flight.OriginAirport.Name;
+                    ViewBag.Destination = ticket.Flight.DestinationAirport.Name;
+                }
+
+                return View(model);
+            }
+            else
+            {
+                _flashMessage.Danger("Ticket cannot be edited");
             }
 
-            return View(model);
+            return RedirectToAction("CustomerOrders", "Orders");
         }
 
         private TicketViewModel ConvertToModel(Ticket ticket)
@@ -293,7 +307,10 @@ namespace BilheticaAeronauticaWeb.Controllers
                         }
 
                     }
-                    return RedirectToAction("Index", "Orders");
+
+                    _flashMessage.Info("Changes saved!");
+
+                    return RedirectToAction("CustomerOrders", "Orders");
                 }
             }
             return View(model);
@@ -314,7 +331,18 @@ namespace BilheticaAeronauticaWeb.Controllers
                 return new NotFoundViewResult("TicketNotFound");
             }
 
-            return View(ticket);
+            if (_ticketService.AllowTicketDeletion(ticket))
+            {
+                return View(ticket);
+            }
+            else
+            {
+                _flashMessage.Danger("Ticket cannot be deleted");
+            }
+
+            return RedirectToAction("CustomerOrders", "Orders");
+
+          
         }
 
         // POST: Tickets/Delete/5
@@ -326,8 +354,9 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             try
             {
-                await _ticketRepository.DeleteAsync(ticket);
-                return RedirectToAction(nameof(Index));
+                    await _ticketRepository.DeleteAsync(ticket);
+                    _flashMessage.Info("Ticket deleted!");
+                    return RedirectToAction("CustomerOrders", "Orders");
             }
             catch (DbUpdateException ex)
             {
@@ -353,6 +382,8 @@ namespace BilheticaAeronauticaWeb.Controllers
                 });
 
             }
+
+            
         }
     }
 }

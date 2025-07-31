@@ -11,6 +11,7 @@ using BilheticaAeronauticaWeb.Models;
 using BilheticaAeronauticaWeb.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using BilheticaAeronauticaWeb.Services;
+using Vereyon.Web;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -22,14 +23,16 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly IConverterHelper _converterHelper;
         private readonly IAirplaneService _airplaneService;
         private readonly IBlobHelper _blobHelper;
+        private readonly IFlashMessage _flashMessage;
 
         public AirplanesController(IAirplaneRepository airplaneRepository, IConverterHelper converterHelper,
-            IAirplaneService airplaneService, IBlobHelper blobHelper)
+            IAirplaneService airplaneService, IBlobHelper blobHelper, IFlashMessage flashMessage)
         {
             _airplaneRepository = airplaneRepository;
             _converterHelper = converterHelper;
             _airplaneService = airplaneService;
             _blobHelper = blobHelper;
+            _flashMessage = flashMessage;
         }
 
         // GET: Airplanes
@@ -85,12 +88,14 @@ namespace BilheticaAeronauticaWeb.Controllers
                 {
                     await _airplaneRepository.CreateAsync(airplane);
 
+                    _flashMessage.Info("Airplane added successfully!");
+
                     return RedirectToAction(nameof(Index));
 
                 }
                 catch (Exception ex)
                 {
-                    //TODO Flashmessage"This airplane already exists!"
+                    _flashMessage.Danger("This airplane already exists!");
                 }
             }
             return View(model);
@@ -149,6 +154,10 @@ namespace BilheticaAeronauticaWeb.Controllers
 
                         await _airplaneRepository.UpdateAsync(editedAirplane);
                     }
+                    else
+                    {
+                        _flashMessage.Danger("This airplanes status cannot be edited");
+                    }
                 }
 
                 catch (DbUpdateConcurrencyException)
@@ -200,6 +209,11 @@ namespace BilheticaAeronauticaWeb.Controllers
                 if (canDelete)
                 {
                     await _airplaneRepository.DeleteAsync(airplane);
+                    _flashMessage.Info("Airplane deleted!");
+                }
+                else
+                {
+                    _flashMessage.Danger("This airplane could not be deleted");
                 }
 
                 return RedirectToAction(nameof(Index));
@@ -229,10 +243,6 @@ namespace BilheticaAeronauticaWeb.Controllers
             } 
         }
 
-        //private bool AirplaneExists(int id)
-        //{
-        //    return _airplaneRepository.Any(e => e.Id == id);
-        //}
 
         public IActionResult AirplaneNotFound()
         {

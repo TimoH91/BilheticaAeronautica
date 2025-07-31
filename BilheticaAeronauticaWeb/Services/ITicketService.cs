@@ -5,10 +5,6 @@ namespace BilheticaAeronauticaWeb.Services
 {
     public interface ITicketService
     {
-        //Task OccupySeats(List<Ticket> Tickets);
-
-        //Task UnoccupySeats(List<Ticket> Tickets);
-
         List<ShoppingBasketTicket> FilterAdults(List<ShoppingBasketTicket> tickets, TicketViewModel ticket);
         Task OccupySeats(int seatId);
 
@@ -24,6 +20,8 @@ namespace BilheticaAeronauticaWeb.Services
         Task MakeResponsibleAdult(ShoppingBasketTicket ticket);
 
         Task<bool> AllowTicketChanges(TicketViewModel model);
+
+        bool AllowTicketDeletion(Ticket ticket);
 
     }
 }

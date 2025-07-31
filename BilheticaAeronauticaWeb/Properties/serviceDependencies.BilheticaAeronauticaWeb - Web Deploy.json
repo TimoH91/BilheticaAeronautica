@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "storage1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('serviceConnectorResourceGroupName')]/providers/Microsoft.Web/sites/BilheticaAeronauticaWeb/providers/Microsoft.ServiceLinker/linkers/BlobConnectionString1_678B0ED85A, /subscriptions/0e16babb-894f-4324-b02b-0db2724a2bd5/resourcegroups/Brisa_97/providers/Microsoft.Web/sites/BilheticaAeronauticaWeb/providers/Microsoft.ServiceLinker/linkers/BlobConnectionString1_0F172B7D46",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Storage/storageAccounts/brisa",
+      "type": "storage.azure",
+      "connectionId": "Blob:ConnectionString1",
+      "dynamicId": null
+    },
+    "mssql1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('serviceConnectorResourceGroupName')]/providers/Microsoft.Web/sites/BilheticaAeronauticaWeb/providers/Microsoft.ServiceLinker/linkers/ConnectionStringsDatabaseConnectionkkkkk_072484C146",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/brisa97/databases/BrisaDatabase",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:DatabaseConnectionkkkkkkk"
+    }
+  }
+}

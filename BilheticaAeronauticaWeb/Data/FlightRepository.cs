@@ -74,7 +74,7 @@ namespace BilheticaAeronauticaWeb.Data
 
         public async Task<IEnumerable<Flight>> GetFlightsByOriginAndDestination(int originAirportId, int destinationAirportId)
         {
-            var flights = await _context.Flights
+            var flights = await _context.Flights.Where(f => f.Date > DateTime.Now.Date || f.Date == DateTime.Now.Date && f.Time > DateTime.Now.TimeOfDay)
                 .Include(f => f.OriginAirport)
                 .Include(f => f.DestinationAirport)
                 .Include(f => f.Layover)
@@ -107,6 +107,15 @@ namespace BilheticaAeronauticaWeb.Data
                 f.OriginAirportId == airportId ||
                 f.DestinationAirportId == airportId ||
                 f.LayoverId == airportId);
+        }
+
+        public IQueryable<Flight> GetAllFutureFlights()
+        {
+            return _context.Flights.Where(f => f.Date > DateTime.Now.Date || f.Date == DateTime.Now.Date && f.Time > DateTime.Now.TimeOfDay)
+               .Include(a => a.Airplane)
+               .Include(a => a.OriginAirport)
+               .Include(a => a.DestinationAirport)
+               .Include(a => a.Layover);
         }
     }
 }

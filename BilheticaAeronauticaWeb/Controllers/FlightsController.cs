@@ -13,6 +13,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using BilheticaAeronauticaWeb.Services;
 using System.Diagnostics.Metrics;
+using Vereyon.Web;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -26,6 +27,7 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly IFlightService _flightService;
         private readonly ISeatRepository _seatRepository;
         private readonly ITicketRepository _ticketRepository;
+        private readonly IFlashMessage _flashMessage;
 
         public FlightsController(IFlightRepository flightRepository,
             IAirplaneRepository airplaneRepository,
@@ -33,7 +35,8 @@ namespace BilheticaAeronauticaWeb.Controllers
             IConverterHelper converterHelper,
             IFlightService flightService,
             ISeatRepository seatRepository,
-            ITicketRepository ticketRepository)
+            ITicketRepository ticketRepository,
+            IFlashMessage flashMessage)
         {
             _flightRepository = flightRepository;
             _airplaneRepository = airplaneRepository;
@@ -42,8 +45,10 @@ namespace BilheticaAeronauticaWeb.Controllers
             _flightService = flightService;
             _seatRepository = seatRepository;
             _ticketRepository = ticketRepository;
+            _flashMessage  = flashMessage;
         }
 
+        [Authorize(Roles = "Staff,Admin")]
         // GET: Flights
         public async Task<IActionResult> Index()
         {
@@ -68,6 +73,30 @@ namespace BilheticaAeronauticaWeb.Controllers
             ViewBag.pivotData = flattenedFlights;
 
             return View(_flightRepository.GetAll().OrderBy(a => a.Id));
+        }
+
+
+        public async Task<IActionResult> AllFutureFlights()
+        {
+            var flights = _flightRepository.GetAllFutureFlights().ToList();
+
+            var flattenedFlights = flights.Select(f => new
+            {
+                Id = f.Id,
+                Origin = f.OriginAirport.Name,
+                Destination = f.DestinationAirport.Name,
+                Airplane = f.Airplane.Name,
+                Layover = f.Layover?.Name,
+                BasePrice = f.BasePrice,
+                Duration = f.Duration,
+                Time = f.Time,
+                Date = f.Date
+
+            }).ToList();
+
+            ViewBag.pivotData = flattenedFlights;
+
+            return View(_flightRepository.GetAllFutureFlights().OrderBy(a => a.Id));
         }
 
         [Authorize(Roles = "Staff")]
@@ -132,6 +161,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
                     await _flightService.CreateSeatsForFlightAsync(flight);
 
+                    _flashMessage.Info("Flight added successfully!");
                     return RedirectToAction(nameof(Index));
 
                 }
@@ -161,11 +191,19 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             var model = _converterHelper.ToFlightViewModel(flight);
 
-            ViewBag.Airplanes = await GetAirplanesViewBag(flight);
-            ViewBag.Airports = _airportRepository.GetComboAirports();
+            if (_flightService.AllowEdit(model))
+            {
+                ViewBag.Airplanes = await GetAirplanesViewBag(flight);
+                ViewBag.Airports = _airportRepository.GetComboAirports();
 
-            return View(model);
+                return View(model);
+            }
+            else
+            {
+                _flashMessage.Danger("Flight cannot be edited");
+            }
 
+            return RedirectToAction("Index");
         }
 
         //POST: Flights/Edit/5
@@ -178,27 +216,28 @@ namespace BilheticaAeronauticaWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                try
-                {
-                    var flight = _converterHelper.ToFlight(model, false);
-
-                    await _flightRepository.UpdateAsync(flight);
-
-                    await _flightService.ReattributeSeats(flight);
-                }
-
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await _flightRepository.ExistAsync(model.Id))
+                    try
                     {
-                        return new NotFoundViewResult("FlightNotFound"); ;
+                        var flight = _converterHelper.ToFlight(model, false);
+
+                        await _flightRepository.UpdateAsync(flight);
+
+                        await _flightService.ReattributeSeats(flight);
                     }
-                    else
+
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!await _flightRepository.ExistAsync(model.Id))
+                        {
+                            return new NotFoundViewResult("FlightNotFound"); ;
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
-                }
-                return RedirectToAction(nameof(Index));
+                    _flashMessage.Info("Changes to flight saved!");
+                    return RedirectToAction(nameof(Index));
             }
             return View(model);
         }
@@ -236,6 +275,7 @@ namespace BilheticaAeronauticaWeb.Controllers
                 {
                     await _flightService.AlterSeatsAndTickets(flight);
                     await _flightRepository.DeleteAsync(flight);
+                    _flashMessage.Info("Flight deleted!");
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateException ex)
@@ -262,6 +302,10 @@ namespace BilheticaAeronauticaWeb.Controllers
                     });
 
                 }
+            }
+            else
+            {
+                _flashMessage.Danger("Flight cannot be deleted");
             }
 
             return RedirectToAction(nameof(Index));

@@ -1,5 +1,6 @@
 ﻿using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
+using BilheticaAeronauticaWeb.Models;
 
 namespace BilheticaAeronauticaWeb.Services
 {
@@ -192,6 +193,16 @@ namespace BilheticaAeronauticaWeb.Services
         public bool AllowDeletion(Flight flight)
         {          
             if (flight.Date < DateTime.Now.Date || (flight.Date == DateTime.Now.Date && flight.Time < DateTime.Now.TimeOfDay))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool AllowEdit(FlightViewModel model)
+        {
+            if (model.Date < DateTime.Now.Date || (model.Date == DateTime.Now.Date && model.Time < DateTime.Now.TimeOfDay))
             {
                 return false;
             }

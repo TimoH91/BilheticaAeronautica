@@ -1,0 +1,232 @@
+﻿@model IEnumerable<BilheticaAeronauticaWeb.Entities.Flight>
+
+
+
+
+<br />
+<div class="card mb-4">
+    <div class="card-header">
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Date)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Time)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Duration)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BasePrice)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Airplane)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OriginAirport)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DestinationAirport)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Layover)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Date)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Time)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Duration)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BasePrice)
+                        </td>
+                        <th>
+                            @Html.DisplayFor(modelItem => item.Airplane.Name)
+                        </th>
+                        <th>
+                            @Html.DisplayFor(modelItem => item.OriginAirport.Name)
+                        </th>
+                        <th>
+                            @Html.DisplayFor(modelItem => item.DestinationAirport.Name)
+                        </th>
+                        <th>
+                            @Html.DisplayFor(modelItem => item.Layover.Name)
+                        </th>
+                        <td>
+                            @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Customer") || !User.Identity.IsAuthenticated)
+                            {
+                                <a asp-controller="Tickets" asp-action="CreateSpecificTicket" asp-route-id="@item.Id" class="btn btn-success">
+                                    Buy Ticket
+                                </a>
+                            }
+                            @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Staff"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-info">Edit</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-light"> Details </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-dark"> Delete </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+@* <div id="pivotview"></div> *@
+
+
+@if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Staff"))
+{
+            <div class="d-flex gap-2 mb-3">
+                <a asp-action="Create" class="btn btn-info">Create New</a>
+                <button id="togglePivotBtn" class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#pivotContainer" aria-expanded="false" aria-controls="pivotContainer">
+                    Show Pivot Table
+                </button>
+            </div>
+}
+
+
+        <!-- 👇 Collapse container with proper class to allow full width -->
+        <div class="collapse" id="pivotContainer">
+            <div class="w-100">
+            </div>
+        </div>
+
+
+        <div class="collapse" id="pivotContainer">
+            <div class="w-100">
+                <ejs-pivotview id="PivotView" width="100%" height="350">
+                    <e-datasourcesettings dataSource="@ViewBag.pivotData">
+                        <e-rows>
+                            <e-field name="Origin" caption="Origin"></e-field>
+                            <e-field name="Destination" caption="Destination"></e-field>
+                            <e-field name="Airplane" caption="Airplane"></e-field>
+                            <e-field name="Layover" caption="Layover"></e-field>
+                        </e-rows>
+                        <e-columns>
+                            <e-field name="BasePrice" caption="Average Price"></e-field>
+                        </e-columns>
+                        <e-values>
+                            <e-field name="BasePrice" caption="Base Price" aggregate="Average"></e-field>
+                        </e-values>
+                    </e-datasourcesettings>
+                </ejs-pivotview>
+            </div>
+        </div>
+
+
+
+@section Scripts {
+            <script>
+                $(document).ready(function () {
+                    $('#datatablesSimple').DataTable({
+                        pageLength: 10,
+                        language: {
+                    search: "Search flights: ",
+                    lengthMenu: "_MENU_" // Just the dropdown, no label
+                        }
+                    });
+                });
+            </script>
+
+            <script>
+                $(document).ready(function () {
+                    // Listen for Bootstrap collapse show event on #pivotContainer
+                    $('#pivotContainer').on('shown.bs.collapse', function () {
+                        // Get the pivotview instance and refresh it
+                        var pivotObj = document.getElementById('PivotView').ej2_instances[0];
+                        if (pivotObj) {
+                            pivotObj.refresh();
+                        }
+                    });
+                });
+            </script>
+
+            <script>
+                $(document).ready(function () {
+                    var collapseElement = $('#pivotContainer');
+                    var toggleBtn = $('#togglePivotBtn');
+
+                    collapseElement.on('shown.bs.collapse', function () {
+                        toggleBtn.text('Hide Pivot Table');
+                    });
+
+                    collapseElement.on('hidden.bs.collapse', function () {
+                        toggleBtn.text('Show Pivot Table');
+                    });
+                });
+            </script>
+
+
+
+    @*      <script>
+                    ej.pivotview.PivotView.Inject(ej.pivotview.Toolbar);
+                $(document).ready(function () {
+                    $.ajax({
+                        url: '@Url.Action("GetFlights", "Flights")',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (flights) {
+                            console.log("Flights raw data:", flights);
+
+                                               var pivotObj = new ej.pivotview.PivotView({
+                    height: 400,
+                    dataSourceSettings: {
+                        dataSource: flights,
+                        rows: [{ name: 'origin' }, { name: 'destination' }],
+                        values: [{ name: 'id', caption: 'Flight Count', type: 'Count' }]
+                    },
+                    showFieldList: true,
+                    allowExcelExport: true,
+                    allowPdfExport: true,
+                    allowCsvExport: true,
+                    toolbar: ['ExcelExport', 'PdfExport', 'CsvExport', 'Print']
+                });
+                pivotObj.appendTo('#pivotview');
+
+                        },
+                        error: function (ex) {
+                            console.error("Failed to load flights:", ex);
+                        }
+                    });
+                });
+
+            </script> *@
+
+    @*             <script>
+                $(document).ready(function () {
+                    var sampleData = [
+                        { Origin: "Heathrow", Destination: "Birmingham", Month: "Jul", Id: 1 },
+                        { Origin: "Heathrow", Destination: "Manchester", Month: "Aug", Id: 2 },
+                        { Origin: "Gatwick", Destination: "Birmingham", Month: "Jul", Id: 3 }
+                    ];
+
+                    var pivotObj = new ej.pivotview.PivotView({
+                        height: 400,
+                        dataSourceSettings: {
+                            dataSource: sampleData,
+                            rows: [{ name: 'Origin' }, { name: 'Destination' }],
+                            columns: [{ name: 'Month' }],
+                            values: [{ name: 'Id', caption: 'Flight Count', type: 'Count' }]
+                        }
+                    });
+                    pivotObj.appendTo('#pivotview');
+                });
+            </script>
+ *@
+
+
+}

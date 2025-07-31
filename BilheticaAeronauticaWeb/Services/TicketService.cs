@@ -127,7 +127,20 @@ namespace BilheticaAeronauticaWeb.Services
             return false;
         }
 
+        public bool AllowTicketDeletion(Ticket ticket)
+        {
+            if (ticket.Flight == null)
+            {
+                return false;
+            }
 
+            if (ticket.Flight.Date < DateTime.Now.Date || (ticket.Flight.Date == DateTime.Now.Date && ticket.Flight.Time < DateTime.Now.TimeOfDay))
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
     
 }

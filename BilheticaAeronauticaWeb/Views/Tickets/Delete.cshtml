@@ -4,78 +4,35 @@
     ViewData["Title"] = "Delete";
 }
 
-<h1>Delete</h1>
+<br />
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h3>Are you sure you want to delete this ticket?</h3>
+        <hr />
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Ticket</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Surname)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Surname)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Flight)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Flight.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Class)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Class)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Seat)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Seat.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OriginAirport)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OriginAirport.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DestinationAirport)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DestinationAirport.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Payment)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Payment)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Type)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Type)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+        <p><strong>@Html.DisplayNameFor(model => model.Name):</strong> @Html.DisplayFor(model => model.Name)</p>
+        <p><strong>@Html.DisplayNameFor(model => model.Surname):</strong> @Html.DisplayFor(model => model.Surname)</p>
+        <p><strong>@Html.DisplayNameFor(model => model.Flight):</strong> @Html.DisplayFor(model => model.Flight.Id)</p>
+        <p><strong>@Html.DisplayNameFor(model => model.Class):</strong> @Html.DisplayFor(model => model.Class)</p>
+        @if (Model.Seat != null)
+        {
+            <p><strong>@Html.DisplayNameFor(model => model.Seat.Id):</strong> @Html.DisplayFor(model => model.Seat.Id)</p>
+        }
+        else
+        {
+            <p><strong>Seat:</strong> Not assigned</p>
+        }
+        <p><strong>@Html.DisplayNameFor(model => model.OriginAirport):</strong> @Html.DisplayFor(model => model.OriginAirport.Name)</p>
+        <p><strong>@Html.DisplayNameFor(model => model.DestinationAirport):</strong> @Html.DisplayFor(model => model.DestinationAirport.Name)</p>
+        <p><strong>@Html.DisplayNameFor(model => model.Payment):</strong> @Html.DisplayFor(model => model.Payment)</p>
+        <p><strong>@Html.DisplayNameFor(model => model.Price):</strong> @Html.DisplayFor(model => model.Price)</p>
+        <p><strong>@Html.DisplayNameFor(model => model.Type):</strong> @Html.DisplayFor(model => model.Type)</p>
+
+        <div class="mt-4">
+            <form asp-action="Delete" asp-route-id="@Model?.Id" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger btn-dark me-2">Delete</button>
+            </form>
+            <a asp-action="CustomerOrders" asp-controller="Orders" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
 </div>

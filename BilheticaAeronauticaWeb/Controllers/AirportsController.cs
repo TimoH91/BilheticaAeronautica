@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Syncfusion.EJ2;
+using Vereyon.Web;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -21,18 +22,19 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly ICountryRepository _countryRepository;
         private readonly IConverterHelper _converterHelper;
         private readonly IAirportService _airportService;
-        //private readonly IBlobHelper _blobHelper;
+        private readonly IFlashMessage _flashMessage;
 
         public AirportsController(IAirportRepository aeroportoRepository,
             IConverterHelper converterHelper,
             ICountryRepository countryRepository,
-            IAirportService airportService)
+            IAirportService airportService,
+            IFlashMessage flashMessage)
         {
             _airportRepository = aeroportoRepository;
             _converterHelper = converterHelper;
             _countryRepository = countryRepository;
             _airportService = airportService;
-            //_blobHelper = blobHelper;
+            _flashMessage = flashMessage;
         }
 
         // GET: Airports
@@ -93,13 +95,13 @@ namespace BilheticaAeronauticaWeb.Controllers
                 try
                 {
                     await _airportRepository.CreateAsync(airport);
-
+                    _flashMessage.Info("Airplane created successfully!");
                     return RedirectToAction(nameof(Index));
 
                 }
                 catch (Exception ex)
                 {
-                    //TODO Flashmessage"Este aeroporto já existe!"
+                    _flashMessage.Danger("This airport already exists!");
                 }
             }
             return View(model);
@@ -151,6 +153,11 @@ namespace BilheticaAeronauticaWeb.Controllers
                     if (canEdit)
                     {
                         await _airportRepository.UpdateAsync(airport);
+                        _flashMessage.Info("Airport edited successfully");
+                    }
+                    else
+                    {
+                        _flashMessage.Danger("This airport cannot be edited");
                     }
                 }
                 catch (DbUpdateConcurrencyException)
@@ -161,7 +168,7 @@ namespace BilheticaAeronauticaWeb.Controllers
                     }
                     else
                     {
-                        throw;
+                        _flashMessage.Danger("This airport failed to be edited"); ;
                     }
                 }
                 return RedirectToAction(nameof(Index));
@@ -214,9 +221,14 @@ namespace BilheticaAeronauticaWeb.Controllers
                 if (canDelete)
                 {
                     await _airportRepository.DeleteAsync(airport);
+                    _flashMessage.Info("Airport deleted successfully");
+                }
+                else
+                {
+                    _flashMessage.Danger("This airport cannot be deleted");
                 }
 
-                return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateException ex)
             {

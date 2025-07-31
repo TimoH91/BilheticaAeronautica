@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Staff")]
     public class SeatsController : Controller
     {
         private readonly ISeatRepository _seatRepository;

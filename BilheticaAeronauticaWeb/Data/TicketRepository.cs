@@ -15,7 +15,10 @@ namespace BilheticaAeronauticaWeb.Data
 
         public override IQueryable<Ticket> GetAll()
         {
-            return _context.Tickets.Include(t => t.DestinationAirport).Include(t => t.Flight).Include(t => t.OriginAirport).Include(t => t.Seat).Include(t => t.UserId);
+            return _context.Tickets.Include(t => t.DestinationAirport).Include(t => t.Flight)
+                .Include(t => t.OriginAirport)
+                .Include(t => t.Seat)
+                .Include(t => t.User);
         }
 
         public async Task<Ticket> GetTicketBySeatIdAsync(int seatId, string firstName, string lastName)
@@ -27,6 +30,7 @@ namespace BilheticaAeronauticaWeb.Data
         public override async Task<Ticket> GetByIdAsync(int id)
         {
             return await _context.Tickets
+                .Include(t => t.User)
                 .Include(t => t.DestinationAirport)
                 .Include(t => t.OriginAirport)
                 .Include(t => t.Flight)
@@ -59,6 +63,11 @@ namespace BilheticaAeronauticaWeb.Data
         public IQueryable GetAllWithUsers()
         {
             return _context.Tickets.Include(p => p.User);
+        }
+
+        public async Task<Ticket> GetTicketsByUser(User user)
+        {
+            return await _context.Tickets.FirstOrDefaultAsync(t => t.User == user);
         }
 
         public async Task<IEnumerable<Ticket>> GetFutureTickets(User user)

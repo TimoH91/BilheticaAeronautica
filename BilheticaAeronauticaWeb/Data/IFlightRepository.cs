@@ -18,5 +18,7 @@ namespace BilheticaAeronauticaWeb.Data
         Task<IEnumerable<Flight>> GetFlightsByAirplane(int airplaneId);
 
         Task<bool> IsAirportUsedInAnyFlightAsync(int airportId);
+
+        IQueryable<Flight> GetAllFutureFlights();
     }
 }

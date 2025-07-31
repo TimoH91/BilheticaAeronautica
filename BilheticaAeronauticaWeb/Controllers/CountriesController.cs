@@ -10,6 +10,7 @@ using BilheticaAeronauticaWeb.Entities;
 using BilheticaAeronauticaWeb.Models;
 using Microsoft.AspNetCore.Authorization;
 using BilheticaAeronauticaWeb.Helpers;
+using Vereyon.Web;
 
 namespace BilheticaAeronauticaWeb.Controllers
 {
@@ -19,14 +20,17 @@ namespace BilheticaAeronauticaWeb.Controllers
         private readonly ICountryRepository _countryRepository;
         private readonly IConverterHelper _converterHelper;
         private readonly IBlobHelper _blobHelper;
+        private readonly IFlashMessage _flashMessage;
 
         public CountriesController(ICountryRepository countryRepository,
             IConverterHelper converterHelper,
-            IBlobHelper blobHelper)
+            IBlobHelper blobHelper,
+            IFlashMessage flashMessage)
         {
             _countryRepository = countryRepository;
             _converterHelper = converterHelper;
             _blobHelper = blobHelper;
+            _flashMessage = flashMessage;
         }
 
         public async Task<IActionResult> Index()
@@ -100,6 +104,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             }
 
             var model = new CityViewModel { CountryId = country.Id };
+
             return View(model);
         }
 
@@ -175,41 +180,71 @@ namespace BilheticaAeronauticaWeb.Controllers
             }
 
             var country = await _countryRepository.GetByIdAsync(id.Value);
+
             if (country == null)
             {
                 return new NotFoundViewResult("CountryNotFound");
             }
-            return View(country);
+
+            var model = _converterHelper.ToCountryViewModel(country);
+
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Country country)
+        public async Task<IActionResult> Edit(CountryViewModel model)
         {
+            ModelState.Remove("ImageFile");
+
             if (ModelState.IsValid)
             {
-                await _countryRepository.UpdateAsync(country);
+                try
+                {
+
+                    Guid imageId = model.FlagImageId;
+
+                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
+                        imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "countries");
+                    }
+
+                    var country = _converterHelper.ToCountry(model, imageId, false);
+
+                    await _countryRepository.UpdateAsync(country);
+
+                    _flashMessage.Info("Country edited successfully!");
+
+                }
+                catch
+                {
+                    _flashMessage.Danger("This country cannot edited");
+                }
+
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(country);
+            return View(model);
         }
+
 
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return new NotFoundViewResult("CountryNotFound");
-            }
+            //if (id == null)
+            //{
+            //    return new NotFoundViewResult("CountryNotFound");
+            //}
 
-            var country = await _countryRepository.GetByIdAsync(id.Value);
-            if (country == null)
-            {
-                return new NotFoundViewResult("CountryNotFound");
-            }
+            //var country = await _countryRepository.GetByIdAsync(id.Value);
+            //if (country == null)
+            //{
+            //    return new NotFoundViewResult("CountryNotFound");
+            //}
 
-            await _countryRepository.DeleteAsync(country);
-            return RedirectToAction(nameof(Index));
+            //await _countryRepository.DeleteAsync(country);
+            //return RedirectToAction(nameof(Index));
+
+            return Forbid();
         }
 
         public IActionResult CountryNotFound()

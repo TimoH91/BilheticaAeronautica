@@ -2,6 +2,7 @@
 using BilheticaAeronauticaWeb.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Logging;
 using Mono.TextTemplating;
 
 namespace BilheticaAeronauticaWeb.Data
@@ -10,13 +11,15 @@ namespace BilheticaAeronauticaWeb.Data
     {
         private readonly DataContext _context;
         private readonly IUserHelper _userHelper;
+        private readonly IBlobHelper _blobHelper;
         private Random _random;
 
-        public SeedDb(DataContext context, IUserHelper userhelper)
+        public SeedDb(DataContext context, IUserHelper userhelper, IBlobHelper blobHelper)
         {
             _context = context;
             _userHelper = userhelper;
             _random = new Random();
+            _blobHelper = blobHelper;
         }
 
         public async Task SeedAsync()
@@ -30,14 +33,9 @@ namespace BilheticaAeronauticaWeb.Data
             if (!_context.Countries.Any())
             {
 
-                var flagId = Guid.NewGuid();
-                
-                var sourcePath = Path.Combine("SeedImages", "england.jpeg"); 
-                var destinationPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "flags", $"{flagId}.jpg");
-       
-                Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
+                var sourcePath = Path.Combine("SeedImages", "england.jpeg");
 
-                File.Copy(sourcePath, destinationPath, overwrite: true);
+                Guid flagId = await _blobHelper.UploadBlobAsync(sourcePath, "countries");
 
                 var cities = new List<City>();
                 cities.Add(new City { Name = "Birmingham" });
@@ -173,16 +171,10 @@ namespace BilheticaAeronauticaWeb.Data
 
             if (!_context.Airplanes.Any()) 
             {
-                var imageId = Guid.NewGuid();
-
 
                 var sourcePath = Path.Combine("SeedImages", "boeing_737.jpeg");
-                var destinationPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "airplanes", $"{imageId}.jpg");
 
-
-                Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
-
-                File.Copy(sourcePath, destinationPath, overwrite: true);
+                Guid imageId = await _blobHelper.UploadBlobAsync(sourcePath, "airplanes");
 
                 var airplane = new Airplane
                 {
@@ -245,7 +237,7 @@ namespace BilheticaAeronauticaWeb.Data
 
                 var flight3 = new Flight
                 {
-                    Date = DateTime.Today.AddDays(26),
+                    Date = DateTime.Today.AddDays(-26),
                     Time = new TimeSpan(17, 0, 0),
                     Duration = 60,
                     BasePrice = 150,
@@ -264,6 +256,7 @@ namespace BilheticaAeronauticaWeb.Data
                 var airplane2 = _context.Airplanes.FirstOrDefault(a => a.Id == 2);
                 var flight = _context.Flights.FirstOrDefault(a => a.Id == 1);
                 var flight2 = _context.Flights.FirstOrDefault(a => a.Id == 2);
+                var flight3 = _context.Flights.FirstOrDefault(a => a.Id == 3);
 
                 if (airplane == null || airplane2 == null)
                 {
@@ -295,9 +288,9 @@ namespace BilheticaAeronauticaWeb.Data
 
                 var seats2 = new List<Seat>();
 
-                for (int row = 1; row <= airplane2.Rows; row++)
+                for (int row = 1; row <= airplane.Rows; row++)
                 {
-                    for (int col = 1; col <= airplane2.SeatsPerRow; col++)
+                    for (int col = 1; col <= airplane.SeatsPerRow; col++)
                     {
                         seats2.Add(new Seat
                         {
@@ -311,6 +304,25 @@ namespace BilheticaAeronauticaWeb.Data
 
                 _context.Seats.AddRange(seats2);
                 await _context.SaveChangesAsync();
+
+                var seats3 = new List<Seat>();
+
+                for (int row = 1; row <= airplane.Rows; row++)
+                {
+                    for (int col = 1; col <= airplane2.SeatsPerRow; col++)
+                    {
+                        seats3.Add(new Seat
+                        {
+                            Flight = flight3,
+                            Row = row,
+                            Column = col,
+                            Occupied = false
+                        });
+                    }
+                }
+
+                _context.Seats.AddRange(seats3);
+                await _context.SaveChangesAsync();
             }
 
             if (!_context.Orders.Any())
@@ -323,7 +335,16 @@ namespace BilheticaAeronauticaWeb.Data
                     Payment = Payment.Paid,
                 };
 
+                Order order2 = new Order
+                {
+                    OrderDate = DateTime.Today.AddDays(-100),
+                    User = user2,
+                    TotalPrice = 300,
+                    Payment = Payment.Paid,
+                };
+
                 _context.Orders.Add(order);
+                _context.Orders.Add(order2);
                 await _context.SaveChangesAsync();
             }
 
@@ -332,9 +353,13 @@ namespace BilheticaAeronauticaWeb.Data
                 var originAirport = _context.Airports.FirstOrDefault(a => a.Id == 1);
                 var destinationAirport = _context.Airports.FirstOrDefault(a => a.Id == 3);
                 var flight = _context.Flights.FirstOrDefault(a => a.Id == 1);
+                var flight3 = _context.Flights.FirstOrDefault(a => a.Id == 3);
                 var seat1 = _context.Seats.FirstOrDefault(a => a.Id == 1);
                 var seat2 = _context.Seats.FirstOrDefault(a => a.Id == 2);
-                var order = _context.Orders.FirstOrDefault(a => a.Id == 1); 
+                var seat3 = _context.Seats.FirstOrDefault(a => a.FlightId == 3 && a.Column == 1);
+                var seat4 = _context.Seats.FirstOrDefault(a => a.FlightId == 3 && a.Column == 2);
+                var order = _context.Orders.FirstOrDefault(a => a.Id == 1);
+                var order2 = _context.Orders.FirstOrDefault(a => a.Id == 2);
 
                 var adultTicket = new AdultTicket
                 {
@@ -369,11 +394,48 @@ namespace BilheticaAeronauticaWeb.Data
                     Type = PassengerType.Child
                 };
 
+                var adultTicket2 = new AdultTicket
+                {
+                    User = user2,
+                    Name = "John",
+                    Surname = "Smith",
+                    OriginAirport = destinationAirport,
+                    DestinationAirport = originAirport,
+                    Flight = flight3,
+                    Seat = seat3,
+                    Payment = Payment.Paid,
+                    Class = TicketClass.Economic,
+                    Price = 150,
+                    Type = PassengerType.Adult,
+                    Order = order2
+
+                };
+
+                var childTicket2 = new ChildTicket
+                {
+                    User = user2,
+                    Name = "Lucy",
+                    Surname = "Smith",
+                    OriginAirport = destinationAirport,
+                    DestinationAirport = originAirport,
+                    Flight = flight3,
+                    Seat = seat4,
+                    Payment = Payment.Paid,
+                    Class = TicketClass.Economic,
+                    Price = 150,
+                    Order = order2,
+                    Type = PassengerType.Child
+                };
+
                 seat1.Occupied = true;
                 seat2.Occupied = true;
+                seat3.Occupied = true;
+                seat4.Occupied = true;
 
                 _context.Tickets.Add(adultTicket);
                 _context.Tickets.Add(childTicket);
+                _context.Tickets.Add(adultTicket2);
+                _context.Tickets.Add(childTicket2);
                 await _context.SaveChangesAsync();
             }
         }

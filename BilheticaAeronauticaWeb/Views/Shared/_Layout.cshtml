@@ -2,7 +2,6 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 
-
 @{
     Layout = null;
 }
@@ -86,16 +85,36 @@
                             Flights
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
+
                         <div class="collapse" id="collapseFlights" aria-labelledby="headingFlights" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" asp-area="" asp-controller="Flights" asp-action="Index">Search</a>
-                                @if (User.Identity.IsAuthenticated && this.User.IsInRole("Staff"))
-                                {
-                                    <a class="nav-link" asp-area="" asp-controller="Flights" asp-action="Index">Manage</a>
-                                    <a class="nav-link" asp-action="Create" asp-controller="Flights" asp-action="Index">Create</a>
+                                @{
+                                    if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                                    {
+                                        <text>
+                                            <a class="nav-link" asp-area="" asp-controller="Flights" asp-action="Index">Search</a>
+                                        </text>
+                                        ;
+                                    }
+                                    else if (User.Identity.IsAuthenticated && User.IsInRole("Staff"))
+                                    {
+                                        <text>
+                                            <a class="nav-link" asp-area="" asp-controller="Flights" asp-action="Index">Manage</a>
+                                            <a class="nav-link" asp-area="" asp-controller="Flights" asp-action="Create">Create</a>
+                                        </text>
+                                        ;
+                                    }
+                                    else
+                                    {
+                                        <text>
+                                            <a class="nav-link" asp-area="" asp-controller="Flights" asp-action="AllFutureFlights">Search</a>
+                                        </text>
+                                        ;
+                                    }
                                 }
                             </nav>
                         </div>
+
 
                         @if (User.Identity.IsAuthenticated && this.User.IsInRole("Admin"))
                         {
@@ -127,24 +146,6 @@
                         }
 
 
-
-
-
-                        @*                         <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                            <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                            Tickets 
-                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                        </a>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                            <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                            Airplanes
-                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                        </a>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                            <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                            Airports
-                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                        </a> *@
 
                         <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
@@ -181,10 +182,17 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
                                 Manage Reservations
                             </a>
-@*                             <a class="nav-link" href="@Url.Content("~/tables.html")">
-                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Check-in
-                            </a>  *@
+
+                        }
+
+                        @if (this.User.IsInRole("Staff") && this.User.Identity.IsAuthenticated)
+                        {
+                            <div class="sb-sidenav-menu-heading">Customer bookings</div>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Orders" asp-action="CustomerOrders">
+                                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                                View Reservations
+                            </a>
+
                         }
                     </div>
                 </div>
@@ -199,17 +207,20 @@
                 <div class="container d-flex justify-content-center">
                     <div class="w-100" style="max-width: 3000px;">
                         @RenderBody()
+                        <flash />
                     </div>
                 </div>
             </main>
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Timothy Harris @DateTime.Now.Year</div>
+                        <div class="text-muted">
+                            Copyright &copy; Timothy Harris @(DateTime.Now.Year) - Version 3.0
+                        </div>
                         <div>
-                            <a href="#">Privacy Policy</a>
+                            <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
                             &middot;
-                            <a href="#">Terms &amp; Conditions</a>
+                            <a asp-controller="Home" asp-action="Terms">Terms &amp; Conditions</a>
                         </div>
                     </div>
                 </div>
