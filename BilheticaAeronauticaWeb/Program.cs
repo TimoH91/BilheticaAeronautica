@@ -51,7 +51,9 @@ builder.Services.AddScoped<IUserHelper, UserHelper>();
 builder.Services.AddScoped<IMailHelper, MailHelper>();
 builder.Services.AddScoped<IBasketHelper, BasketHelper>();
 builder.Services.AddScoped<IBlobHelper, BlobHelper>();
-builder.Services.AddScoped<IUserService, UserService>();    
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
 
 
 builder.Services.AddDistributedMemoryCache();
@@ -131,5 +133,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllers();
 
 app.Run();

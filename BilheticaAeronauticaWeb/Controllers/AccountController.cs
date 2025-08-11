@@ -30,6 +30,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             _blobHelper = blobHelper;
         }
 
+        [Route("api/account/createtoken")]
         [HttpPost] 
         public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)
         {
@@ -53,12 +54,14 @@ namespace BilheticaAeronauticaWeb.Controllers
 
                         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
                         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
                         var token = new JwtSecurityToken(
                             _configuration["Tokens:Issuer"],
                             _configuration["Tokens:Audience"],
                             claims,
                             expires: DateTime.UtcNow.AddDays(15),
                             signingCredentials: credentials);
+
                         var results = new
                         {
                             token = new JwtSecurityTokenHandler().WriteToken(token),
@@ -90,6 +93,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _userHelper.LoginAsync(model);
+
                 if (result.Succeeded)
                 {
                     if (this.Request.Query.Keys.Contains("ReturnUrl"))
