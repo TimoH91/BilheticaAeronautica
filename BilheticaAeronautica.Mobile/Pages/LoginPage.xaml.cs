@@ -1,29 +1,31 @@
 using BilheticaAeronautica.Mobile.Services;
+using BilheticaAeronautica.Mobile.Validations;
 namespace BilheticaAeronautica.Mobile.Pages;
 
 
 public partial class LoginPage : ContentPage
 {
     private readonly ApiService _apiService;
-    //private readonly IValidator _validator;
+    private readonly IValidator _validator;
 
-    public LoginPage(ApiService apiService)
+    public LoginPage(ApiService apiService, IValidator validator)
     {
         InitializeComponent();
         _apiService = apiService;
+        _validator = validator;
     }
 
     private async void BtnSignIn_Clicked(object sender, EventArgs e)
     {
         if (string.IsNullOrEmpty(EntEmail.Text))
         {
-            await DisplayAlert("Erro", "Informe o email", "Cancelar");
+            await DisplayAlert("Erro", "Enter your email", "Cancelar");
             return;
         }
 
         if (string.IsNullOrEmpty(EntPassword.Text))
         {
-            await DisplayAlert("Erro", "Informe a senha", "Cancelar");
+            await DisplayAlert("Erro", "Enter your password", "Cancelar");
             return;
         }
 
@@ -31,7 +33,8 @@ public partial class LoginPage : ContentPage
 
         if (!response.HasError)
         {
-            Application.Current!.MainPage = new AppShell(_apiService, _validator);
+            await Navigation.PushAsync(new NewPage1(_apiService));
+            //Application.Current!.MainPage = new AppShell(_apiService, _validator);
         }
         else
         {
@@ -43,7 +46,7 @@ public partial class LoginPage : ContentPage
     private async void TapRegister_Tapped(object sender, TappedEventArgs e)
     {
 
-        await Navigation.PushAsync(new InscriptionPage(_apiService, _validator));
+        //await Navigation.PushAsync(new InscriptionPage(_apiService, _validator));
 
     }
 }

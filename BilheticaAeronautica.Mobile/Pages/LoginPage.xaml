@@ -5,50 +5,54 @@
              Title="LoginPage"
              NavigationPage.HasNavigationBar="False">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*"
-          RowSpacing="20"
-          Margin="20,150,20,40">
+    <Grid RowSpacing="20" Margin="20,150,20,40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
         <Image Grid.Row="0"
-               Source="lanchesico.png"
-               Aspect="AspectFit"
-               HeightRequest="100"
-               WidthRequest="100" />
+           Source="lanchesico.png"
+           Aspect="AspectFit"
+           HeightRequest="100"
+           WidthRequest="100" />
+
         <Label Grid.Row="1"
-               Text="Login"
-               FontAttributes="Bold"
-               HorizontalOptions="Center" />
+           Text="Login"
+           FontAttributes="Bold"
+           HorizontalOptions="Center" />
 
         <Frame Grid.Row="2"
-               Padding="15"
-               BackgroundColor="White">
-
+           Padding="15"
+           BackgroundColor="White">
             <VerticalStackLayout>
-
                 <Entry Placeholder="Email"
-                       x:Name="EntEmail" />
-
+                   x:Name="EntEmail" />
                 <Entry Placeholder="Password"
-                       IsPassword="True"
-                       x:Name="EntPassword" />
+                   IsPassword="True"
+                   x:Name="EntPassword" />
             </VerticalStackLayout>
         </Frame>
 
         <Button Grid.Row="3"
-                Text="Entrar"
-                FontSize="Medium"
-                x:Name="BtnSignIn" 
-                BackgroundColor="#a90409"
-                Clicked="BtnSignIn_Clicked"/>
+            Text="Entrar"
+            FontSize="Medium"
+            x:Name="BtnSignIn" 
+            BackgroundColor="#a90409"
+            Clicked="BtnSignIn_Clicked"/>
+
         <HorizontalStackLayout Grid.Row="4"
-                               Spacing="2"
-                               HorizontalOptions="Center"
-                               VerticalOptions="EndAndExpand">
+                           Spacing="2"
+                           HorizontalOptions="Center"
+                           VerticalOptions="EndAndExpand">
             <Label Text="Não tem conta ? " />
             <Label Text="Faça o registro agora" TextColor="#a90409" FontAttributes="Bold">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer x:Name="TapRegister"
-                                          Tapped="TapRegister_Tapped"/>
+                                      Tapped="TapRegister_Tapped"/>
                 </Label.GestureRecognizers>
             </Label>
         </HorizontalStackLayout>

@@ -62,6 +62,7 @@ namespace BilheticaAeronauticaWeb.Controllers.API
             }
 
             var tickets = await _ticketRepository.GetFutureTickets(user);
+
             _logger.LogInformation("Returning {Count} tickets for user {UserName}", tickets.Count(), userName);
 
             return Ok(tickets);

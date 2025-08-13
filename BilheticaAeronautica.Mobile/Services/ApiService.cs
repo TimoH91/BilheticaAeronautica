@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -14,9 +15,8 @@ namespace BilheticaAeronautica.Mobile.Services
     public class ApiService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl = "https://localhost:44358/";
+        private readonly string _baseUrl = "https://8dlchknh-7244.uks1.devtunnels.ms/";
         private readonly ILogger<ApiService> _logger;
-
         JsonSerializerOptions _serializerOptions;
         public ApiService(HttpClient httpClient, ILogger<ApiService> logger)
         {
@@ -50,7 +50,7 @@ namespace BilheticaAeronautica.Mobile.Services
             {
                 var login = new Login
                 {
-                    Email = email,
+                    Username = email,
                     Password = password
                 };
 
@@ -70,20 +70,30 @@ namespace BilheticaAeronautica.Mobile.Services
                 }
                 var jsonResult = await response.Content.ReadAsStringAsync();
 
-                var result = JsonSerializer.Deserialize<Token>(jsonResult, _serializerOptions);
-
-                if (result == null || string.IsNullOrEmpty(result.AccessToken))
+                try
                 {
-                    return new ApiResponse<bool>
+                    var result = JsonSerializer.Deserialize<Token>(jsonResult, _serializerOptions);
+
+                    if (result == null || string.IsNullOrEmpty(result.AccessToken))
                     {
-                        ErrorMessage = "Failed to get access token from API response."
-                    };
+                        return new ApiResponse<bool>
+                        {
+                            ErrorMessage = "Failed to get access token from API response."
+                        };
+                    }
+                    Preferences.Set("accessToken", result.AccessToken!);
+                    Preferences.Set("userId", result.UserId!);
+                    Preferences.Set("userName", result.UserName);
+
+                    
                 }
-                Preferences.Set("accesstoken", result!.AccessToken);
-                Preferences.Set("userid", (int)result.UserId!);
-                Preferences.Set("username", result.UserName);
+                catch (JsonException ex)
+                {
+                    Console.WriteLine("Deserialization error: " + ex.Message);
+                }
 
                 return new ApiResponse<bool> { Data = true };
+
             }
 
             catch (Exception ex)
@@ -112,5 +122,51 @@ namespace BilheticaAeronautica.Mobile.Services
                 return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
         }
+
+
+        //TODO sort the password recovery
+        public async Task<ApiResponse<bool>> RecoverPassword()
+        {
+            RecoverPassword recoverPasswordModel = new RecoverPassword
+            {
+                Email = Preferences.Get("userName", "")
+            };
+
+            var json = JsonSerializer.Serialize(recoverPasswordModel, _serializerOptions);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var result = await PostRequest("api/Users/RecoverPassword", content);
+
+            return new ApiResponse<bool> { Data = true };
+        }
+
+
+        public async Task<ApiResponse<bool>> ChangePassword(string oldPassword, string newPassword, string confirmPassword)
+        {
+            ChangePassword changePasswordModel = new ChangePassword
+            {
+                Email = Preferences.Get("userName", ""),
+                OldPassword = oldPassword,
+                NewPassword = newPassword,
+                Confirm = confirmPassword
+            };
+
+            var json = JsonSerializer.Serialize(changePasswordModel, _serializerOptions);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var result = await PostRequest("api/Users/ChangePassword", content);
+
+            return new ApiResponse<bool> { Data = true };
+        }
+
+
+        //public async Task<(List<OrderByUser>?, string? ErrorMessage)> GetTicketsByUser(string userId)
+        //{
+        //    string endpoint = $"api/Orders/GetOrdersByUser/{usuarioId}";
+
+        //    return await GetAsync<List<OrderByUser>>(endpoint);
+        //}
     }
 }

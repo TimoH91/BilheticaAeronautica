@@ -1,8 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace BilheticaAeronauticaWeb.Models
+namespace BilheticaAeronautica.Mobile.Models
 {
-    public class ChangePasswordViewModel
+    public class ChangePassword
     {
         [Required]
         [Display(Name = "Current password")]
@@ -19,4 +24,3 @@ namespace BilheticaAeronauticaWeb.Models
         public string? Email { get; set; }
     }
 }
-

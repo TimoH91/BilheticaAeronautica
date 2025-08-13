@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using BilheticaAeronautica.Mobile.Services;
+using BilheticaAeronautica.Mobile.Validations;
 
 namespace BilheticaAeronautica.Mobile
 {
@@ -22,6 +23,7 @@ namespace BilheticaAeronautica.Mobile
 #endif
             builder.Services.AddHttpClient();
             builder.Services.AddSingleton<ApiService>();
+            builder.Services.AddSingleton<IValidator, Validator>();
             return builder.Build();
 
         }
