@@ -42,4 +42,11 @@ public partial class NewPage1 : ContentPage
 
         await _apiService.ChangePassword(EntOldPassword.Text, EntNewPassword.Text, EntConfirmPassword.Text);
     }
+
+    private async void Button_Clicked_1(object sender, EventArgs e)
+    {
+        var flights = await _apiService.GetAllFlightsAsync();
+
+        FlightList.ItemsSource = flights;   
+    }
 }

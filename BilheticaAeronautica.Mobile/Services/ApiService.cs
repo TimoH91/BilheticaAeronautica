@@ -44,6 +44,23 @@ namespace BilheticaAeronautica.Mobile.Services
             return Enumerable.Empty<Ticket>();
         }
 
+
+        public async Task<IEnumerable<Flight>> GetAllFlightsAsync()
+        {
+
+            var response = await _httpClient.GetAsync($"{_baseUrl}api/flights/GetAllFutureFlights");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<List<Flight>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+
+            return Enumerable.Empty<Flight>();
+        }
+
+
+
         public async Task<ApiResponse<bool>> Login(string email, string password)
         {
             try

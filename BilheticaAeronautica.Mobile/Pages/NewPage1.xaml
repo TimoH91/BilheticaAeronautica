@@ -17,6 +17,16 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
+        <Button Text="Load Flights" Clicked="Button_Clicked_1"/>
+
+        <CollectionView x:Name="FlightList" HeightRequest="200">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Label Text="{Binding Date}" />
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
         <Button Text="Recover password" Clicked="Button_Clicked"/>
 
         <Frame Padding="15" BackgroundColor="White">

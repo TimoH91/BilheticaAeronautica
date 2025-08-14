@@ -27,19 +27,6 @@ namespace BilheticaAeronauticaWeb.Controllers.API
             }
 
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetTickets()
-        //{
-        //    var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
-
-        //    if (user == null)
-        //    {
-        //        return Unauthorized();
-        //}
-
-        //    return Ok(await _ticketRepository.GetFutureTickets(user));
-        //}
-
         [HttpGet]
         public async Task<IActionResult> GetTickets()
         {
