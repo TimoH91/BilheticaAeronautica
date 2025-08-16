@@ -12,20 +12,36 @@
         <CollectionView x:Name="TicketList" HeightRequest="200">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Label Text="{Binding FullName}" />
+                    <Border Padding="10" Stroke="#87A7AC" StrokeShape="RoundRectangle 10">
+                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="2*,8*" ColumnSpacing="10">
+                            <Label  Grid.Row="1"
+                           Grid.Column="1"
+                            Text="{Binding FullName}" />
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 
         <Button Text="Load Flights" Clicked="Button_Clicked_1"/>
 
-        <CollectionView x:Name="FlightList" HeightRequest="200">
+        <CollectionView x:Name="FlightList"
+                SelectionMode="Single"
+                SelectionChanged="FlightList_SelectionChanged"
+                HeightRequest="200">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Label Text="{Binding Date}" />
+                    <Border Padding="10" Stroke="#87A7AC" StrokeShape="RoundRectangle 10">
+                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="2*,8*" ColumnSpacing="10">
+                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding Date}" />
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+
+
+        <Button Text="Select Flight" Clicked="Button_Clicked_3"/>
 
         <Button Text="Recover password" Clicked="Button_Clicked"/>
 
@@ -48,6 +64,12 @@
                 x:Name="BtnSignIn" 
                 BackgroundColor="#a90409"
                 Clicked="BtnSignIn_Clicked"/>
+
+        <!--<Button Text="Shopping Basket"
+                FontSize="Medium"
+                x:Name="BtnShoppingBasket" 
+                BackgroundColor="#a90409"
+                Clicked="BtnShoppingBasket_Clicked"/>-->
 
     </VerticalStackLayout>
 </ContentPage>

@@ -24,6 +24,7 @@ namespace BilheticaAeronautica.Mobile
             builder.Services.AddHttpClient();
             builder.Services.AddSingleton<ApiService>();
             builder.Services.AddSingleton<IValidator, Validator>();
+            builder.Services.AddSingleton<IBasketService, BasketService>();
             return builder.Build();
 
         }

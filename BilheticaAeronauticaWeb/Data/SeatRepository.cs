@@ -51,7 +51,7 @@ namespace BilheticaAeronauticaWeb.Data
         {
             return await _context.Seats
                 .AsNoTracking()
-                .Where(f => f.Flight.Id == flightId && f.Occupied == false)
+                .Where(f => f.Flight.Id == flightId && f.Occupied == false && f.IsHeld == false)
                 .OrderBy(f => f.Id)
                 .ToListAsync();
         }

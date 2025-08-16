@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace BilheticaAeronautica.Mobile.Models
 {
     public class Ticket
@@ -14,17 +15,19 @@ namespace BilheticaAeronautica.Mobile.Models
         public string Name { get; set; }
         public string Surname { get; set; }
 
-        public int? FlightId { get; set; }
+        public int FlightId { get; set; }
 
-        public int? SeatId { get; set; }
+        public int SeatId { get; set; }
 
-        public int OriginAirportId { get; set; }
+        public PassengerType PassengerType { get; set; }
+        public TicketClass Class { get; set; }
 
-        public int DestinationAirportId { get; set; }
+        public int? ResponsibleAdultTicketId { get; set; }
+        public bool IsResponsibleAdult { get; set; }
 
         public decimal Price { get; set; }
 
-        public int OrderId { get; set; }
+        public int? OrderId { get; set; }
 
         public string FullName => $"{Name} {Surname}";
     }

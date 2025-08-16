@@ -139,7 +139,7 @@ namespace BilheticaAeronauticaWeb.Controllers
 
             await _orderRepository.CreateAsync(order);
 
-            var tickets = await ConvertAdultAndChildTickets(shoppingBasketTickets, model, user);
+            var tickets = await ConvertAdultAndChildTickets(shoppingBasketTickets, user);
 
             tickets = await AddTicketsAsync(tickets, order);
 
@@ -333,7 +333,7 @@ namespace BilheticaAeronauticaWeb.Controllers
             return shoppingBasketTickets;
         }
 
-        private async Task<List<Ticket>> ConvertAdultAndChildTickets(List<ShoppingBasketTicket> shoppingBasketTickets, ShoppingBasketWithUserViewModel model, User user)
+        private async Task<List<Ticket>> ConvertAdultAndChildTickets(List<ShoppingBasketTicket> shoppingBasketTickets, User user)
         {
             var tickets = new List<Ticket>();
 

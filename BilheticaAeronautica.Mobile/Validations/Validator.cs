@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BilheticaAeronautica.Mobile.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,10 @@ namespace BilheticaAeronautica.Mobile.Validations
         public string TelephoneError { get; set; }
         public string PasswordError { get; set; }
 
+        public string PassengerTypeError { get; set; }
+
+        public string TicketClassError { get; set; }
+
         private const string EmptyNameErrorMessage = "Please, enter your name.";
         private const string InvalidNameErrorMessage = "Please, enter a valid name.";
         private const string EmailEmptyErrorMessage = "Please, enter your email.";
@@ -22,15 +27,27 @@ namespace BilheticaAeronautica.Mobile.Validations
         private const string TelephoneInvalidErorrMessage = "Please, enter a valid telephone number.";
         private const string PasswordEmptyErrorMessage = "Please, enter a password.";
         private const string PasswordInvalidErrorMessage = "The password must contain at least 8 caracteres, including letters and numbers.";
-
-        public Task<bool> Validar(string name, string email, string telephone, string password)
+        private const string PassengerTypeErrorMessage = "Please, choose a passenger type.";
+        private const string TicketClassErrorMessage = "Please, choose a ticket class.";
+        public Task<bool> ValidateLogin(string name, string email, string telephone, string password)
         {
             var isNameValid = ValidateName(name);
             var isEmailValid = ValidateEmail(email);
             var isTelephoneValid = ValidateTelephone(telephone);
             var isPasswordValid = ValidatePassword(password);
 
+
             return Task.FromResult(isNameValid && isEmailValid && isTelephoneValid && isPasswordValid);
+        }
+
+        public Task<bool> ValidateTicket(string name, string surname, string passengerType, string ticketClass) 
+        {
+            var isNameValid = ValidateName(name);
+            var isSurnameValid = ValidateName(surname);
+            var isTicketClassValid = ValidateTicketClass(ticketClass);
+            var isPassengerTypeValid = ValidatePassengerType(passengerType);
+
+            return Task.FromResult(isNameValid && isSurnameValid && isTicketClassValid && isPassengerTypeValid);
         }
 
         private bool ValidateName(string name)
@@ -104,6 +121,43 @@ namespace BilheticaAeronautica.Mobile.Validations
             PasswordError = "";
             return true;
         }
+
+        public bool ValidatePassengerType(object selectedItem)
+        {
+            if (selectedItem == null)
+            {
+                PassengerTypeError = PassengerTypeErrorMessage;
+                return false;
+            }
+
+            if (!Enum.TryParse(typeof(PassengerType), selectedItem.ToString(), ignoreCase: true, out _))
+            {
+                PassengerTypeError = "Invalid passenger type selected.";
+                return false;
+            }
+
+            PassengerTypeError = "";
+            return true;
+        }
+
+        public bool ValidateTicketClass(object selectedItem)
+        {
+            if (selectedItem == null)
+            {
+                TicketClassError = TicketClassErrorMessage;
+                return false;
+            }
+
+            if (!Enum.TryParse(typeof(TicketClass), selectedItem.ToString(), ignoreCase: true, out _))
+            {
+                TicketClassError = "Invalid ticket class selected.";
+                return false;
+            }
+
+            TicketClassError = "";
+            return true;
+        }
+
 
     }
 }

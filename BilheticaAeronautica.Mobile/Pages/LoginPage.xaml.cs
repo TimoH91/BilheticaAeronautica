@@ -6,13 +6,15 @@ namespace BilheticaAeronautica.Mobile.Pages;
 public partial class LoginPage : ContentPage
 {
     private readonly ApiService _apiService;
+    private readonly IBasketService _basketService;
     private readonly IValidator _validator;
 
-    public LoginPage(ApiService apiService, IValidator validator)
+    public LoginPage(ApiService apiService, IValidator validator, IBasketService basketService)
     {
         InitializeComponent();
         _apiService = apiService;
         _validator = validator;
+        _basketService = basketService;
     }
 
     private async void BtnSignIn_Clicked(object sender, EventArgs e)
@@ -33,7 +35,7 @@ public partial class LoginPage : ContentPage
 
         if (!response.HasError)
         {
-            await Navigation.PushAsync(new NewPage1(_apiService));
+            await Navigation.PushAsync(new NewPage1(_apiService, _basketService, _validator));
             //Application.Current!.MainPage = new AppShell(_apiService, _validator);
         }
         else

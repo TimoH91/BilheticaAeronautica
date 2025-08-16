@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BilheticaAeronautica.Mobile.Pages.ConfirmOrder"
+             Title="ConfirmOrder">
+
+    <VerticalStackLayout>
+
+        <CollectionView x:Name="ShoppingBasketTickets"
+                Margin="20"
+                ItemsSource="{Binding Items}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="10" Stroke="#87A7AC" StrokeShape="RoundRectangle 10">
+                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="2*,8*" ColumnSpacing="10">
+
+                            <Label Grid.Row="1"
+                           Grid.Column="1"
+                           Text="{Binding Name}" />
+
+                            <Label Grid.Row="2"
+                           Grid.Column="1"
+                           Text="{Binding Surname}" />
+
+                            <Label Grid.Row="3"
+                           Grid.Column="1"
+                           Text="{Binding BasePrice, StringFormat='R{0:C}'}" />
+
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+
+        <Button Grid.Row="4"
+            Text="Confirm Order"
+                FontSize="Medium"
+                x:Name="BtnConfirmOrder" 
+                BackgroundColor="#a90409"
+                Clicked="BtnConfirmOrder_Clicked"/>
+
+        <Button Grid.Row="0"
+            Text="Empty basket"
+            FontSize="Medium"
+            x:Name="BtnEmptyBasket" 
+            BackgroundColor="#a90409"
+            Clicked="BtnEmptyBasket_Clicked"/>
+
+
+
+    </VerticalStackLayout>
+</ContentPage>

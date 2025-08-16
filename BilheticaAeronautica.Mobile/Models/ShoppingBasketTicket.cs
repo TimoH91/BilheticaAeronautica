@@ -1,45 +1,39 @@
-﻿using System.ComponentModel.DataAnnotations;
-using NuGet.ContentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace BilheticaAeronauticaWeb.Entities
+namespace BilheticaAeronautica.Mobile.Models
 {
-    public class ShoppingBasketTicket : IEntity
+    public enum PassengerType
+    {
+        Adult,
+        Child,
+        Infant
+    };
+    public enum TicketClass
+    {
+        Economic,
+        Business
+    };
+    public class ShoppingBasketTicket
     {
         public int Id { get; set; }
 
-        [Required]
         public string Name { get; set; }
-
-        [Required]
         public string Surname { get; set; }
 
         public int? SeatId { get; set; }
-
-        public Seat? Seat { get; set; }
-
-
-        public Flight? Flight { get; set; }
-
-
         public int FlightId { get; set; }
 
-        [Required]
         public PassengerType PassengerType { get; set; }
-
-        [Required]
         public TicketClass Class { get; set; }
-
-        [Required]
         public decimal Price { get; set; }
 
         public int? ResponsibleAdultTicketId { get; set; }
-
         public bool IsResponsibleAdult { get; set; }
 
         public string? UserId { get; set; }
-
-        public User? User { get; set; }
-
-
     }
 }

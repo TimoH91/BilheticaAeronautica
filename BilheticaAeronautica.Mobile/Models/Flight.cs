@@ -22,14 +22,14 @@ namespace BilheticaAeronautica.Mobile.Models
 
         public int AirplaneId { get; set; }
 
-        //public string OriginAirport { get; set; }
+        public Airport OriginAirport { get; set; }
 
-        //public int OriginAirportId { get; set; }
+        public int OriginAirportId { get; set; }
 
-        //public string DestinationAirport { get; set; }
-        //public int DestinationAirportId { get; set; }
+        public Airport DestinationAirport { get; set; }
+        public int DestinationAirportId { get; set; }
 
-        //public int? LayoverId { get; set; }
+        public int? LayoverId { get; set; }
     }
 
 }

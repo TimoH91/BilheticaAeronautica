@@ -60,6 +60,23 @@ namespace BilheticaAeronautica.Mobile.Services
         }
 
 
+        public async Task<IEnumerable<Seat>> GetSeatsByFlightAsync(int flightId)
+        {
+            var toSend = new { flightId = flightId };
+
+            var json = JsonSerializer.Serialize(toSend, _serializerOptions);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await PostRequest("api/Seats/GetSeats", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonString = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<List<Seat>>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+
+            return Enumerable.Empty<Seat>();
+        }
 
         public async Task<ApiResponse<bool>> Login(string email, string password)
         {
@@ -174,6 +191,19 @@ namespace BilheticaAeronautica.Mobile.Services
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var result = await PostRequest("api/Users/ChangePassword", content);
+
+            return new ApiResponse<bool> { Data = true };
+        }
+
+
+        public async Task<ApiResponse<bool>> ConfirmOrder(List<ShoppingBasketTicket> tickets)
+        {
+
+            var json = JsonSerializer.Serialize(tickets, _serializerOptions);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var result = await PostRequest("api/Orders/ConfirmOrder", content);
 
             return new ApiResponse<bool> { Data = true };
         }

@@ -7,19 +7,22 @@ namespace BilheticaAeronautica.Mobile
     public partial class App : Application
     {
         private readonly ApiService _apiService;
+        private readonly IBasketService _basketService;
         private readonly IValidator _validator;
 
-        public App(ApiService apiService, IValidator validator)
+        public App(ApiService apiService, IValidator validator, IBasketService basketService)
         {
             InitializeComponent();
             _apiService = apiService;
             _validator = validator;
+            _basketService = basketService;
 
             //NavigationPage navPage1 = new NavigationPage(new NewPage1());
 
             //MainPage = navPage1;
 
             SetMainPage();
+
         }
 
         private void SetMainPage()
@@ -32,7 +35,7 @@ namespace BilheticaAeronautica.Mobile
             //    return;
             //}
 
-            MainPage = new AppShell(_apiService, _validator);
+            MainPage = new AppShell(_apiService, _validator, _basketService);
         }
     }
 }
