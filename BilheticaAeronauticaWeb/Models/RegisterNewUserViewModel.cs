@@ -26,10 +26,10 @@ namespace BilheticaAeronauticaWeb.Models
         public string Confirm { get; set; }
 
         [Display(Name = "Photo")]
-        public IFormFile ImageFile { get; set; }
+        public IFormFile? ImageFile { get; set; }
 
         [DisplayName("Photo")]
-        public Guid ImageId { get; set; }
+        public Guid? ImageId { get; set; }
     }
 
 }

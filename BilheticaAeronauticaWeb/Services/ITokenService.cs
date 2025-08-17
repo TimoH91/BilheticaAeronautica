@@ -4,6 +4,9 @@ namespace BilheticaAeronauticaWeb.Services
 {
     public interface ITokenService
     {
-        public string GenerateToken(User user);
+        string GenerateToken(User user);
+
+        Task<string> GenerateEmailConfirmationLinkAsync(User user);
+            
     }
 }

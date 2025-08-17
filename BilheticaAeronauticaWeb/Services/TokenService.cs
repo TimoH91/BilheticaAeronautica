@@ -1,6 +1,8 @@
 ﻿using BilheticaAeronauticaWeb.Entities;
+using BilheticaAeronauticaWeb.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -11,10 +13,12 @@ namespace BilheticaAeronauticaWeb.Services
     {
 
         private readonly IConfiguration _configuration;
+        private readonly IUserHelper _userHelper;
 
-        public TokenService(IConfiguration configuration)
+        public TokenService(IConfiguration configuration, IUserHelper userHelper)
         {
             _configuration = configuration;
+            _userHelper = userHelper;
         }
 
         public string GenerateToken(User user)
@@ -37,6 +41,13 @@ namespace BilheticaAeronauticaWeb.Services
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public async Task<string> GenerateEmailConfirmationLinkAsync(User user)
+        {
+            string token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+            string encodedToken = WebUtility.UrlEncode(token); // always encode tokens for URLs
+            return $"{_configuration["Tokens:Issuer"]}account/confirmemail?userid={user.Id}&token={encodedToken}";
         }
     }
 }

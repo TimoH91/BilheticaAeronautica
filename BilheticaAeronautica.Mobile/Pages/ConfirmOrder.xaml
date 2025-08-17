@@ -6,6 +6,26 @@
 
     <VerticalStackLayout>
 
+        <Frame Grid.Row="2"
+    Padding="15"
+    BackgroundColor="White">
+            <VerticalStackLayout>
+                <Entry Placeholder="First name"
+        x:Name="EntName" />
+                <Entry Placeholder="Surname"
+        x:Name="EntSurname" />
+                <Entry Placeholder="Email"
+        x:Name="EntEmail" />
+                <Entry Placeholder="Password"
+        IsPassword="True"
+        x:Name="EntPassword" />
+                <Entry Placeholder="Confirm Password"
+        IsPassword="True"
+        x:Name="EntConfirmPassword" />
+            </VerticalStackLayout>
+        </Frame>
+
+
         <CollectionView x:Name="ShoppingBasketTickets"
                 Margin="20"
                 ItemsSource="{Binding Items}">

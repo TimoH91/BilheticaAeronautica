@@ -48,7 +48,7 @@ public partial class LoginPage : ContentPage
     private async void TapRegister_Tapped(object sender, TappedEventArgs e)
     {
 
-        //await Navigation.PushAsync(new InscriptionPage(_apiService, _validator));
+        await Navigation.PushAsync(new RegisterPage(_apiService, _validator, _basketService));
 
     }
 }

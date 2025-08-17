@@ -26,9 +26,10 @@ namespace BilheticaAeronautica.Mobile
         private void ConfigureShell()
         {
             var homePage1 = new NewPage1(_apiService, _basketService, _validator);
-            var homePage = new LoginPage(_apiService, _validator, _basketService);
+            var loginPage = new LoginPage(_apiService, _validator, _basketService);
             //var page3 = new FlightPage(_apiService, _basketService, _validator);
-            var page4 = new ConfirmOrder(_apiService, _basketService);
+            var registerPage = new RegisterPage(_apiService, _validator, _basketService);
+            var page4 = new ConfirmOrder(_apiService, _basketService, _validator);
 
             Items.Add(new TabBar
             {

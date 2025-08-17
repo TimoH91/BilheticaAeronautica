@@ -202,7 +202,7 @@ namespace BilheticaAeronauticaWeb.Controllers
                     if (response.IsSuccess)
                     {
                         
-                        ViewBag.Message = "The instructions to allow you user has been sent to email";
+                        ViewBag.Message = "The instructions to login as a user has been sent to email";
                         return View(model);
                     }
 

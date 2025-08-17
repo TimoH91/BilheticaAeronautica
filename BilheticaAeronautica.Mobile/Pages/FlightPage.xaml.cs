@@ -12,6 +12,8 @@ public partial class FlightPage : ContentPage
     private readonly IValidator _validator;
     private readonly IBasketService _basketService;
     private readonly Flight _flight;
+    public ObservableCollection<Seat> Seats { get; set; }
+    public Seat SelectedSeat { get; set; }
 
     public FlightPage(ApiService apiService, IBasketService basketService, IValidator validator, Flight flight)
     {
@@ -20,12 +22,19 @@ public partial class FlightPage : ContentPage
         _basketService = basketService;
         _validator = validator;
         _flight = flight;
+
+        Seats = new ObservableCollection<Seat>();
+        BindingContext = this; 
     }
 
-    protected override void OnAppearing()
+    protected async override void OnAppearing()
     {
         base.OnAppearing();
-        var seats = _apiService.GetSeatsByFlightAsync(_flight.Id);
+        var seats = await _apiService.GetSeatsByFlightAsync(_flight.Id);
+
+        Seats.Clear();
+        foreach (var seat in seats)
+            Seats.Add(seat);
     }
 
     public async void AddShoppingBasketTicket()
@@ -33,6 +42,8 @@ public partial class FlightPage : ContentPage
 
         if (await _validator.ValidateTicket(EntName.Text, EntSurname.Text, PickPassengerType.SelectedItem?.ToString(), PickClass.SelectedItem?.ToString()))
         {
+            var userId = Preferences.Get("userId", string.Empty);
+
             var entity = new ShoppingBasketTicket
             {
                 Name = EntName.Text,
@@ -41,9 +52,9 @@ public partial class FlightPage : ContentPage
                 Class = Enum.Parse<TicketClass>(PickClass.SelectedItem.ToString()),
                 FlightId = _flight.Id,
                 Price = _flight.BasePrice,
-                SeatId = 3,
+                SeatId = SelectedSeat.Id,
                 IsResponsibleAdult = false,
-                UserId = "a47fec80-ee63-4e71-a016-a51873bf009b"
+                UserId = userId
             };
 
             _basketService.Add(entity);
@@ -74,11 +85,19 @@ public partial class FlightPage : ContentPage
 
     private async void Purchase_Clicked(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new ConfirmOrder(_apiService, _basketService));
+        await Navigation.PushAsync(new ConfirmOrder(_apiService, _basketService, _validator));
     }
 
     private void BtnEmptyBasket_Clicked(object sender, EventArgs e)
     {
         _basketService.Clear(); // automatically saved
+    }
+
+    private void ConfirmSeatSelection()
+    {
+        if (SelectedSeat != null)
+        {
+            DisplayAlert("Seat Selected", $"You chose {SelectedSeat.DisplayName}", "OK");
+        }
     }
 }

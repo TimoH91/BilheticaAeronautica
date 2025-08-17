@@ -23,5 +23,7 @@ namespace BilheticaAeronautica.Mobile.Models
         public DateTime? HoldingTime { get; set; }
 
         public bool IsHeld { get; set; }
+
+        public string DisplayName => $"Row {Row} Seat number {Column}";
     }
 }

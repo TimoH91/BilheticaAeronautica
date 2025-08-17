@@ -19,6 +19,9 @@ namespace BilheticaAeronautica.Mobile.Validations
         Task<bool> ValidateLogin(string name, string email,
                            string telephone, string password);
 
+        Task<bool> ValidateRegister(string name, string surname,
+            string username, string password);
+
         Task<bool> ValidateTicket(string name, string surname,
             string passengerType, string ticketClass);
     }

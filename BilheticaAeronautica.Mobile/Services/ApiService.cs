@@ -77,7 +77,48 @@ namespace BilheticaAeronautica.Mobile.Services
 
             return Enumerable.Empty<Seat>();
         }
+        public async Task<ApiResponse<bool>> RegisterUser(string name, string surname, string email,string password, string confirmPassword)
+        {
+            try
+            {
+                var register = new RegisterNewUser()
+                {
+                    FirstName = name,
+                    LastName = surname,
+                    Username = email,
+                    Password = password,
+                    Confirm = confirmPassword
+                };
 
+                var json = JsonSerializer.Serialize(register, _serializerOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await PostRequest("api/Users/Register", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError($"Erro ao enviar requisição HTTP: {response.StatusCode}");
+                    return new ApiResponse<bool>
+                    {
+                        ErrorMessage = $"Erro ao enviar requisição HTTP: {response.StatusCode}"
+                    };
+                }
+
+                var json2 = await response.Content.ReadAsStringAsync();
+                var json3 = JsonSerializer.Deserialize<RegisterUserResponse>(json2, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                return new ApiResponse<bool>
+                {
+                    Data = true,
+                    RegisterUser = json3
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Erro ao registrar o usuário: {ex.Message}");
+                return new ApiResponse<bool> { ErrorMessage = ex.Message };
+            }
+        }
         public async Task<ApiResponse<bool>> Login(string email, string password)
         {
             try
@@ -198,7 +239,6 @@ namespace BilheticaAeronautica.Mobile.Services
 
         public async Task<ApiResponse<bool>> ConfirmOrder(List<ShoppingBasketTicket> tickets)
         {
-
             var json = JsonSerializer.Serialize(tickets, _serializerOptions);
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");

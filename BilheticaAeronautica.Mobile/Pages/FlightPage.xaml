@@ -52,6 +52,11 @@
             </VerticalStackLayout>
         </Frame>
 
+        <Picker Title="Select a Seat"
+        ItemsSource="{Binding Seats}"
+        ItemDisplayBinding="{Binding DisplayName}"
+        SelectedItem="{Binding SelectedSeat}" />
+
         <Button Grid.Row="3"
             Text="Add to Shopping Basket"
             FontSize="Medium"

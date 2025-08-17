@@ -1,8 +1,10 @@
-﻿using BilheticaAeronauticaWeb.Helpers;
+﻿using BilheticaAeronauticaWeb.Entities;
+using BilheticaAeronauticaWeb.Helpers;
 using BilheticaAeronauticaWeb.Models;
 using BilheticaAeronauticaWeb.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BilheticaAeronauticaWeb.Controllers.API
@@ -15,12 +17,15 @@ namespace BilheticaAeronauticaWeb.Controllers.API
         private readonly IUserHelper _userHelper;
         private readonly ITokenService _tokenService;
         private readonly IMailHelper _mailHelper;
+        private readonly IBlobHelper _blobHelper;
 
-        public UsersController(IUserHelper userHelper, ITokenService tokenService, IMailHelper mailHelper)
+        public UsersController(IUserHelper userHelper, ITokenService tokenService,
+            IMailHelper mailHelper, IBlobHelper blobHelper)
         {
             _userHelper = userHelper;
             _tokenService = tokenService;
             _mailHelper = mailHelper;
+            _blobHelper = blobHelper;
         }
 
         [HttpPost("Login")]
@@ -46,6 +51,70 @@ namespace BilheticaAeronauticaWeb.Controllers.API
                 UserName = user.UserName
             });
         }
+
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register([FromBody] RegisterNewUserViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid login request.");
+
+            var user = await _userHelper.GetUserByEmailAsync(model.Username);
+
+            if (user == null)
+            {
+                Guid imageId = Guid.Empty;
+
+                if (model.ImageFile != null && model.ImageFile.Length > 0)
+                {
+                    imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "users");
+
+                }
+
+                user = new User
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Username,
+                    UserName = model.Username,
+                    ImageId = imageId,
+                    Role = "Customer"
+
+                };
+
+                var result = await _userHelper.AddUserAsync(user, model.Password);
+
+                if (!result.Succeeded)
+                {
+                    return BadRequest(new { message = "The user couldn't be created." });
+                }
+                else
+                {
+                    await _userHelper.AddUserToRoleAsync(user, "Customer");
+                }
+
+                string tokenLink = await _tokenService.GenerateEmailConfirmationLinkAsync(user);
+
+
+                Response response = _mailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                                                                         $"To allow the user, " +
+                                                                        $"please click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
+
+
+                if (!response.IsSuccess)
+                {
+                    return StatusCode(500, new { message = "Error sending email." });
+                }
+
+            }
+
+            return Ok(new 
+            { 
+                Message = "The instructions to login as a user has been sent to email.",
+                UserId = user.Id,
+            });
+
+        }
+        
 
         [HttpPost("RecoverPassword")]
         public async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordViewModel model)

@@ -40,6 +40,17 @@ namespace BilheticaAeronautica.Mobile.Validations
             return Task.FromResult(isNameValid && isEmailValid && isTelephoneValid && isPasswordValid);
         }
 
+        public Task<bool> ValidateRegister(string name, string surname, string username, string password)
+        {
+            var isNameValid = ValidateName(name);
+            var isSurnameValid = ValidateName(surname);
+            var isEmailValid = ValidateEmail(username);
+            var isPasswordValid = ValidatePassword(password);
+
+
+            return Task.FromResult(isNameValid && isSurnameValid && isEmailValid && isPasswordValid);
+        }
+
         public Task<bool> ValidateTicket(string name, string surname, string passengerType, string ticketClass) 
         {
             var isNameValid = ValidateName(name);
