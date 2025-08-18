@@ -7,14 +7,14 @@ using BilheticaAeronautica.Mobile.Validations;
 
 namespace BilheticaAeronautica.Mobile.Pages;
 
-public partial class NewPage1 : ContentPage
+public partial class FlightsPage : ContentPage
 {
 
     private readonly ApiService _apiService;
     private readonly IValidator _validator;
     private readonly IBasketService _basketService;
     private Flight _flight;
-	public NewPage1(ApiService apiService, IBasketService basketService, IValidator validator)
+	public FlightsPage(ApiService apiService, IBasketService basketService, IValidator validator)
 	{
 		InitializeComponent();
         _apiService = apiService;
@@ -25,7 +25,7 @@ public partial class NewPage1 : ContentPage
 
     private async void OnLoadTicketsClicked(object sender, EventArgs e)
     {
-        string token = Preferences.Get("accessToken", "");
+        string token = Preferences.Get("accesstoken", "");
 
         var tickets = await _apiService.GetTicketsAsync(token);
 
@@ -34,7 +34,7 @@ public partial class NewPage1 : ContentPage
 
     private async void Button_Clicked(object sender, EventArgs e)
     {
-        await _apiService.RecoverPassword();
+        //await _apiService.RecoverPassword();
     }
 
     private async void BtnSignIn_Clicked(object sender, EventArgs e)

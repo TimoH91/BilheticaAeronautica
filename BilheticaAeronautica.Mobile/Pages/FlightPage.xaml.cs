@@ -42,7 +42,7 @@ public partial class FlightPage : ContentPage
 
         if (await _validator.ValidateTicket(EntName.Text, EntSurname.Text, PickPassengerType.SelectedItem?.ToString(), PickClass.SelectedItem?.ToString()))
         {
-            var userId = Preferences.Get("userId", string.Empty);
+            var userId = Preferences.Get("userid", string.Empty);
 
             var entity = new ShoppingBasketTicket
             {
@@ -80,7 +80,7 @@ public partial class FlightPage : ContentPage
 
     private async void BtnFlights_Clicked(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new NewPage1(_apiService, _basketService, _validator));
+        await Navigation.PushAsync(new FlightsPage(_apiService, _basketService, _validator));
     }
 
     private async void Purchase_Clicked(object sender, EventArgs e)

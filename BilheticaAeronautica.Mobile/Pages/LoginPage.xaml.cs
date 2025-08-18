@@ -1,5 +1,6 @@
 using BilheticaAeronautica.Mobile.Services;
 using BilheticaAeronautica.Mobile.Validations;
+using System.Threading.Tasks;
 namespace BilheticaAeronautica.Mobile.Pages;
 
 
@@ -35,7 +36,7 @@ public partial class LoginPage : ContentPage
 
         if (!response.HasError)
         {
-            await Navigation.PushAsync(new NewPage1(_apiService, _basketService, _validator));
+            await Navigation.PushAsync(new FlightsPage(_apiService, _basketService, _validator));
             //Application.Current!.MainPage = new AppShell(_apiService, _validator);
         }
         else
@@ -50,5 +51,10 @@ public partial class LoginPage : ContentPage
 
         await Navigation.PushAsync(new RegisterPage(_apiService, _validator, _basketService));
 
+    }
+
+    private async void TapRecover_Tapped(object sender, TappedEventArgs e)
+    {
+        await _apiService.RecoverPassword(EntEmail.Text);
     }
 }

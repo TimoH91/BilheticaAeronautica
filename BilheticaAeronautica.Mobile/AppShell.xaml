@@ -4,12 +4,36 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:BilheticaAeronautica.Mobile.Pages"
+    xmlns:pages="clr-namespace:BilheticaAeronautica.Mobile.Pages"
+    Title="BilheticaAeronautica.Mobile"   
     Shell.FlyoutBehavior="Disabled"
-    Title="BilheticaAeronautica.Mobile">
+    Shell.NavBarHasShadow="True"
+       Shell.BackgroundColor="#2196F3"
+       Shell.ForegroundColor="White"
+       Shell.TitleColor="White"
+       Shell.UnselectedColor="White"
+       Shell.DisabledColor="#BFBFBF"
+       Shell.TabBarTitleColor="AntiqueWhite"
+       Shell.TabBarBackgroundColor="#2196F3"
+       Shell.TabBarForegroundColor="White">
 
-    <!--<ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:NewPage1}"
-        Route="NewPage1" />-->
+<!--<TabBar>
+        <Tab Title="Home"
+             Icon="home">
+            <ShellContent ContentTemplate="{DataTemplate pages:RegisterPage}" />
+        </Tab>
+        <Tab Title="Basket"
+             Icon="cart">
+            <ShellContent ContentTemplate="{DataTemplate pages:ShoppingBasketPage}" />
+        </Tab>
+        --><!--<Tab Title="Flights"-->
+             <!--Icon="">
+            <ShellContent ContentTemplate="{DataTemplate pages:FavouritesPage}" />
+        </Tab>--><!--
+        <Tab Title="Perfil"
+             Icon="profile">
+            <ShellContent ContentTemplate="{DataTemplate pages:ProfilePage}" />
+        </Tab>
+    </TabBar>-->
 
 </Shell>

@@ -156,9 +156,9 @@ namespace BilheticaAeronautica.Mobile.Services
                             ErrorMessage = "Failed to get access token from API response."
                         };
                     }
-                    Preferences.Set("accessToken", result.AccessToken!);
-                    Preferences.Set("userId", result.UserId!);
-                    Preferences.Set("userName", result.UserName);
+                    Preferences.Set("accesstoken", result.AccessToken!);
+                    Preferences.Set("userid", result.UserId!);
+                    Preferences.Set("username", result.UserName);
 
                     
                 }
@@ -200,11 +200,12 @@ namespace BilheticaAeronautica.Mobile.Services
 
 
         //TODO sort the password recovery
-        public async Task<ApiResponse<bool>> RecoverPassword()
+        public async Task<ApiResponse<bool>> RecoverPassword(string email)
         {
+
             RecoverPassword recoverPasswordModel = new RecoverPassword
             {
-                Email = Preferences.Get("userName", "")
+                Email = email
             };
 
             var json = JsonSerializer.Serialize(recoverPasswordModel, _serializerOptions);
@@ -221,7 +222,7 @@ namespace BilheticaAeronautica.Mobile.Services
         {
             ChangePassword changePasswordModel = new ChangePassword
             {
-                Email = Preferences.Get("userName", ""),
+                Email = Preferences.Get("username", ""),
                 OldPassword = oldPassword,
                 NewPassword = newPassword,
                 Confirm = confirmPassword

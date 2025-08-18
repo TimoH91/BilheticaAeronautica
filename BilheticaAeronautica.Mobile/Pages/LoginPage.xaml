@@ -11,6 +11,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -48,13 +49,27 @@
                            Spacing="2"
                            HorizontalOptions="Center"
                            VerticalOptions="EndAndExpand">
-            <Label Text="Não tem conta ? " />
-            <Label Text="Faça o registro agora" TextColor="#a90409" FontAttributes="Bold">
+            <Label Text="Don't have an account? " />
+            <Label Text="Register now" TextColor="#a90409" FontAttributes="Bold">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer x:Name="TapRegister"
                                       Tapped="TapRegister_Tapped"/>
                 </Label.GestureRecognizers>
             </Label>
         </HorizontalStackLayout>
+
+        <HorizontalStackLayout Grid.Row="5"
+                    Spacing="2"
+                    HorizontalOptions="Center"
+                    VerticalOptions="EndAndExpand">
+            <Label Text="Forgotten your password?" />
+            <Label Text="Recover password" TextColor="#a90409" FontAttributes="Bold">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer x:Name="TapRecover"
+                           Tapped="TapRecover_Tapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </HorizontalStackLayout>
+
     </Grid>
 </ContentPage>
