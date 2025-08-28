@@ -13,6 +13,10 @@ namespace BilheticaAeronautica.Mobile.Services
     {
         ObservableCollection<ShoppingBasketTicket> Items { get; }
 
+        int InfantSeatId { get; set; }
+
+        int ResponsibleAdultId { get; set; }
+
         void Add(ShoppingBasketTicket ticket);
 
         void Remove(ShoppingBasketTicket ticket);

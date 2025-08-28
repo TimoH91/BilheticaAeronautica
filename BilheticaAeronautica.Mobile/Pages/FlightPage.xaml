@@ -14,7 +14,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Image Grid.Row="0"
+        <!--<Image Grid.Row="0"
            Source="lanchesico.png"
            Aspect="AspectFit"
            HeightRequest="100"
@@ -23,9 +23,26 @@
         <Label Grid.Row="1"
            Text="Login"
            FontAttributes="Bold"
-           HorizontalOptions="Center" />
+           HorizontalOptions="Center" />-->
+
+
+        <Picker Grid.Row="0"
+                    Title="Select a Seat"
+                x:Name="DepartureSeatPicker"
+        ItemsSource="{Binding DepartureSeats}"
+        ItemDisplayBinding="{Binding DisplayName}"
+        SelectedItem="{Binding SelectedDepartureSeat}" />
+
+        <Picker Grid.Row="1"
+                IsVisible="False"
+                Title="Select a Seat"
+                x:Name="ReturnSeatPicker"
+        ItemsSource="{Binding ReturnSeats}"
+        ItemDisplayBinding="{Binding DisplayName}"
+        SelectedItem="{Binding SelectedReturnSeat}" />
 
         <Frame Grid.Row="2"
+               x:Name="PassengerDetails"
            Padding="15"
            BackgroundColor="White">
             <VerticalStackLayout>
@@ -52,17 +69,13 @@
             </VerticalStackLayout>
         </Frame>
 
-        <Picker Title="Select a Seat"
-        ItemsSource="{Binding Seats}"
-        ItemDisplayBinding="{Binding DisplayName}"
-        SelectedItem="{Binding SelectedSeat}" />
 
         <Button Grid.Row="3"
             Text="Add to Shopping Basket"
             FontSize="Medium"
-            x:Name="BtnSignIn" 
+            x:Name="BtnShoppingBasket" 
             BackgroundColor="#a90409"
-            Clicked="BtnSignIn_Clicked_2"/>
+            Clicked="BtnShoppingBasket_Clicked"/>
 
         <Button Grid.Row="4"
             Text="Back to flights"
@@ -78,12 +91,12 @@
             BackgroundColor="#a90409"
             Clicked="Purchase_Clicked"/>
 
-        <Button Grid.Row="6"
+        <!--<Button Grid.Row="6"
             Text="Empty basket"
             FontSize="Medium"
             x:Name="BtnEmptyBasket" 
             BackgroundColor="#a90409"
-            Clicked="BtnEmptyBasket_Clicked"/>
+            Clicked="BtnEmptyBasket_Clicked"/>-->
 
     </Grid>
 </ContentPage>

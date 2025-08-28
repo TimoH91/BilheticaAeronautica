@@ -4,7 +4,9 @@
              x:Class="BilheticaAeronautica.Mobile.Pages.ConfirmOrder"
              Title="ConfirmOrder">
 
-    <VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout>
+
 
         <Frame Grid.Row="2"
     Padding="15"
@@ -71,4 +73,5 @@
 
 
     </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

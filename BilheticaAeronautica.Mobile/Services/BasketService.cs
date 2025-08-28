@@ -12,6 +12,10 @@ namespace BilheticaAeronautica.Mobile.Services
         private readonly ObservableCollection<ShoppingBasketTicket> _items = new();
         public ObservableCollection<ShoppingBasketTicket> Items => _items;
 
+        public int InfantSeatId { get; set; }
+
+        public int ResponsibleAdultId { get; set; }
+
         public BasketService()
         {
             var json = Preferences.Get(BasketKey, "[]");

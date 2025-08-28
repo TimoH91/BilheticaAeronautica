@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BilheticaAeronautica.Mobile.Pages.ResponsibleAdultPage"
+             Title="ResponsibleAdultPage">
+    <VerticalStackLayout>
+        
+        <CollectionView x:Name="ShoppingBasketTickets"
+                                        SelectionMode="Single"
+                SelectionChanged="ShoppingBasketTickets_SelectionChanged"
+          Margin="20"
+          ItemsSource="{Binding Items}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="10" Stroke="#87A7AC" StrokeShape="RoundRectangle 10">
+                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="2*,8*" ColumnSpacing="10">
+
+                            <Label Grid.Row="1"
+                     Grid.Column="1"
+                     Text="{Binding Name}" />
+
+                            <Label Grid.Row="2"
+                     Grid.Column="1"
+                     Text="{Binding Surname}" />
+
+                            <Label Grid.Row="3"
+                     Grid.Column="1"
+                     Text="{Binding BasePrice, StringFormat='R{0:C}'}" />
+
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button
+            Text="Select responsible adult"
+            FontSize="Medium"
+            x:Name="BtnAdult" 
+            BackgroundColor="#a90409"
+            Clicked="BtnAdult_Clicked"/>
+
+    </VerticalStackLayout>
+</ContentPage>

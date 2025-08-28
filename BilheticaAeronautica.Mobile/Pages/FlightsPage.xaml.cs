@@ -13,8 +13,11 @@ public partial class FlightsPage : ContentPage
     private readonly ApiService _apiService;
     private readonly IValidator _validator;
     private readonly IBasketService _basketService;
+    private IEnumerable<Airport> _allAirports;
     private Flight _flight;
-	public FlightsPage(ApiService apiService, IBasketService basketService, IValidator validator)
+    private bool departureDatePicked = false;
+    private bool returnDatePicked = false;
+    public FlightsPage(ApiService apiService, IBasketService basketService, IValidator validator)
 	{
 		InitializeComponent();
         _apiService = apiService;
@@ -23,56 +26,64 @@ public partial class FlightsPage : ContentPage
         _flight = new Flight();
 	}
 
-    private async void OnLoadTicketsClicked(object sender, EventArgs e)
+    protected override async void OnAppearing()
     {
-        string token = Preferences.Get("accesstoken", "");
+        base.OnAppearing();
 
-        var tickets = await _apiService.GetTicketsAsync(token);
-
-        TicketList.ItemsSource = tickets;
-    }
-
-    private async void Button_Clicked(object sender, EventArgs e)
-    {
-        //await _apiService.RecoverPassword();
-    }
-
-    private async void BtnSignIn_Clicked(object sender, EventArgs e)
-    {
-        if (EntNewPassword.Text != EntConfirmPassword.Text)
+        if (_allAirports == null)
         {
-            await DisplayAlert("Error", "New password and confirm password do not match.", "OK");
-            return;
+            _allAirports = await _apiService.GetAllAirportsAsync();
         }
-
-        await _apiService.ChangePassword(EntOldPassword.Text, EntNewPassword.Text, EntConfirmPassword.Text);
     }
 
-    private async void Button_Clicked_1(object sender, EventArgs e)
-    {
-        var flights = await _apiService.GetAllFlightsAsync();
 
-        FlightList.ItemsSource = flights;   
+    private void OnOriginSearchTextChanged(object sender, TextChangedEventArgs e)
+    {
+        var searchText = e.NewTextValue?.Trim();
+
+        if (!string.IsNullOrEmpty(searchText))
+        {
+            OriginAirportsList.ItemsSource = _allAirports
+                .Where(a => a.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        else
+        {
+            OriginAirportsList.ItemsSource = new List<Airport>();
+        }
     }
 
-    //private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
-    //{
-    //    _flight = (Flight)FlightList.SelectedItem;
-    //}
-
-    private void Button_Clicked_2(object sender, EventArgs e)
+    private void OnDestinationSearchTextChanged(object sender, TextChangedEventArgs e)
     {
 
+        var searchText = e.NewTextValue?.Trim();
+
+        if (!string.IsNullOrEmpty(searchText))
+        {
+            DestinationAirportsList.ItemsSource = _allAirports
+                .Where(a => a.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        else
+        {
+            DestinationAirportsList.ItemsSource = new List<Airport>();
+        }
     }
 
-    private async void Button_Clicked_3(object sender, EventArgs e)
+    private void OnOriginAirportSelected(object sender, SelectionChangedEventArgs e)
     {
-        await Navigation.PushAsync(new FlightPage(_apiService, _basketService, _validator, _flight));
+        if (e.CurrentSelection.FirstOrDefault() is Airport airport)
+        {
+            DisplayAlert("Origin Selected", airport.Name, "OK");
+        }
     }
 
-    private async void BtnShoppingBasket_Clicked(object sender, EventArgs e)
+    private void OnDestinationAirportSelected(object sender, SelectionChangedEventArgs e)
     {
-        await Navigation.PushAsync(new FlightPage(_apiService, _basketService, _validator, _flight));
+        if (e.CurrentSelection.FirstOrDefault() is Airport airport)
+        {
+            DisplayAlert("Destination Selected", airport.Name, "OK");
+        }
     }
 
     private void FlightList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -81,5 +92,86 @@ public partial class FlightsPage : ContentPage
         {
             _flight = flight;
         }
+
+        ReturnFlightsList.IsEnabled = true;
+        ReturnFlightsList.Opacity = 1;
+    }
+
+    private async void BtnSelectFlight_Clicked(object sender, EventArgs e)
+    {
+        //var departure = FlightList.SelectedItem as Flight;
+        //var returnFlight = ReturnFlightsList.SelectedItem as Flight;
+
+        var departure = (Flight)FlightList.SelectedItem;
+        var returnFlight = (Flight)ReturnFlightsList.SelectedItem;
+
+        if (departure != null && returnFlight == null)
+        {
+            await DisplayAlert("Flights Selected",
+                $"Departure: {departure.Date}",
+                "OK");
+
+            await Navigation.PushAsync(new FlightPage(_apiService, _basketService, _validator, departure, null));
+        }
+        else if (departure != null && returnFlight != null)
+        {
+            await DisplayAlert("Flights Selected",
+            $"Departure: {departure.Date}\nReturn: {returnFlight.Date}",
+            "OK");
+
+            await Navigation.PushAsync(new FlightPage(_apiService, _basketService, _validator, departure, returnFlight));
+        }
+    }
+
+    private async void BtnLoadFlights_Clicked(object sender, EventArgs e)
+    {
+
+        Airport origin = (Airport)OriginAirportsList.SelectedItem;
+        Airport destination = (Airport)DestinationAirportsList.SelectedItem;
+
+        int? originId = origin?.Id;               
+        int? destinationId = destination?.Id;
+
+        DateTime? departureDate = departureDatePicked ? DepartureDatePicker.Date : (DateTime?)null;
+        DateTime? returnDate = returnDatePicked ? ReturnDatePicker.Date : (DateTime?)null;
+
+        var flights = await _apiService.GetFlightsMobileAsync(originId, destinationId, departureDate);
+
+        FlightList.ItemsSource = flights;
+
+        if (RoundTripSwitch.IsToggled && origin != null && destination != null)
+        {
+            var returnFlights = await _apiService.GetFlightsMobileAsync(destinationId, originId, returnDate);
+
+            if (returnFlights.Any())
+            {
+                ReturnFlightsList.IsEnabled = true;
+                ReturnFlightsList.ItemsSource = returnFlights;
+            }
+        }
+    }
+
+    private void DepartureDatePicker_DateSelected(object sender, DateChangedEventArgs e)
+    {
+        departureDatePicked = true;
+    }
+
+    private void ReturnDatePicker_DateSelected(object sender, DateChangedEventArgs e)
+    {
+
+    }
+
+    private void OnReturnFlightSelected(object sender, SelectionChangedEventArgs e)
+    {
+        // Enable confirm button only when both are selected
+        if (ReturnFlightsList.SelectedItem != null && ReturnFlightsList.SelectedItem != null)
+        {
+            BtnSelectFlight.IsEnabled = true;
+        }
+    }
+
+    private void RoundTripSwitch_Toggled(object sender, ToggledEventArgs e)
+    {
+        ReturnDatePicker.IsVisible = e.Value;
     }
 }

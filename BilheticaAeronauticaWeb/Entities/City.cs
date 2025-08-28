@@ -11,6 +11,6 @@ namespace BilheticaAeronauticaWeb.Entities
         [MaxLength(100, ErrorMessage = "The field {0} can contain {1} characters.")]
         public string Name { get; set; }
 
-        public ICollection<Airport> Airports { get; set; }
+        //public ICollection<Airport> Airports { get; set; }
     }
 }

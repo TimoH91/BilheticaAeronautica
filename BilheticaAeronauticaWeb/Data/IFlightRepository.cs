@@ -20,5 +20,7 @@ namespace BilheticaAeronauticaWeb.Data
         Task<bool> IsAirportUsedInAnyFlightAsync(int airportId);
 
         IQueryable<Flight> GetAllFutureFlights();
+
+        Task<IEnumerable<Flight>> GetFlightsMobile(int? originAirportId = null, int? destinationAirportId = null, DateTime? date = null);
     }
 }

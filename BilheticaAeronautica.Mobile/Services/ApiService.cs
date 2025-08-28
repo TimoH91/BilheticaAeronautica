@@ -1,21 +1,19 @@
 ﻿using BilheticaAeronautica.Mobile.Models;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
+
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+
+
 
 namespace BilheticaAeronautica.Mobile.Services
 {
     public class ApiService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl = "https://8dlchknh-7244.uks1.devtunnels.ms/";
+        private readonly string _baseUrl = AppConfig.BaseUrl;
         private readonly ILogger<ApiService> _logger;
         JsonSerializerOptions _serializerOptions;
         public ApiService(HttpClient httpClient, ILogger<ApiService> logger)
@@ -30,8 +28,7 @@ namespace BilheticaAeronautica.Mobile.Services
 
         public async Task<IEnumerable<Ticket>> GetTicketsAsync(string token)
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+            AddAuthorizationHeader();
 
             var response = await _httpClient.GetAsync($"{_baseUrl}api/tickets");
 
@@ -59,15 +56,59 @@ namespace BilheticaAeronautica.Mobile.Services
             return Enumerable.Empty<Flight>();
         }
 
+        public async Task<IEnumerable<Flight>> GetFlightsMobileAsync(
+            int? originAirportId = null,
+            int? destinationAirportId = null,
+            DateTime? departureDate = null)
+
+        {
+            var queryParams = new List<string>();
+
+            if (originAirportId.HasValue)
+                queryParams.Add($"originAirportId={originAirportId.Value}");
+
+            if (destinationAirportId.HasValue)
+                queryParams.Add($"destinationAirportId={destinationAirportId.Value}");
+
+            if (departureDate.HasValue)
+                queryParams.Add($"date={departureDate.Value:yyyy-MM-dd}");
+
+            //if (returnDate.HasValue)
+            //    queryParams.Add($"date={returnDate.Value:yyyy-MM-dd}");
+
+            var queryString = queryParams.Count > 0
+                ? "?" + string.Join("&", queryParams)
+                : string.Empty;
+
+            var response = await _httpClient.GetAsync($"{_baseUrl}api/Flights/flights{queryString}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<List<Flight>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+
+            return Enumerable.Empty<Flight>();
+        }
+
+        public async Task<IEnumerable<Airport>> GetAllAirportsAsync()
+        {
+            var response = await _httpClient.GetAsync($"{_baseUrl}api/Airports/GetAllAirports");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<List<Airport>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+
+            return Enumerable.Empty<Airport>();
+
+        }
+
 
         public async Task<IEnumerable<Seat>> GetSeatsByFlightAsync(int flightId)
         {
-            var toSend = new { flightId = flightId };
-
-            var json = JsonSerializer.Serialize(toSend, _serializerOptions);
-
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await PostRequest("api/Seats/GetSeats", content);
+            var response = await _httpClient.GetAsync($"{_baseUrl}api/Seats/GetSeats/{flightId}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -77,7 +118,10 @@ namespace BilheticaAeronautica.Mobile.Services
 
             return Enumerable.Empty<Seat>();
         }
-        public async Task<ApiResponse<bool>> RegisterUser(string name, string surname, string email,string password, string confirmPassword)
+
+      
+
+        public async Task<ApiResponse<bool>> RegisterUser(string name, string surname, string email, string password, string confirmPassword)
         {
             try
             {
@@ -159,8 +203,10 @@ namespace BilheticaAeronautica.Mobile.Services
                     Preferences.Set("accesstoken", result.AccessToken!);
                     Preferences.Set("userid", result.UserId!);
                     Preferences.Set("username", result.UserName);
+                    Preferences.Set("firstname", result.FirstName);
+                    Preferences.Set("lastname", result.LastName);
 
-                    
+
                 }
                 catch (JsonException ex)
                 {
@@ -181,21 +227,15 @@ namespace BilheticaAeronautica.Mobile.Services
             }
         }
 
-        private async Task<HttpResponseMessage> PostRequest(string uri, HttpContent content)
+        public async Task<ApiResponse<bool>> HoldSeat(int seatId)
         {
-            var urlAddress = _baseUrl + uri;
+            //var response = await _httpClient.PostAsync($"{_baseUrl}api/Seats/{seatId}/hold", null);
 
-            try
-            {
-                var result = await _httpClient.PostAsync(urlAddress, content);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                // Log o erro ou trate conforme necessário
-                _logger.LogError($"Error when sending POST request to {uri}: {ex.Message}");
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
-            }
+            var result = await PostRequest($"api/Seats/{seatId}/hold", null);
+
+            return new ApiResponse<bool> { Data = true};
+
+            //return new ApiResponse<bool> { Data = false };
         }
 
 
@@ -237,6 +277,29 @@ namespace BilheticaAeronautica.Mobile.Services
             return new ApiResponse<bool> { Data = true };
         }
 
+        public async Task<ApiResponse<bool>> ChangeUserInfo(string? name, string? lastName)
+        {
+            ChangeUser changeUser = new ChangeUser
+            {
+                FirstName = name ?? Preferences.Get("firstname", string.Empty),
+                LastName = lastName ?? Preferences.Get("lastname", string.Empty),
+            };
+
+            var json = JsonSerializer.Serialize(changeUser, _serializerOptions);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var result = await PutRequest("api/Users/changeuserinfo", content);
+
+            if (result.IsSuccessStatusCode)
+            {
+                Preferences.Set("firstname", name);
+                Preferences.Set("lastname", lastName);
+            }
+
+            return new ApiResponse<bool> { Data = true };
+        }
+
 
         public async Task<ApiResponse<bool>> ConfirmOrder(List<ShoppingBasketTicket> tickets)
         {
@@ -247,6 +310,129 @@ namespace BilheticaAeronautica.Mobile.Services
             var result = await PostRequest("api/Orders/ConfirmOrder", content);
 
             return new ApiResponse<bool> { Data = true };
+        }
+
+        public async Task<ApiResponse<bool>> UploadUserImage(byte[] imageArray)
+        {
+            try
+            {
+                AddAuthorizationHeader();
+
+                var content = new MultipartFormDataContent();
+                content.Add(new ByteArrayContent(imageArray), "image", "image.jpg");
+                var response = await PostRequest("api/Users/uploadphoto", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorMessage = response.StatusCode == HttpStatusCode.Unauthorized
+                      ? "Unauthorized"
+                      : $"Error when sending HTTP request: {response.StatusCode}";
+
+                    _logger.LogError($"Error when sending HTTP request: {response.StatusCode}");
+                    return new ApiResponse<bool> { ErrorMessage = errorMessage };
+                }
+                return new ApiResponse<bool> { Data = true };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error when uploading user profile image: {ex.Message}");
+                return new ApiResponse<bool> { ErrorMessage = ex.Message };
+            }
+        }
+
+        public async Task<(ProfileImage? ProfileImage, string? ErrorMessage)> GetUserProfileImage()
+        {
+            string endpoint = "api/Users/profileimage";
+            return await GetAsync<ProfileImage>(endpoint);
+        }
+
+        private async Task<(T? Data, string? ErrorMessage)> GetAsync<T>(string endpoint)
+        {
+            try
+            {
+                AddAuthorizationHeader();
+
+                var response = await _httpClient.GetAsync(AppConfig.BaseUrl + endpoint);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var data = JsonSerializer.Deserialize<T>(responseString, _serializerOptions);
+                    return (data ?? Activator.CreateInstance<T>(), null);
+                }
+                else
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        string errorMessage = "Unauthorized";
+                        _logger.LogWarning(errorMessage);
+                        return (default, errorMessage);
+                    }
+
+                    string generalErrorMessage = $"Erro na requisição: {response.ReasonPhrase}";
+                    _logger.LogError(generalErrorMessage);
+                    return (default, generalErrorMessage);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                string errorMessage = $"Erro de requisição HTTP: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (default, errorMessage);
+            }
+            catch (JsonException ex)
+            {
+                string errorMessage = $"Erro de desserialização JSON: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (default, errorMessage);
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = $"Erro inesperado: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (default, errorMessage);
+            }
+        }
+
+        private void AddAuthorizationHeader()
+        {
+            var token = Preferences.Get("accesstoken", string.Empty);
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+        }
+
+        private async Task<HttpResponseMessage> PutRequest(string uri, HttpContent content)
+        {
+            var urlAddress = AppConfig.BaseUrl + uri;
+
+            try
+            {
+                AddAuthorizationHeader();
+                var result = await _httpClient.PutAsync(urlAddress, content);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error when sending PUT request for {uri}: {ex.Message}");
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+            }
+        }
+        private async Task<HttpResponseMessage> PostRequest(string uri, HttpContent? content)
+        {
+            var urlAddress = AppConfig.BaseUrl + uri;
+
+            try
+            {
+                var result = await _httpClient.PostAsync(urlAddress, content);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error when sending POST request to {uri}: {ex.Message}");
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+            }
         }
 
 

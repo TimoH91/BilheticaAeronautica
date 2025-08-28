@@ -6,26 +6,29 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BilheticaAeronauticaWeb.Controllers.API
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
     public class UsersController : Controller
     {
         private readonly IUserHelper _userHelper;
         private readonly ITokenService _tokenService;
         private readonly IMailHelper _mailHelper;
         private readonly IBlobHelper _blobHelper;
+        private readonly ILogger<UsersController> _logger;
 
         public UsersController(IUserHelper userHelper, ITokenService tokenService,
-            IMailHelper mailHelper, IBlobHelper blobHelper)
+            IMailHelper mailHelper, IBlobHelper blobHelper, ILogger<UsersController> logger)
         {
             _userHelper = userHelper;
             _tokenService = tokenService;
             _mailHelper = mailHelper;
             _blobHelper = blobHelper;
+            _logger = logger;
         }
 
         [HttpPost("Login")]
@@ -48,7 +51,9 @@ namespace BilheticaAeronauticaWeb.Controllers.API
                 AccessToken = token,
                 TokenType = "bearer",
                 UserId = user.Id,
-                UserName = user.UserName
+                UserName = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName
             });
         }
 
@@ -147,7 +152,7 @@ namespace BilheticaAeronauticaWeb.Controllers.API
         }
 
         [HttpPost("ChangePassword")]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -172,6 +177,95 @@ namespace BilheticaAeronauticaWeb.Controllers.API
 
             return BadRequest(new { message = "Email is required." });
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPut("changeuserinfo")]
+        public async Task<IActionResult> ChangeUserInfo([FromBody] ChangeUserViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+             
+            var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+            var user = await _userHelper.GetUserByEmailAsync(userEmail);
+
+            if (user == null)
+                    return NotFound(new { message = "The email doesn't correspond to a registered user." });
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+
+            
+            var result = await _userHelper.UpdateUserAsync(user);
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description);
+                return BadRequest(new { message = "Password change failed.", errors });
+            }
+
+            return Ok(new { message = "User info changed successfully." });
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost("uploadphoto")]
+        public async Task<IActionResult> UploadUserPhoto(IFormFile image)
+        {
+            var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+            var user = await _userHelper.GetUserByEmailAsync(userEmail);
+
+            if (user is null)
+            {
+                return NotFound("User not found");
+            }
+
+            Guid imageId = user.ImageId;
+
+            if (image != null && image.Length > 0)
+            {
+                imageId = await _blobHelper.UploadBlobAsync(image, "users");
+
+                user.ImageId = imageId;
+
+                var response = await _userHelper.UpdateUserAsync(user);
+
+                if (!response.Succeeded)
+                {
+                    return StatusCode(500, new { message = "Error uploading photo." });
+                }                
+            }
+
+            return Ok(new { message = "Photo uploaded sucessfully." });
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("profileimage")]
+        public async Task<IActionResult> ImageProfileUser()
+        {
+
+            foreach (var claim in User.Claims)
+            {
+                _logger.LogInformation("Claim {Type} = {Value}", claim.Type, claim.Value);
+            }
+
+
+            var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+            _logger.LogInformation("User email: {Email}", userEmail);
+
+            var user = await _userHelper.GetUserByEmailAsync(userEmail);
+
+            if (user == null)
+                return NotFound("Usuário não encontrado");
+
+
+            var profileImage = user.ImageFullPath;
+
+            return Ok(profileImage);
+        }
+
+
 
     }
 }

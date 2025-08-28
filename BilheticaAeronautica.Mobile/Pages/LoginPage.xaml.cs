@@ -22,13 +22,13 @@ public partial class LoginPage : ContentPage
     {
         if (string.IsNullOrEmpty(EntEmail.Text))
         {
-            await DisplayAlert("Erro", "Enter your email", "Cancelar");
+            await DisplayAlert("Error", "Enter your email", "Cancelar");
             return;
         }
 
         if (string.IsNullOrEmpty(EntPassword.Text))
         {
-            await DisplayAlert("Erro", "Enter your password", "Cancelar");
+            await DisplayAlert("Error", "Enter your password", "Cancelar");
             return;
         }
 

@@ -11,14 +11,14 @@ namespace BilheticaAeronautica.Mobile
         private readonly ApiService _apiService;
         private readonly IBasketService _basketService;
         private readonly IValidator _validator;
-        //private readonly Flight _flight;
+
         public AppShell(ApiService apiService, IValidator validator, IBasketService basketService)
         {
             InitializeComponent();
             _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
             _validator = validator;
             _basketService = basketService ?? throw new ArgumentNullException(nameof(basketService));
-            //_flight = flight;
+
             ConfigureShell();
 
         }
@@ -28,7 +28,7 @@ namespace BilheticaAeronautica.Mobile
             var homePage = new HomePage(_apiService, _validator, _basketService);
             var flightsPage = new FlightsPage(_apiService, _basketService, _validator);
             var loginPage = new LoginPage(_apiService, _validator, _basketService);
-            //var page3 = new FlightPage(_apiService, _basketService, _validator);
+            var myAccountPage = new MyAccountPage(_apiService);
             var registerPage = new RegisterPage(_apiService, _validator, _basketService);
             var confirmOrderPage = new ConfirmOrder(_apiService, _basketService, _validator);
             var profilePage = new ProfilePage(_validator, _apiService, _basketService);

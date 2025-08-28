@@ -2,30 +2,81 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              x:Class="BilheticaAeronautica.Mobile.Pages.FlightsPage"
              Title="Flights">
 
+    <ScrollView>
+        
+        
+        
+        
     <VerticalStackLayout Padding="20" Spacing="15">
 
-        <Button Text="Load Tickets" Clicked="OnLoadTicketsClicked" />
 
-        <CollectionView x:Name="TicketList" HeightRequest="200">
+
+        <!-- Origin Airport -->
+        <Label Text="Origin Airport" FontAttributes="Bold"/>
+        <SearchBar x:Name="OriginSearchBar"
+               Placeholder="Search origin airport"
+               TextChanged="OnOriginSearchTextChanged"/>
+
+        <CollectionView x:Name="OriginAirportsList"
+                    HeightRequest="150"
+                    SelectionMode="Single"
+                    SelectionChanged="OnOriginAirportSelected">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Border Padding="10" Stroke="#87A7AC" StrokeShape="RoundRectangle 10">
-                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="2*,8*" ColumnSpacing="10">
-                            <Label  Grid.Row="1"
-                           Grid.Column="1"
-                            Text="{Binding FullName}" />
-                        </Grid>
-                    </Border>
+                    <Label Text="{Binding Name}" Padding="10"/>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Button Text="Load Flights" Clicked="Button_Clicked_1"/>
 
-        <CollectionView x:Name="FlightList"
+        <!-- Destination Airport -->
+        <Label Text="Destination Airport" FontAttributes="Bold"/>
+        <SearchBar x:Name="DestinationSearchBar"
+               Placeholder="Search destination airport"
+               TextChanged="OnDestinationSearchTextChanged"/>
+
+        <CollectionView x:Name="DestinationAirportsList"
+                    HeightRequest="150"
+                    SelectionMode="Single"
+                    SelectionChanged="OnDestinationAirportSelected">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Label Text="{Binding Name}" Padding="10"/>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+            <!-- Toggle for Return Flight -->
+            <HorizontalStackLayout>
+                <Label Text="Round-trip?" VerticalOptions="Center"/>
+                <Switch x:Name="RoundTripSwitch" Toggled="RoundTripSwitch_Toggled"/>
+            </HorizontalStackLayout>
+
+            <!-- Departure Date -->
+            <DatePicker x:Name="DepartureDatePicker"
+                DateSelected="DepartureDatePicker_DateSelected"
+                MinimumDate="{x:Static sys:DateTime.Today}"
+                Format="dd MMM yyyy" />
+
+            <!-- Return Date (hidden by default) -->
+            <DatePicker x:Name="ReturnDatePicker"
+                IsVisible="False"
+                DateSelected="ReturnDatePicker_DateSelected"
+                MinimumDate="{x:Static sys:DateTime.Today}"
+                Format="dd MMM yyyy" />
+
+        <Button Text="Load Flights" x:Name="BtnLoadFlights" Clicked="BtnLoadFlights_Clicked"/>
+
+
+            <Label Text="Select Departure Flight"
+                   FontAttributes="Bold"
+                   FontSize="18"/>
+
+            <CollectionView x:Name="FlightList"
                 SelectionMode="Single"
                 SelectionChanged="FlightList_SelectionChanged"
                 HeightRequest="200">
@@ -40,36 +91,30 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
+            <Label Text="Select Return Flight"
+                   FontAttributes="Bold"
+                   FontSize="18"
+                   Margin="0,20,0,0"/>
 
-        <Button Text="Select Flight" Clicked="Button_Clicked_3"/>
+            <CollectionView x:Name="ReturnFlightsList"
+                            SelectionMode="Single"
+                            SelectionChanged="OnReturnFlightSelected"
+                            HeightRequest="200"
+                            IsEnabled="False"
+                            Opacity="0.5">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="10" Stroke="#87A7AC" StrokeShape="RoundRectangle 10" Margin="0,5">
+                            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="2*,8*" ColumnSpacing="10">
+                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding Date}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
-        <Button Text="Recover password" Clicked="Button_Clicked"/>
-
-        <Frame Padding="15" BackgroundColor="White">
-            <VerticalStackLayout>
-                <Entry Placeholder="Old Password"
-                       IsPassword="True"
-                       x:Name="EntOldPassword" />
-                <Entry Placeholder="New Password"
-                       IsPassword="True"
-                       x:Name="EntNewPassword" />
-                <Entry Placeholder="Confirm Password"
-                       IsPassword="True"
-                       x:Name="EntConfirmPassword" />
-            </VerticalStackLayout>
-        </Frame>
-
-        <Button Text="Change Password"
-                FontSize="Medium"
-                x:Name="BtnSignIn" 
-                BackgroundColor="#a90409"
-                Clicked="BtnSignIn_Clicked"/>
-
-        <!--<Button Text="Shopping Basket"
-                FontSize="Medium"
-                x:Name="BtnShoppingBasket" 
-                BackgroundColor="#a90409"
-                Clicked="BtnShoppingBasket_Clicked"/>-->
+            <Button Text="Select Flight" x:Name="BtnSelectFlight" Clicked="BtnSelectFlight_Clicked"/>
 
     </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

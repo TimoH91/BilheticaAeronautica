@@ -11,15 +11,18 @@
                              Spacing="1"
                              Padding="20">
 
-            <!--<ImageButton Source=""
+            <ImageButton 
                          HeightRequest="120"
                          WidthRequest="110"
                          Aspect="AspectFill"
                          CornerRadius="30"
                          HorizontalOptions="Center" 
                          x:Name="ImgBtnProfile"
-                         Clicked="ImgBtnProfile_Clicked"/>-->
+                         Clicked="ImgBtnProfile_Clicked"/>
 
+            <Label x:Name="LblUserEmail"
+                   HorizontalOptions="Center"
+                   TextColor="Black" />
             <Label x:Name="LblUserName"
                    HorizontalOptions="Center"
                    TextColor="Black" />

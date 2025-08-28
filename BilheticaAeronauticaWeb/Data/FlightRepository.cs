@@ -117,5 +117,29 @@ namespace BilheticaAeronauticaWeb.Data
                .Include(a => a.DestinationAirport)
                .Include(a => a.Layover);
         }
+
+        public async Task<IEnumerable<Flight>> GetFlightsMobile(int? originAirportId = null, int? destinationAirportId = null, DateTime? date = null)
+        {
+            var query = _context.Flights
+                .Include(f => f.OriginAirport)
+                .Include(f => f.DestinationAirport)
+                .Include(f => f.Layover)
+                .AsQueryable();
+
+            query = query.Where(f =>
+                f.Date > DateTime.Now.Date ||
+                (f.Date == DateTime.Now.Date && f.Time > DateTime.Now.TimeOfDay));
+
+            if (originAirportId.HasValue)
+                query = query.Where(f => f.OriginAirportId == originAirportId.Value);
+
+            if (destinationAirportId.HasValue)
+                query = query.Where(f => f.DestinationAirportId == destinationAirportId.Value);
+
+            if (date.HasValue)
+                query = query.Where(f => f.Date == date.Value.Date);
+
+            return await query.OrderBy(f => f.Date).ToListAsync();
+        }
     }
 }

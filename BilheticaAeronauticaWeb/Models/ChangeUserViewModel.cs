@@ -14,7 +14,7 @@ namespace BilheticaAeronauticaWeb.Models
         public string LastName { get; set; }
 
         [Display(Name = "Photo")]
-        public IFormFile ImageFile { get; set; }
+        public IFormFile? ImageFile { get; set; }
 
         [DisplayName("Photo")]
         public Guid ImageId { get; set; }

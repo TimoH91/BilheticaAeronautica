@@ -13,18 +13,20 @@ namespace BilheticaAeronauticaWeb.Controllers.API
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TicketsController : Controller
     {
-            private readonly ITicketRepository _ticketRepository;
-            private readonly IUserHelper _userHelper;
-            private readonly ILogger<TicketsController> _logger;
+        private readonly ITicketRepository _ticketRepository;
 
-            public TicketsController(ITicketRepository ticketRepository
-                ,IUserHelper userHelper,
-                ILogger<TicketsController> logger)
-            {
-                _ticketRepository = ticketRepository;
-                _userHelper = userHelper;
-                _logger = logger;
-            }
+        private readonly IUserHelper _userHelper;
+        private readonly ILogger<TicketsController> _logger;
+
+        public TicketsController(ITicketRepository ticketRepository
+            , IUserHelper userHelper,
+            ILogger<TicketsController> logger)
+
+        {
+            _ticketRepository = ticketRepository;
+            _userHelper = userHelper;
+            _logger = logger;
+        }
 
 
         [HttpGet]
@@ -54,8 +56,6 @@ namespace BilheticaAeronauticaWeb.Controllers.API
 
             return Ok(tickets);
         }
-
-
 
     }
 }

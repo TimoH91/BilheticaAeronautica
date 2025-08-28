@@ -12,10 +12,17 @@ public partial class FlightPage : ContentPage
     private readonly IValidator _validator;
     private readonly IBasketService _basketService;
     private readonly Flight _flight;
-    public ObservableCollection<Seat> Seats { get; set; }
-    public Seat SelectedSeat { get; set; }
+    private readonly Flight _returnFlight;
+    private bool _departureAdded;
 
-    public FlightPage(ApiService apiService, IBasketService basketService, IValidator validator, Flight flight)
+    //public Seat InfantSeat { get; set; }
+    //public int ResponsibleAdultId { get; set; }
+    public ObservableCollection<Seat> DepartureSeats { get; set; }
+    public ObservableCollection<Seat> ReturnSeats { get; set; }
+    public Seat SelectedDepartureSeat { get; set; }
+    public Seat SelectedReturnSeat { get; set; }
+
+    public FlightPage(ApiService apiService, IBasketService basketService, IValidator validator, Flight flight, Flight? returnFlight)
     {
         InitializeComponent();
         _apiService = apiService;
@@ -23,41 +30,98 @@ public partial class FlightPage : ContentPage
         _validator = validator;
         _flight = flight;
 
-        Seats = new ObservableCollection<Seat>();
+        if (returnFlight != null)
+        {
+            _returnFlight = returnFlight;
+        }
+
+        DepartureSeats = new ObservableCollection<Seat>();
+        ReturnSeats = new ObservableCollection<Seat>();
+        _departureAdded = false;
         BindingContext = this; 
     }
 
     protected async override void OnAppearing()
     {
         base.OnAppearing();
-        var seats = await _apiService.GetSeatsByFlightAsync(_flight.Id);
+        var departureSeats = await _apiService.GetSeatsByFlightAsync(_flight.Id);
+        DepartureSeats.Clear();
+        foreach (var seat in departureSeats)
+            DepartureSeats.Add(seat);
 
-        Seats.Clear();
-        foreach (var seat in seats)
-            Seats.Add(seat);
+
+
+        if (_returnFlight != null)
+        {
+            var returnSeats = await _apiService.GetSeatsByFlightAsync(_returnFlight.Id);
+            ReturnSeats.Clear();
+            foreach (var seat in returnSeats)
+                ReturnSeats.Add(seat);
+        }
     }
 
-    public async void AddShoppingBasketTicket()
+    public async Task AddShoppingBasketTicket()
     {
+        ConfirmSeatSelection();
 
+
+        //TODO add seat to validation
         if (await _validator.ValidateTicket(EntName.Text, EntSurname.Text, PickPassengerType.SelectedItem?.ToString(), PickClass.SelectedItem?.ToString()))
         {
+
+           await  IsInfant(PickPassengerType.SelectedItem?.ToString());
+
+            int infant = _basketService.InfantSeatId;
+
             var userId = Preferences.Get("userid", string.Empty);
 
-            var entity = new ShoppingBasketTicket
+            if (_departureAdded == false)
             {
-                Name = EntName.Text,
-                Surname = EntSurname.Text,
-                PassengerType = Enum.Parse<PassengerType>(PickPassengerType.SelectedItem.ToString()),
-                Class = Enum.Parse<TicketClass>(PickClass.SelectedItem.ToString()),
-                FlightId = _flight.Id,
-                Price = _flight.BasePrice,
-                SeatId = SelectedSeat.Id,
-                IsResponsibleAdult = false,
-                UserId = userId
-            };
+                var flightTicket = new ShoppingBasketTicket
+                {
+                    Name = EntName.Text,
+                    Surname = EntSurname.Text,
+                    PassengerType = Enum.Parse<PassengerType>(PickPassengerType.SelectedItem.ToString()),
+                    Class = Enum.Parse<TicketClass>(PickClass.SelectedItem.ToString()),
+                    FlightId = _flight.Id,
+                    Price = _flight.BasePrice,
+                    SeatId = SelectedDepartureSeat.Id,
+                    IsResponsibleAdult = false,
+                    UserId = userId
+                };
 
-            _basketService.Add(entity);
+                await _apiService.HoldSeat(SelectedDepartureSeat.Id);
+                _basketService.Add(flightTicket);
+
+                    _departureAdded = true;
+                    SelectedDepartureSeat = null;
+                    EnableReturnPicker();
+                
+            }
+
+            if (_departureAdded && SelectedReturnSeat != null)
+            {
+                IsInfant(PickPassengerType.SelectedItem?.ToString());
+
+                var returnFlightTicket = new ShoppingBasketTicket
+                {
+                    Name = EntName.Text,
+                    Surname = EntSurname.Text,
+                    PassengerType = Enum.Parse<PassengerType>(PickPassengerType.SelectedItem.ToString()),
+                    Class = Enum.Parse<TicketClass>(PickClass.SelectedItem.ToString()),
+                    FlightId = _returnFlight.Id,
+                    Price = _returnFlight.BasePrice,
+                    SeatId = SelectedReturnSeat.Id,
+                    IsResponsibleAdult = false,
+                    UserId = userId
+                };
+
+                _departureAdded = false;
+                SelectedReturnSeat = null;
+                await _apiService.HoldSeat(SelectedReturnSeat.Id);
+                _basketService.Add(returnFlightTicket);
+                DisableReturnPicker();
+            }
         }
         else
         {
@@ -68,16 +132,24 @@ public partial class FlightPage : ContentPage
             errorMessage += _validator.PassengerTypeError != null ? $"\n- {_validator.PassengerTypeError}" : "";
 
             await DisplayAlert("Erro", errorMessage, "OK");
-        }
-
-   
+        }   
     }
 
-    private void BtnSignIn_Clicked_2(object sender, EventArgs e)
+    private async Task IsInfant(string passengerType)
     {
-        AddShoppingBasketTicket();
-    }
+        if (passengerType == "Infant")
+        {
+            var tcs = new TaskCompletionSource<bool>();
 
+
+            await Navigation.PushAsync(new ResponsibleAdultPage(_basketService, () =>
+            {
+                tcs.SetResult(true); 
+            }));
+
+            await tcs.Task;
+        }
+    }
     private async void BtnFlights_Clicked(object sender, EventArgs e)
     {
         await Navigation.PushAsync(new FlightsPage(_apiService, _basketService, _validator));
@@ -95,9 +167,35 @@ public partial class FlightPage : ContentPage
 
     private void ConfirmSeatSelection()
     {
-        if (SelectedSeat != null)
+        if (SelectedReturnSeat != null)
         {
-            DisplayAlert("Seat Selected", $"You chose {SelectedSeat.DisplayName}", "OK");
+            DisplayAlert("Seat Selected", $"You chose {SelectedReturnSeat.DisplayName}", "OK");
         }
+
+
+        if (SelectedDepartureSeat != null && SelectedReturnSeat == null)
+        {
+            DisplayAlert("Seat Selected", $"You chose {SelectedDepartureSeat.DisplayName}", "OK");
+        }
+    }
+
+    private void EnableReturnPicker()
+    { 
+
+            ReturnSeatPicker.IsVisible = true;
+            DepartureSeatPicker.IsVisible = false;
+
+    }
+
+    private void DisableReturnPicker()
+    {
+            ReturnSeatPicker.IsVisible = false;
+            DepartureSeatPicker.IsVisible = true;
+
+    }
+
+    private async void BtnShoppingBasket_Clicked(object sender, EventArgs e)
+    {
+        await AddShoppingBasketTicket();
     }
 }
