@@ -74,6 +74,9 @@ namespace BilheticaAeronauticaWeb.Data
         {
              var tickets = await _context.Tickets
             .Include(t => t.Flight)
+            .ThenInclude(f => f.DestinationAirport)
+            .Include(t => t.Flight)
+            .ThenInclude(f => f.OriginAirport)
             .Where(t => t.UserId == user.Id)
             .ToListAsync();
 

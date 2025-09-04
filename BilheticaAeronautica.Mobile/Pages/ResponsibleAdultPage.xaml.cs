@@ -8,31 +8,40 @@ public partial class ResponsibleAdultPage : ContentPage
 {
     private readonly IBasketService _basketService;
     private readonly Action _onCompleted;
+    private readonly int _flightId;
 
-    public ResponsibleAdultPage(IBasketService basketService, Action onCompleted)
+    public ResponsibleAdultPage(IBasketService basketService, int FlightId, Action onCompleted)
 	{
 		InitializeComponent();
 		_basketService = basketService;
         _onCompleted = onCompleted;
+        _flightId = FlightId;
 	}
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        BindingContext = _basketService;
 
+        var adultTickets = _basketService.Items.Where(i => i.PassengerType == PassengerType.Adult && i.FlightId == _flightId).ToList();
+
+        BindingContext = adultTickets;
     }
+
+
 
     private async void BtnAdult_Clicked(object sender, EventArgs e)
     {
-        ShoppingBasketTicket responsibleAdult = (ShoppingBasketTicket)ShoppingBasketTickets.SelectedItem;
-        _basketService.InfantSeatId = responsibleAdult.SeatId.Value;
-        //_basketService.ResponsibleAdultId = responsibleAdult.Id;
-        responsibleAdult.IsResponsibleAdult = true;
-        //will this update? or I need to find the ticket and replace
 
-        _onCompleted?.Invoke();
-        await Navigation.PopAsync();
+        if (ShoppingBasketTickets.SelectedItem != null)
+        {
+            ShoppingBasketTicket responsibleAdult = (ShoppingBasketTicket)ShoppingBasketTickets.SelectedItem;
+            _basketService.InfantSeatId = responsibleAdult.SeatId.Value;
+            _onCompleted?.Invoke();
+            await Navigation.PopAsync();
+        }
+
+        await DisplayAlert("Error", "No adult ticket has been selected.", "OK");
+
     }
 
     private void ShoppingBasketTickets_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -3,10 +3,47 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BilheticaAeronautica.Mobile.Pages.HomePage"
              Title="HomePage">
-    <VerticalStackLayout>
+    <Grid>
 
-        <Button Text="Flights" x:Name="BtnFlights" Clicked="BtnFlights_Clicked" />
-        <Button Text="Login" x:Name="BtnLogin" Clicked="BtnLogin_Clicked" />
-        <Button Text="Register" x:Name="BtnRegister" Clicked="BtnRegister_Clicked"/>
-    </VerticalStackLayout>
+        <!-- Background Image -->
+        <Image Source="airplanehomepage.jpg"
+            Aspect="AspectFill" />
+
+            <!-- Optional dark overlay to make buttons readable -->
+            <!--<BoxView Color="Black" Opacity="0.3" />-->
+
+            <!-- Buttons centered -->
+            <VerticalStackLayout Spacing="20"
+                             Padding="30"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             WidthRequest="250">
+
+                <Button Text="Flights"
+                    x:Name="BtnFlights"
+                    Clicked="BtnFlights_Clicked"
+                    TextColor="White"
+                    CornerRadius="10"
+                    FontSize="Medium"
+                    HeightRequest="50"/>
+
+                <Button Text="Login"
+                    x:Name="BtnLogin"
+                    Clicked="BtnLogin_Clicked"
+                    TextColor="White"
+                    CornerRadius="10"
+                    FontSize="Medium"
+                    HeightRequest="50"/>
+
+                <Button Text="Register"
+                    x:Name="BtnRegister"
+                    Clicked="BtnRegister_Clicked"
+                    TextColor="White"
+                    CornerRadius="10"
+                    FontSize="Medium"
+                    HeightRequest="50"/>
+
+            </VerticalStackLayout>
+
+    </Grid>
 </ContentPage>

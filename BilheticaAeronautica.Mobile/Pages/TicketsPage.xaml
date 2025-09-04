@@ -3,22 +3,68 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BilheticaAeronautica.Mobile.Pages.TicketsPage"
              Title="TicketsPage">
-    <VerticalStackLayout>
-        
-        <CollectionView x:Name="TicketList" HeightRequest="200">
+    <ScrollView>
+        <VerticalStackLayout>
+
+        <!--<CollectionView x:Name="TicketList" HeightRequest="200">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Border Padding="10" Stroke="#87A7AC" StrokeShape="RoundRectangle 10">
                         <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="2*,8*" ColumnSpacing="10">
-                            <Label  Grid.Row="1"
-                           Grid.Column="1"
-                            Text="{Binding FullName}" />
+                            <Label Grid.Row="0" Grid.Column="1"
+       Text="{Binding FullName, StringFormat='Name: {0}'}" />
+
+                                <Label Grid.Row="1" Grid.Column="1"
+       Text="{Binding Flight.OriginAirport.Name, StringFormat='From: {0}'}" />
+
+                                <Label Grid.Row="2" Grid.Column="1"
+       Text="{Binding Flight.DestinationAirport.Name, StringFormat='To: {0}'}" />
                         </Grid>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
+        </CollectionView>-->
+
+        <CollectionView x:Name="TicketList">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Padding="10"
+                   CornerRadius="10"
+                   HasShadow="True"
+                   BorderColor="#87A7AC"
+                   Margin="5"
+                   BackgroundColor="White">
+
+                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto, *" ColumnSpacing="10">
+
+                            <!-- Ticket Icon on the left -->
+                            <Image Grid.RowSpan="3"
+                           Grid.Column="0"
+                           Source="air_ticket_icon.png" 
+                                WidthRequest="40"
+                           HeightRequest="40"
+                           VerticalOptions="Center" />
+
+                            <!-- Ticket Info -->
+                            <Label Grid.Row="0" Grid.Column="1"
+                           Text="{Binding FullName, StringFormat='Name: {0}'}"
+                           FontAttributes="Bold"
+                           TextColor="#333"/>
+
+                            <Label Grid.Row="1" Grid.Column="1"
+                           Text="{Binding Flight.OriginAirport.Name, StringFormat='From: {0}'}"
+                           TextColor="#555"/>
+
+                            <Label Grid.Row="2" Grid.Column="1"
+                           Text="{Binding Flight.DestinationAirport.Name, StringFormat='To: {0}'}"
+                           TextColor="#555"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
         </CollectionView>
-        
+
+
     </VerticalStackLayout>
-    
+    </ScrollView>
 </ContentPage>

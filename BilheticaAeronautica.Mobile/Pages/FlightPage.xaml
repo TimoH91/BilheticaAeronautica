@@ -3,100 +3,85 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BilheticaAeronautica.Mobile.Pages.FlightPage"
              Title="FlightPage">
-    <Grid RowSpacing="20" Margin="20,150,20,40">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20">
 
-        <!--<Image Grid.Row="0"
-           Source="lanchesico.png"
-           Aspect="AspectFit"
-           HeightRequest="100"
-           WidthRequest="100" />
+            <!-- Passenger Details Frame -->
+            <Frame x:Name="PassengerDetails"
+               Padding="20"
+               BackgroundColor="White"
+               CornerRadius="10"
+               HasShadow="True"
+               HorizontalOptions="Center"
+               WidthRequest="300">
 
-        <Label Grid.Row="1"
-           Text="Login"
-           FontAttributes="Bold"
-           HorizontalOptions="Center" />-->
+                <VerticalStackLayout Spacing="15">
 
+                    <Label Text="Passenger Details"
+                       FontSize="Large"
+                       HorizontalOptions="Center"
+                       TextColor="#333" />
 
-        <Picker Grid.Row="0"
-                    Title="Select a Seat"
+                    <Entry Placeholder="Name" x:Name="EntName" />
+                    <Entry Placeholder="Surname" x:Name="EntSurname" />
+
+                    <Picker x:Name="PickClass" Title="Class">
+                        <Picker.Items>
+                            <x:String>Economic</x:String>
+                            <x:String>Business</x:String>
+                        </Picker.Items>
+                    </Picker>
+
+                    <Picker x:Name="PickPassengerType" Title="Passenger Type">
+                        <Picker.Items>
+                            <x:String>Adult</x:String>
+                            <x:String>Child</x:String>
+                            <x:String>Infant</x:String>
+                        </Picker.Items>
+                    </Picker>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Departure Seat -->
+            <Picker Title="Select a departure seat"
                 x:Name="DepartureSeatPicker"
-        ItemsSource="{Binding DepartureSeats}"
-        ItemDisplayBinding="{Binding DisplayName}"
-        SelectedItem="{Binding SelectedDepartureSeat}" />
+                ItemsSource="{Binding DepartureSeats}"
+                ItemDisplayBinding="{Binding DisplayName}"
+                SelectedItem="{Binding SelectedDepartureSeat}" />
 
-        <Picker Grid.Row="1"
-                IsVisible="False"
-                Title="Select a Seat"
+            <!-- Return Seat -->
+            <Picker IsVisible="False"
+                Title="Select a return seat"
                 x:Name="ReturnSeatPicker"
-        ItemsSource="{Binding ReturnSeats}"
-        ItemDisplayBinding="{Binding DisplayName}"
-        SelectedItem="{Binding SelectedReturnSeat}" />
+                ItemsSource="{Binding ReturnSeats}"
+                ItemDisplayBinding="{Binding DisplayName}"
+                SelectedItem="{Binding SelectedReturnSeat}" />
 
-        <Frame Grid.Row="2"
-               x:Name="PassengerDetails"
-           Padding="15"
-           BackgroundColor="White">
-            <VerticalStackLayout>
-                <Entry Placeholder="Name"
-                   x:Name="EntName" />
-                <Entry Placeholder="Surname"
-                   x:Name="EntSurname" />
-                <Picker x:Name="PickClass"
-        Title="Class">
-                    <Picker.Items>
-                        <x:String>Economic</x:String>
-                        <x:String>Business</x:String>
-                    </Picker.Items>
-                </Picker>
+            <!-- Buttons -->
+            <Button Text="Add to Shopping Basket"
+                FontSize="Medium"
+                x:Name="BtnShoppingBasket"
+                BackgroundColor="#a90409"
+                Clicked="BtnShoppingBasket_Clicked" />
 
-                <Picker x:Name="PickPassengerType"
-        Title="Passenger Type">
-                    <Picker.Items>
-                        <x:String>Adult</x:String>
-                        <x:String>Child</x:String>
-                        <x:String>Infant</x:String>
-                    </Picker.Items>
-                </Picker>
-            </VerticalStackLayout>
-        </Frame>
+            <Button Text="Back to flights"
+                FontSize="Medium"
+                x:Name="BtnFlights"
+                BackgroundColor="#a90409"
+                Clicked="BtnFlights_Clicked" />
 
+            <Button Text="Purchase tickets"
+                FontSize="Medium"
+                x:Name="BtnPurchase"
+                BackgroundColor="#a90409"
+                Clicked="Purchase_Clicked" />
 
-        <Button Grid.Row="3"
-            Text="Add to Shopping Basket"
-            FontSize="Medium"
-            x:Name="BtnShoppingBasket" 
-            BackgroundColor="#a90409"
-            Clicked="BtnShoppingBasket_Clicked"/>
+            <!--<Button Text="Empty basket"
+                FontSize="Medium"
+                x:Name="BtnEmptyBasket"
+                BackgroundColor="#a90409"
+                Clicked="BtnEmptyBasket_Clicked" />-->
 
-        <Button Grid.Row="4"
-            Text="Back to flights"
-            FontSize="Medium"
-            x:Name="BtnFlights" 
-            BackgroundColor="#a90409"
-            Clicked="BtnFlights_Clicked"/>
-
-        <Button Grid.Row="5"
-            Text="Purchase tickets"
-            FontSize="Medium"
-            x:Name="BtnPurchase" 
-            BackgroundColor="#a90409"
-            Clicked="Purchase_Clicked"/>
-
-        <!--<Button Grid.Row="6"
-            Text="Empty basket"
-            FontSize="Medium"
-            x:Name="BtnEmptyBasket" 
-            BackgroundColor="#a90409"
-            Clicked="BtnEmptyBasket_Clicked"/>-->
-
-    </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

@@ -9,7 +9,7 @@
                                         SelectionMode="Single"
                 SelectionChanged="ShoppingBasketTickets_SelectionChanged"
           Margin="20"
-          ItemsSource="{Binding Items}">
+          ItemsSource="{Binding}">
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>

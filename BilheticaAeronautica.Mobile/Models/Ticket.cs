@@ -15,6 +15,8 @@ namespace BilheticaAeronautica.Mobile.Models
         public string Name { get; set; }
         public string Surname { get; set; }
 
+        public Flight? Flight { get; set; }
+
         public int FlightId { get; set; }
 
         public int SeatId { get; set; }

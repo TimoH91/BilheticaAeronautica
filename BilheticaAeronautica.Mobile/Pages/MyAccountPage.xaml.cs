@@ -21,7 +21,12 @@ public partial class MyAccountPage : ContentPage
             return;
         }
 
-        await _apiService.ChangePassword(EntOldPassword.Text, EntNewPassword.Text, EntConfirmPassword.Text);
+        var response = await _apiService.ChangePassword(EntOldPassword.Text, EntNewPassword.Text, EntConfirmPassword.Text);
+
+        if (response.Data)
+        {
+            await DisplayAlert("", "Password changed successfully!", "Ok");
+        }
     }
 
     private async void BtnChangeInfo_Clicked(object sender, EventArgs e)
@@ -32,7 +37,12 @@ public partial class MyAccountPage : ContentPage
             return;
         }
 
-        await _apiService.ChangeUserInfo(EntName.Text, EntSurname.Text);
+        var response = await _apiService.ChangeUserInfo(EntName.Text, EntSurname.Text);
+
+        if (response.Data)
+        {
+            await DisplayAlert("", "Info changed successfully!", "Ok");
+        }
     }
 
 

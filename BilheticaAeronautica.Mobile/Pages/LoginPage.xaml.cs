@@ -36,12 +36,14 @@ public partial class LoginPage : ContentPage
 
         if (!response.HasError)
         {
+            await DisplayAlert("", "Logged in successfully!", "Ok");
             await Navigation.PushAsync(new FlightsPage(_apiService, _basketService, _validator));
             //Application.Current!.MainPage = new AppShell(_apiService, _validator);
         }
         else
         {
-            await DisplayAlert("Erro", "Algo deu errado", "Cancelar");
+            await DisplayAlert("Error", "Something went wrong. Try again!", "Cancelar");
+            await Task.Delay(200);
         }
 
     }
@@ -55,6 +57,17 @@ public partial class LoginPage : ContentPage
 
     private async void TapRecover_Tapped(object sender, TappedEventArgs e)
     {
-        await _apiService.RecoverPassword(EntEmail.Text);
+        if (string.IsNullOrEmpty(EntEmail.Text))
+        {
+            await DisplayAlert("Error", "Enter your email", "Cancelar");
+            return;
+        }
+
+        var response =  await _apiService.RecoverPassword(EntEmail.Text);
+
+        if (response.Data)
+        {
+            await DisplayAlert("", "Password recovery instructions have been sent to your email.", "Ok");
+        }
     }
 }

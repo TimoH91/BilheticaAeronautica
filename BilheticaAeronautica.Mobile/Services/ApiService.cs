@@ -80,7 +80,10 @@ namespace BilheticaAeronautica.Mobile.Services
                 ? "?" + string.Join("&", queryParams)
                 : string.Empty;
 
+            //_httpClient.Timeout = TimeSpan.FromSeconds(10);
+
             var response = await _httpClient.GetAsync($"{_baseUrl}api/Flights/flights{queryString}");
+ 
 
             if (response.IsSuccessStatusCode)
             {
@@ -220,6 +223,7 @@ namespace BilheticaAeronautica.Mobile.Services
             catch (Exception ex)
             {
                 _logger.LogError($"Login error: {ex.Message}");
+
                 return new ApiResponse<bool>
                 {
                     ErrorMessage = ex.Message

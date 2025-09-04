@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BilheticaAeronautica.Mobile.Models;
 using BilheticaAeronautica.Mobile.Services;
 using BilheticaAeronautica.Mobile.Validations;
+using Microsoft.Maui.Layouts;
 
 namespace BilheticaAeronautica.Mobile.Pages;
 
@@ -125,7 +126,6 @@ public partial class FlightsPage : ContentPage
 
     private async void BtnLoadFlights_Clicked(object sender, EventArgs e)
     {
-
         Airport origin = (Airport)OriginAirportsList.SelectedItem;
         Airport destination = (Airport)DestinationAirportsList.SelectedItem;
 
@@ -146,8 +146,22 @@ public partial class FlightsPage : ContentPage
             if (returnFlights.Any())
             {
                 ReturnFlightsList.IsEnabled = true;
+                ReturnFlightsSelector.IsVisible = true;
                 ReturnFlightsList.ItemsSource = returnFlights;
             }
+        }
+
+        if (flights.Any())
+        {
+            OriginSearchBar.IsVisible = false;
+            DestinationSearchBar.IsVisible = false;
+            DepartureDatePicker.IsVisible = false;
+            ReturnDatePicker.IsVisible = false;
+            BtnLoadFlights.IsVisible = false;
+            RoundTripSwitch.IsVisible = false;
+            RoundTripLbl.IsVisible = false;
+            DepartureFlightsLbl.IsVisible = true;
+            BtnSelectFlight.IsVisible = true;
         }
     }
 
@@ -173,5 +187,10 @@ public partial class FlightsPage : ContentPage
     private void RoundTripSwitch_Toggled(object sender, ToggledEventArgs e)
     {
         ReturnDatePicker.IsVisible = e.Value;
+    }
+
+    private void DateTripSwitch_Toggled(object sender, ToggledEventArgs e)
+    {
+
     }
 }

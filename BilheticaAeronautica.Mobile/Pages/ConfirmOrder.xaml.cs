@@ -26,6 +26,13 @@ public partial class ConfirmOrder : ContentPage
     {
         base.OnAppearing();
         //ShoppingBasketTickets.ItemsSource = _basketService.Items;
+
+        var username = Preferences.Get("username", "");
+
+        if (String.IsNullOrEmpty(username))
+        {
+            RegisterUser.IsVisible = true;
+        }
     }
 
     private async void BtnConfirmOrder_Clicked(object sender, EventArgs e)
@@ -38,21 +45,43 @@ public partial class ConfirmOrder : ContentPage
             return;
         }
 
-        //TODO add register new user part here
-        if (string.IsNullOrEmpty(items[0].UserId))
-        {
-            var response = await _apiService.RegisterUser(EntName.Text, EntSurname.Text, EntEmail.Text, EntPassword.Text, EntConfirmPassword.Text);
+        var userId = Preferences.Get("userid", string.Empty);
 
-            if (!response.HasError && response.RegisterUser != null)
+        //TODO add register new user part here
+        if (string.IsNullOrEmpty(userId))
+        {
+            if (await _validator.ValidateRegister(EntName.Text, EntSurname.Text, EntEmail.Text, EntPassword.Text))
             {
-                foreach (var item in items)
+                var registerResponse = await _apiService.RegisterUser(EntName.Text, EntSurname.Text, EntEmail.Text, EntPassword.Text, EntConfirmPassword.Text);
+
+                if (!registerResponse.Data)
                 {
-                    item.UserId = response.RegisterUser.UserId;
+                    await DisplayAlert("Error", "User failed to register. Please try again later.", "OK");
+                    return;
                 }
 
-                await _apiService.ConfirmOrder(items);
+                if (!registerResponse.HasError && registerResponse.RegisterUser != null)
+                {
 
-                _basketService.Clear();
+                    await DisplayAlert("", "User registered please check email for account confirmation.", "OK");
+
+                    foreach (var item in items)
+                    {
+                        item.UserId = registerResponse.RegisterUser.UserId;
+                    }
+
+                    var orderResponse = await _apiService.ConfirmOrder(items);
+
+                    if (!orderResponse.Data)
+                    {
+                        await DisplayAlert("Error", "Tickets failed to be purchased. Please try again later", "OK");
+                        return;
+                    }
+
+                    await DisplayAlert("", "Ticket order confirmed!", "OK");
+
+                    _basketService.Clear();
+                }
             }
             else
             {
@@ -62,9 +91,30 @@ public partial class ConfirmOrder : ContentPage
                 errorMessage += _validator.EmailError != null ? $"\n- {_validator.EmailError}" : "";
                 errorMessage += _validator.PasswordError != null ? $"\n- {_validator.PasswordError}" : "";
 
-                await DisplayAlert("Erro", errorMessage, "OK");
+                await DisplayAlert("Error", errorMessage, "OK");
             }
         }
+        else
+        {
+            foreach (var shoppingBasketTicket in items)
+            {
+                shoppingBasketTicket.UserId = userId;
+                shoppingBasketTicket.Flight = null;
+            }
+
+            var orderResponse = await _apiService.ConfirmOrder(items);
+
+            if (!orderResponse.Data)
+            {
+                await DisplayAlert("Error", "Tickets failed to be purchased. Please try again later", "OK");
+                return;
+            }
+
+            await DisplayAlert("", "Ticket order confirmed!", "OK");
+
+            _basketService.Clear();
+        }
+
     }
 
     private void BtnEmptyBasket_Clicked(object sender, EventArgs e)

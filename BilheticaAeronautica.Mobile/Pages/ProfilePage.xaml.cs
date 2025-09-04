@@ -77,16 +77,7 @@ public partial class ProfilePage : ContentPage
         await Navigation.PushAsync(new TicketsPage(_apiService));
     }
 
-    private async void FAQ_Tapped(object sender, TappedEventArgs e)
-    {
 
-
-    }
-
-    private async void BtnLogout_Clicked(object sender, EventArgs e)
-    {
-
-    }
 
     private async void ImgBtnProfile_Clicked(object sender, EventArgs e)
     {
@@ -150,15 +141,15 @@ public partial class ProfilePage : ContentPage
 
     private async void Logout_Tapped(object sender, TappedEventArgs e)
     {
-        //var check = Preferences.Get("username", string.Empty);
-        //var check3 = Preferences.Get("accesstoken", string.Empty);
-        //var check4 = Preferences.Get("userid", string.Empty);
         Preferences.Remove("accesstoken");
         Preferences.Remove("userid");
         Preferences.Remove("username");
-        //var check2 = Preferences.Get("username", string.Empty);
-        //var check5 = Preferences.Get("accesstoken", string.Empty);
-        //var check6 = Preferences.Get("userid", string.Empty);
+        Preferences.Remove("firstname");
         await Navigation.PushAsync(new LoginPage(_apiService, _validator, _basketService));
+    }
+
+    private async void About_Tapped(object sender, TappedEventArgs e)
+    {
+        await Navigation.PushAsync(new AuthorPage());
     }
 }

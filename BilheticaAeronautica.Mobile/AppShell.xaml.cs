@@ -40,7 +40,7 @@ namespace BilheticaAeronautica.Mobile
             {
                 new ShellContent { Title = "Home",Icon = "home",Content = homePage },
                 new ShellContent { Title = "Basket",Icon = "cart",Content = confirmOrderPage },
-                new ShellContent { Title = "Flights",Icon = "profile",Content = flightsPage },
+                new ShellContent { Title = "Flights",Icon = "plane_icon",Content = flightsPage },
                 new ShellContent { Title = "Profile",Icon = "profile",Content = profilePage },
             }
 

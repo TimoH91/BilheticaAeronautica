@@ -59,11 +59,11 @@
 
             <HorizontalStackLayout Spacing="10">
                 <!--<Image Source="faq" HeightRequest="30" />-->
-                <Label Text="FAQ"
+                <Label Text="About this app"
                        FontAttributes="Bold"
                        FontSize="Small" />
                 <HorizontalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer x:Name="FAQ" Tapped="FAQ_Tapped" />
+                    <TapGestureRecognizer x:Name="About" Tapped="About_Tapped" />
                 </HorizontalStackLayout.GestureRecognizers>
             </HorizontalStackLayout>
 

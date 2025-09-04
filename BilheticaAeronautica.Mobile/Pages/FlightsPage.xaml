@@ -7,22 +7,21 @@
              Title="Flights">
 
     <ScrollView>
-        
-        
-        
-        
-    <VerticalStackLayout Padding="20" Spacing="15">
-
-
+        <VerticalStackLayout Padding="10" Spacing="15">
+            <Label Text="Where are you dreaming of?"
+FontSize="Large"
+HorizontalOptions="Center"
+TextColor="#333" 
+                   Margin="0,30,0,10"/>
 
         <!-- Origin Airport -->
-        <Label Text="Origin Airport" FontAttributes="Bold"/>
+        <!--<Label Text="" FontAttributes="Bold"/>-->
         <SearchBar x:Name="OriginSearchBar"
                Placeholder="Search origin airport"
                TextChanged="OnOriginSearchTextChanged"/>
 
         <CollectionView x:Name="OriginAirportsList"
-                    HeightRequest="150"
+
                     SelectionMode="Single"
                     SelectionChanged="OnOriginAirportSelected">
             <CollectionView.ItemTemplate>
@@ -34,13 +33,12 @@
 
 
         <!-- Destination Airport -->
-        <Label Text="Destination Airport" FontAttributes="Bold"/>
+        <!--<Label Text="Destination Airport" FontAttributes="Bold"/>-->
         <SearchBar x:Name="DestinationSearchBar"
                Placeholder="Search destination airport"
                TextChanged="OnDestinationSearchTextChanged"/>
 
         <CollectionView x:Name="DestinationAirportsList"
-                    HeightRequest="150"
                     SelectionMode="Single"
                     SelectionChanged="OnDestinationAirportSelected">
             <CollectionView.ItemTemplate>
@@ -51,9 +49,16 @@
         </CollectionView>
 
             <!-- Toggle for Return Flight -->
+            <!--<HorizontalStackLayout>
+                <Label Text="Search dates" VerticalOptions="Center"/>
+                <Switch x:Name="DateTripSwitch"  Toggled="DateTripSwitch_Toggled"/>
+            </HorizontalStackLayout>-->
+
             <HorizontalStackLayout>
-                <Label Text="Round-trip?" VerticalOptions="Center"/>
-                <Switch x:Name="RoundTripSwitch" Toggled="RoundTripSwitch_Toggled"/>
+                <Label Text="Round-trip?" VerticalOptions="Center" x:Name="RoundTripLbl"/>
+                <Switch x:Name="RoundTripSwitch" Toggled="RoundTripSwitch_Toggled"
+                        HorizontalOptions="Center"/>
+                
             </HorizontalStackLayout>
 
             <!-- Departure Date -->
@@ -74,46 +79,103 @@
 
             <Label Text="Select Departure Flight"
                    FontAttributes="Bold"
-                   FontSize="18"/>
+                   FontSize="18"
+                   x:Name="DepartureFlightsLbl"
+                   IsVisible="false" />
 
             <CollectionView x:Name="FlightList"
-                SelectionMode="Single"
-                SelectionChanged="FlightList_SelectionChanged"
-                HeightRequest="200">
+                             SelectionMode="Single">
             <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Border Padding="10" Stroke="#87A7AC" StrokeShape="RoundRectangle 10">
-                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="2*,8*" ColumnSpacing="10">
-                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding Date}" />
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                        Stroke="#87A7AC"
+                        StrokeShape="RoundRectangle 10"
+                        StrokeThickness="1"
+                        BackgroundColor="White"
+                        Margin="5"
+                        Padding="10">       
+                            <Border.Shadow>
+                                <Shadow Brush="Black"
+                    Offset="5,5"
+                    Radius="10"
+                    Opacity="0.3"/>
+                            </Border.Shadow>
+
+                            <Grid RowDefinitions="Auto,Auto,Auto"
+                              ColumnDefinitions="Auto,*"
+                              ColumnSpacing="10">           
+
+                                <!-- Ticket Icon -->
+                                <Image Grid.RowSpan="3"
+                                   Grid.Column="0"
+                                   Source="plane_icon.png" 
+                                   WidthRequest="40"
+                                   HeightRequest="40"
+                                   VerticalOptions="Center" />      
+
+                                <Label Grid.Row="0" Grid.Column="1"
+                   Text="{Binding Date, StringFormat='Date: {0}'}"/>
+
+                                <Label Grid.Row="1" Grid.Column="1"
+                   Text="{Binding OriginAirport.Name, StringFormat='From: {0}'}"/>
+
+                                <Label Grid.Row="2" Grid.Column="1"
+                   Text="{Binding DestinationAirport.Name, StringFormat='To: {0}'}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
         </CollectionView>
 
             <Label Text="Select Return Flight"
+                   x:Name="ReturnFlightsSelector"
                    FontAttributes="Bold"
                    FontSize="18"
+                   IsVisible="False"
                    Margin="0,20,0,0"/>
 
             <CollectionView x:Name="ReturnFlightsList"
                             SelectionMode="Single"
-                            SelectionChanged="OnReturnFlightSelected"
-                            HeightRequest="200"
-                            IsEnabled="False"
-                            Opacity="0.5">
+                            SelectionChanged="OnReturnFlightSelected">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Border Padding="10" Stroke="#87A7AC" StrokeShape="RoundRectangle 10" Margin="0,5">
-                            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="2*,8*" ColumnSpacing="10">
-                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding Date}" />
+                        <Border
+                         Stroke="#87A7AC"
+                        StrokeShape="RoundRectangle 10"
+                        StrokeThickness="1"
+                        BackgroundColor="White"
+                        Margin="5"
+                        Padding="10">           
+                            <Border.Shadow>
+                                <Shadow Brush="Black"
+                                Offset="5,5"
+                                Radius="10"
+                                Opacity="0.3"/>     
+                            </Border.Shadow>
+                            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="2*,8*" ColumnSpacing="10">
+
+                                <Image Grid.RowSpan="3"
+                                Grid.Column="0"
+                                Source="plane_icon.png" 
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                VerticalOptions="Center" /> 
+
+                                <Label Grid.Row="0" Grid.Column="1"
+                            Text="{Binding Date, StringFormat='Date: {0}'}" />
+
+                                                <Label Grid.Row="1" Grid.Column="1"
+                                Text="{Binding OriginAirport.Name, StringFormat='From: {0}'}" />
+
+                                    <Label Grid.Row="2" Grid.Column="1"
+                                Text="{Binding DestinationAirport.Name, StringFormat='To: {0}'}" /> 
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <Button Text="Select Flight" x:Name="BtnSelectFlight" Clicked="BtnSelectFlight_Clicked"/>
+            <Button Text="Select Flight/s" x:Name="BtnSelectFlight" Clicked="BtnSelectFlight_Clicked" IsVisible="False"/>
 
     </VerticalStackLayout>
     </ScrollView>

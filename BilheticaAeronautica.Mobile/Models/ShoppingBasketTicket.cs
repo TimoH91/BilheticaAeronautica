@@ -27,6 +27,8 @@ namespace BilheticaAeronautica.Mobile.Models
         public int? SeatId { get; set; }
         public int FlightId { get; set; }
 
+        public Flight? Flight { get; set; }
+
         public PassengerType PassengerType { get; set; }
         public TicketClass Class { get; set; }
         public decimal Price { get; set; }
@@ -35,5 +37,7 @@ namespace BilheticaAeronautica.Mobile.Models
         public bool IsResponsibleAdult { get; set; }
 
         public string? UserId { get; set; }
+
+        public string FullName => $"{Name} {Surname}";
     }
 }
