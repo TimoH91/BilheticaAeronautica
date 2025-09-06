@@ -2,31 +2,61 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BilheticaAeronautica.Mobile.Pages.ResponsibleAdultPage"
-             Title="ResponsibleAdultPage">
+             Title="">
     <VerticalStackLayout>
-        
+        <!--<Label Text="There are no adult tickets in your basket"
+                   FontSize="Large"
+               HorizontalTextAlignment="Center"
+                    HorizontalOptions="Center"
+                    TextColor="#333"
+               Margin="30,30,30,30"/>-->
+        <Label Text="Please add adults before infants"
+                   FontSize="Large"
+                    HorizontalOptions="Center"
+                    TextColor="#333"
+               Margin="30,40,30,30"/>
         <CollectionView x:Name="ShoppingBasketTickets"
                                         SelectionMode="Single"
                 SelectionChanged="ShoppingBasketTickets_SelectionChanged"
           Margin="20"
           ItemsSource="{Binding}">
 
+
+      
+
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Border Padding="10" Stroke="#87A7AC" StrokeShape="RoundRectangle 10">
+                    <Border
+                      Stroke="#87A7AC"
+                     StrokeShape="RoundRectangle 10"
+                     StrokeThickness="1"
+                     BackgroundColor="White"
+                     Margin="60,5,60,5"
+                     Padding="10">      
+                        <Border.Shadow>
+                            <Shadow Brush="Black"
+                             Offset="5,5"
+                             Radius="10"
+                             Opacity="0.3"/>        
+                        </Border.Shadow>
                         <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="2*,8*" ColumnSpacing="10">
-
-                            <Label Grid.Row="1"
+                            <Image Grid.RowSpan="3"
+                            Grid.Column="0"
+                            Source="air_ticket_icon.png" 
+                                 WidthRequest="40"
+                            HeightRequest="40"
+                            VerticalOptions="Center" />         
+                            <Label Grid.Row="0"
                      Grid.Column="1"
-                     Text="{Binding Name}" />
+                     Text="{Binding FullName, StringFormat='Name: {0}'}" />
 
-                            <Label Grid.Row="2"
-                     Grid.Column="1"
-                     Text="{Binding Surname}" />
+                            <Label Grid.Row="1" Grid.Column="1"
+Text="{Binding Flight.OriginAirport.Name, StringFormat='From: {0}'}"
+TextColor="#555"/>
 
-                            <Label Grid.Row="3"
-                     Grid.Column="1"
-                     Text="{Binding BasePrice, StringFormat='R{0:C}'}" />
+                            <Label Grid.Row="2" Grid.Column="1"
+Text="{Binding Flight.DestinationAirport.Name, StringFormat='To: {0}'}"
+TextColor="#555"/>
 
                         </Grid>
                     </Border>
@@ -38,7 +68,7 @@
             Text="Select responsible adult"
             FontSize="Medium"
             x:Name="BtnAdult" 
-            BackgroundColor="#a90409"
+            HorizontalOptions="Center"
             Clicked="BtnAdult_Clicked"/>
 
     </VerticalStackLayout>

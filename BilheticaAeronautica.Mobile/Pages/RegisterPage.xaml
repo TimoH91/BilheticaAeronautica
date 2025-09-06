@@ -2,24 +2,54 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BilheticaAeronautica.Mobile.Pages.RegisterPage"
-             Title="RegisterPage">
+             Title="Register your account">
     
-    <Grid RowSpacing="20" Margin="20,150,20,40">
+    <!--<Grid RowSpacing="20" Margin="20,150,20,40">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+        </Grid.RowDefinitions>-->
 
-        <Image Grid.Row="0"
+        <!--<Image Grid.Row="0"
        Source="lanchesico.png"
        Aspect="AspectFit"
        HeightRequest="100"
-       WidthRequest="100" />
+       WidthRequest="100" />-->
+    
+    <ScrollView>
+    <VerticalStackLayout>
+        <Frame
+         x:Name="RegisterUser"
+         Grid.Row="2"
+         Padding="20"
+         BackgroundColor="White"
+         CornerRadius="10"
+         HorizontalOptions="Center"
+         WidthRequest="300"
+         HasShadow="True"
+         Margin="0,30,0,0">
 
-        <Label Grid.Row="1"
+            <VerticalStackLayout Spacing="15">
+
+                <Label Text="Please create an account"
+                  FontSize="Large"
+                  HorizontalOptions="Center"
+                  TextColor="#333" 
+                       Grid.Row="0"/>
+                <Entry Placeholder="First name" x:Name="EntName" HorizontalOptions="Fill" />
+                <Entry Placeholder="Surname" x:Name="EntSurname" HorizontalOptions="Fill" />
+                <Entry Placeholder="Email" x:Name="EntEmail" HorizontalOptions="Fill" Keyboard="Email" />
+                <Entry Placeholder="Password" IsPassword="True" x:Name="EntPassword" HorizontalOptions="Fill" />
+                <Entry Placeholder="Confirm Password" IsPassword="True" x:Name="EntConfirmPassword" HorizontalOptions="Fill" />
+            </VerticalStackLayout>
+        </Frame>
+
+
+
+        <!--<Label Grid.Row="1"
        Text="Login"
        FontAttributes="Bold"
        HorizontalOptions="Center" />
@@ -41,14 +71,16 @@
                IsPassword="True"
                x:Name="EntConfirmPassword" />
             </VerticalStackLayout>
-        </Frame>
+        </Frame>-->
 
-        <Button Grid.Row="3"
+        <Button 
         Text="Register"
         FontSize="Medium"
         x:Name="BtnRegister" 
-        BackgroundColor="#a90409"
-        Clicked="BtnRegister_Clicked"/>
+                HorizontalOptions="Center"
+        Clicked="BtnRegister_Clicked"
+            Margin="20,20,20,20"/>
 
-    </Grid>
+    </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

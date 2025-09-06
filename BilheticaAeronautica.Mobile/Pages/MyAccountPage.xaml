@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BilheticaAeronautica.Mobile.Pages.MyAccountPage"
-             Title="My Account Page">
+             Title="My Account">
     <!--<VerticalStackLayout>-->
         <!--<Label 
             Text="Welcome to .NET MAUI!"
@@ -55,30 +55,26 @@
 
     </VerticalStackLayout>-->
 
-    <Shell.TitleView>
+    <!--<Shell.TitleView>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <!-- Left: back button space -->
+                --><!-- Left: back button space --><!--
                 <ColumnDefinition Width="*"/>
-                <!-- Center: title -->
+                --><!-- Center: title --><!--
                 <ColumnDefinition Width="Auto"/>
-                <!-- Right: toolbar icons -->
+                --><!-- Right: toolbar icons --><!--
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="1"
-               Text="My Account Page"
-               FontSize="Large"
-               HorizontalOptions="Center"
-               VerticalOptions="Center"/>
+
         </Grid>
-    </Shell.TitleView>
+    </Shell.TitleView>-->
     
     <ScrollView>
         <VerticalStackLayout >
-            <Label Text="My Account Page"
+            <!--<Label Text="My Account Page"
                FontSize="Large"
-               HorizontalOptions="Center" />
+               HorizontalOptions="Center" />-->
 
             <Frame Grid.Row="2"
                 Padding="10"
@@ -87,7 +83,7 @@
                 HorizontalOptions="Center"
                 WidthRequest="300"
                 HasShadow="True"
-                Margin="0,10,0,10">
+                Margin="0,30,0,30">
 
                 <VerticalStackLayout Spacing="15">
                     <Entry Placeholder="Old Password"
@@ -117,7 +113,7 @@
                    CornerRadius="10"
                    HasShadow="True"
                    HorizontalOptions="Center"
-                   Margin="0,10,0,10"
+                   Margin="0,30,0,30"
                    WidthRequest="300">
                 <VerticalStackLayout Spacing="15">
                     <Entry Placeholder="New Name" x:Name="EntName" />

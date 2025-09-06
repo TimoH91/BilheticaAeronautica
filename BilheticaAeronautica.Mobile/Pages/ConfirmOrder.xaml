@@ -35,23 +35,23 @@
             </Frame>
 
             <Label Text="Your tickets"
-FontSize="Large"
-HorizontalOptions="Center"
-TextColor="#333" 
-                   Margin="0,30,0,0"/>
+                    FontSize="Large"
+                    HorizontalOptions="Center"
+                    TextColor="#333" 
+                   Margin="60,30,60,30"/>
 
             <CollectionView x:Name="ShoppingBasketTickets"
-                Margin="20"
+                Margin="60,5,60,30"
                 ItemsSource="{Binding Items}">
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame Padding="10"
-       CornerRadius="10"
-       HasShadow="True"
-       BorderColor="#87A7AC"
-       Margin="5"
-       BackgroundColor="White">
+                       CornerRadius="10"
+                       HasShadow="True"
+                       BorderColor="#87A7AC"
+                       Margin="5"
+                       BackgroundColor="White">     
 
                             <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto, *" ColumnSpacing="10">
 

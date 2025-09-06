@@ -4,7 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              x:Class="BilheticaAeronautica.Mobile.Pages.FlightsPage"
-             Title="Flights">
+             Title="Choose a flight">
 
     <ScrollView>
         <VerticalStackLayout Padding="10" Spacing="15">
@@ -14,8 +14,6 @@ HorizontalOptions="Center"
 TextColor="#333" 
                    Margin="0,30,0,10"/>
 
-        <!-- Origin Airport -->
-        <!--<Label Text="" FontAttributes="Bold"/>-->
         <SearchBar x:Name="OriginSearchBar"
                Placeholder="Search origin airport"
                TextChanged="OnOriginSearchTextChanged"/>
@@ -31,9 +29,6 @@ TextColor="#333"
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-
-        <!-- Destination Airport -->
-        <!--<Label Text="Destination Airport" FontAttributes="Bold"/>-->
         <SearchBar x:Name="DestinationSearchBar"
                Placeholder="Search destination airport"
                TextChanged="OnDestinationSearchTextChanged"/>
@@ -54,32 +49,33 @@ TextColor="#333"
                 <Switch x:Name="DateTripSwitch"  Toggled="DateTripSwitch_Toggled"/>
             </HorizontalStackLayout>-->
 
-            <HorizontalStackLayout>
-                <Label Text="Round-trip?" VerticalOptions="Center" x:Name="RoundTripLbl"/>
+            <Label Text="Round-trip?" VerticalOptions="Center" x:Name="RoundTripLbl"     HorizontalOptions="Center"/>
                 <Switch x:Name="RoundTripSwitch" Toggled="RoundTripSwitch_Toggled"
                         HorizontalOptions="Center"/>
-                
-            </HorizontalStackLayout>
 
-            <!-- Departure Date -->
+
             <DatePicker x:Name="DepartureDatePicker"
                 DateSelected="DepartureDatePicker_DateSelected"
                 MinimumDate="{x:Static sys:DateTime.Today}"
-                Format="dd MMM yyyy" />
+                Format="dd MMM yyyy"                 HorizontalOptions="Center"
+                VerticalOptions="Center"/>
 
-            <!-- Return Date (hidden by default) -->
             <DatePicker x:Name="ReturnDatePicker"
                 IsVisible="False"
                 DateSelected="ReturnDatePicker_DateSelected"
                 MinimumDate="{x:Static sys:DateTime.Today}"
-                Format="dd MMM yyyy" />
+                Format="dd MMM yyyy"                HorizontalOptions="Center"
+                VerticalOptions="Center" />
 
-        <Button Text="Load Flights" x:Name="BtnLoadFlights" Clicked="BtnLoadFlights_Clicked"/>
+        <Button Text="Load Flights" x:Name="BtnLoadFlights" Clicked="BtnLoadFlights_Clicked"
+                            HorizontalOptions="Center"
+            VerticalOptions="Center"/>
 
 
             <Label Text="Select Departure Flight"
                    FontAttributes="Bold"
                    FontSize="18"
+                   HorizontalOptions="Center"
                    x:Name="DepartureFlightsLbl"
                    IsVisible="false" />
 
@@ -92,7 +88,7 @@ TextColor="#333"
                         StrokeShape="RoundRectangle 10"
                         StrokeThickness="1"
                         BackgroundColor="White"
-                        Margin="5"
+                        Margin="60,5,60,5"
                         Padding="10">       
                             <Border.Shadow>
                                 <Shadow Brush="Black"
@@ -105,7 +101,7 @@ TextColor="#333"
                               ColumnDefinitions="Auto,*"
                               ColumnSpacing="10">           
 
-                                <!-- Ticket Icon -->
+
                                 <Image Grid.RowSpan="3"
                                    Grid.Column="0"
                                    Source="plane_icon.png" 
@@ -131,6 +127,7 @@ TextColor="#333"
                    x:Name="ReturnFlightsSelector"
                    FontAttributes="Bold"
                    FontSize="18"
+                   HorizontalOptions="Center"
                    IsVisible="False"
                    Margin="0,20,0,0"/>
 
@@ -144,7 +141,7 @@ TextColor="#333"
                         StrokeShape="RoundRectangle 10"
                         StrokeThickness="1"
                         BackgroundColor="White"
-                        Margin="5"
+                        Margin="60,5,60,5"
                         Padding="10">           
                             <Border.Shadow>
                                 <Shadow Brush="Black"
@@ -175,7 +172,7 @@ TextColor="#333"
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <Button Text="Select Flight/s" x:Name="BtnSelectFlight" Clicked="BtnSelectFlight_Clicked" IsVisible="False"/>
+            <Button Text="Select Flight/s" x:Name="BtnSelectFlight" Clicked="BtnSelectFlight_Clicked" IsVisible="False"     HorizontalOptions="Center"     VerticalOptions="Center"/>
 
     </VerticalStackLayout>
     </ScrollView>

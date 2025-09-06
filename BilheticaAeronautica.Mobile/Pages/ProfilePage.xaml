@@ -2,14 +2,15 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BilheticaAeronautica.Mobile.Pages.ProfilePage"
-             Title="ProfilePage">
+             Title="My profile">
     <Grid RowDefinitions="Auto,5*,1*" RowSpacing="0">
 
         <VerticalStackLayout Grid.Row="0"
-                             BackgroundColor="Cyan"
+                             BackgroundColor="DarkGrey"
                              VerticalOptions="Start"
                              Spacing="1"
-                             Padding="20">
+                             Padding="20"
+                             Margin="20,20,20,20">
 
             <ImageButton 
                          HeightRequest="120"
@@ -18,11 +19,14 @@
                          CornerRadius="30"
                          HorizontalOptions="Center" 
                          x:Name="ImgBtnProfile"
-                         Clicked="ImgBtnProfile_Clicked"/>
+                         Clicked="ImgBtnProfile_Clicked"
+                Margin="20,20,20,20"/>
 
             <Label x:Name="LblUserEmail"
                    HorizontalOptions="Center"
-                   TextColor="Black" />
+                   TextColor="Black"
+                   Margin="20,20,20,20"/>
+            
             <Label x:Name="LblUserName"
                    HorizontalOptions="Center"
                    TextColor="Black" />
@@ -36,8 +40,8 @@
             <HorizontalStackLayout Spacing="10">
                 <!--<Image Source="" HeightRequest="30" />-->
                 <Label Text="My tickets"
-                       FontAttributes="Bold"
-                       FontSize="Small" />
+                       FontSize="Large"
+                       TextColor="#333"/>
                 <HorizontalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer x:Name="MyTickets" Tapped="MyTickets_Tapped"  />
                 </HorizontalStackLayout.GestureRecognizers>
@@ -48,8 +52,8 @@
             <HorizontalStackLayout Spacing="10">
                 <!--<Image Source="" HeightRequest="30" />-->
                 <Label Text="My account"
-                       FontAttributes="Bold"
-                       FontSize="Small" />
+                      FontSize="Large"
+TextColor="#333"/>
                 <HorizontalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer x:Name="MyAccount" Tapped="MyAccount_Tapped"/>
                 </HorizontalStackLayout.GestureRecognizers>
@@ -60,8 +64,8 @@
             <HorizontalStackLayout Spacing="10">
                 <!--<Image Source="faq" HeightRequest="30" />-->
                 <Label Text="About this app"
-                       FontAttributes="Bold"
-                       FontSize="Small" />
+                      FontSize="Large"
+TextColor="#333"/>
                 <HorizontalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer x:Name="About" Tapped="About_Tapped" />
                 </HorizontalStackLayout.GestureRecognizers>
@@ -69,23 +73,27 @@
 
         </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Row="2"
+            <VerticalStackLayout Grid.Row="2"
                      Margin="20"
                      Spacing="20">
-            <HorizontalStackLayout 
-                               Spacing="2"
-                               HorizontalOptions="Center"
-                               VerticalOptions="EndAndExpand">
-                <Label Text="Logout">
-                <Label.GestureRecognizers>
-                        <TapGestureRecognizer x:Name="Logout"
-                                          Tapped="Logout_Tapped"/>
-                    </Label.GestureRecognizers>
-                </Label>
-                </HorizontalStackLayout>
-        </VerticalStackLayout>
+                <HorizontalStackLayout 
+        Spacing="2"
+        HorizontalOptions="Center"
+        VerticalOptions="EndAndExpand">
 
-        <!--<ImageButton Grid.Row="2"
+                    <Label Text="Logout"
+               FontSize="Medium"
+               TextColor="#333">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer x:Name="Logout"
+                                      Tapped="Logout_Tapped"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <!--<ImageButton Grid.Row="2"
                 Source=""
                 HeightRequest="60"
                 WidthRequest="60"

@@ -22,25 +22,37 @@ public partial class ResponsibleAdultPage : ContentPage
     {
         base.OnAppearing();
 
-        var adultTickets = _basketService.Items.Where(i => i.PassengerType == PassengerType.Adult && i.FlightId == _flightId).ToList();
+        var adultTickets = _basketService.Items.Where(i => i.PassengerType == PassengerType.Adult && i.FlightId == _flightId && i.IsResponsibleAdult == false).ToList();
 
         BindingContext = adultTickets;
+
+        if (!adultTickets.Any())
+        {
+
+        }
     }
 
 
 
     private async void BtnAdult_Clicked(object sender, EventArgs e)
     {
+        if (ShoppingBasketTickets.SelectedItem == null)
+        {
+            await DisplayAlert("Error", "No adult ticket has been selected.", "OK");
+            return;
+        }
+
 
         if (ShoppingBasketTickets.SelectedItem != null)
         {
             ShoppingBasketTicket responsibleAdult = (ShoppingBasketTicket)ShoppingBasketTickets.SelectedItem;
             _basketService.InfantSeatId = responsibleAdult.SeatId.Value;
+            responsibleAdult.IsResponsibleAdult = true;
             _onCompleted?.Invoke();
             await Navigation.PopAsync();
         }
 
-        await DisplayAlert("Error", "No adult ticket has been selected.", "OK");
+        
 
     }
 

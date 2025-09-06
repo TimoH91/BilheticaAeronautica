@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BilheticaAeronautica.Mobile.Pages.FlightPage"
-             Title="FlightPage">
+             Title="">
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="20">
 
@@ -47,7 +47,8 @@
                 x:Name="DepartureSeatPicker"
                 ItemsSource="{Binding DepartureSeats}"
                 ItemDisplayBinding="{Binding DisplayName}"
-                SelectedItem="{Binding SelectedDepartureSeat}" />
+                SelectedItem="{Binding SelectedDepartureSeat}"
+                    HorizontalOptions="Center"/>
 
             <!-- Return Seat -->
             <Picker IsVisible="False"
@@ -55,33 +56,44 @@
                 x:Name="ReturnSeatPicker"
                 ItemsSource="{Binding ReturnSeats}"
                 ItemDisplayBinding="{Binding DisplayName}"
-                SelectedItem="{Binding SelectedReturnSeat}" />
+                SelectedItem="{Binding SelectedReturnSeat}" 
+                     HorizontalOptions="Center"/>
 
             <!-- Buttons -->
-            <Button Text="Add to Shopping Basket"
+
+            <FlexLayout Direction="Row"
+             JustifyContent="Center"
+             AlignItems="Center"
+             Wrap="NoWrap"
+             Margin="20"
+             >
+
+                <Button Text="Add ticket"
                 FontSize="Medium"
+                FlexLayout.Basis="45%"
+                Margin="0,0,10,0"
                 x:Name="BtnShoppingBasket"
-                BackgroundColor="#a90409"
                 Clicked="BtnShoppingBasket_Clicked" />
 
-            <Button Text="Back to flights"
+                <!--<Button Text="Back to flights"
                 FontSize="Medium"
+                                       HorizontalOptions="Center"
                 x:Name="BtnFlights"
-                BackgroundColor="#a90409"
-                Clicked="BtnFlights_Clicked" />
+                Clicked="BtnFlights_Clicked" />-->
 
-            <Button Text="Purchase tickets"
+                <Button Text="Purchase tickets"         
+                FlexLayout.Basis="45%"
+                Margin="10,0,0,0"
                 FontSize="Medium"
                 x:Name="BtnPurchase"
-                BackgroundColor="#a90409"
                 Clicked="Purchase_Clicked" />
 
-            <!--<Button Text="Empty basket"
+                <!--<Button Text="Empty basket"
                 FontSize="Medium"
                 x:Name="BtnEmptyBasket"
                 BackgroundColor="#a90409"
                 Clicked="BtnEmptyBasket_Clicked" />-->
-
+            </FlexLayout>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

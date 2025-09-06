@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BilheticaAeronautica.Mobile.Pages.LoginPage"
-             Title="LoginPage"
+             Title="Login"
              NavigationPage.HasNavigationBar="False">
 
     <Grid RowSpacing="20" Margin="20,150,20,40">
@@ -16,19 +16,19 @@
         </Grid.RowDefinitions>
 
         <Image Grid.Row="0"
-           Source="lanchesico.png"
-           Aspect="AspectFit"
+           Source="logo_background.png"
            HeightRequest="100"
            WidthRequest="100" />
 
-        <Label Grid.Row="1"
+        <!--<Label Grid.Row="1"
            Text="Login"
            FontAttributes="Bold"
-           HorizontalOptions="Center" />
+           HorizontalOptions="Center" />-->
 
         <Frame Grid.Row="2"
            Padding="15"
-           BackgroundColor="White">
+           BackgroundColor="White"
+               Margin="40,20,40,20">
             <VerticalStackLayout>
                 <Entry Placeholder="Email"
                    x:Name="EntEmail" />
@@ -39,10 +39,10 @@
         </Frame>
 
         <Button Grid.Row="3"
-            Text="Entrar"
+            Text="Login"
             FontSize="Medium"
+                HorizontalOptions="Center"
             x:Name="BtnSignIn" 
-            BackgroundColor="#a90409"
             Clicked="BtnSignIn_Clicked"/>
 
         <HorizontalStackLayout Grid.Row="4"
