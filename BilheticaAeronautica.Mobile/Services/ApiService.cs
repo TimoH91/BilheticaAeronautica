@@ -233,17 +233,13 @@ namespace BilheticaAeronautica.Mobile.Services
 
         public async Task<ApiResponse<bool>> HoldSeat(int seatId)
         {
-            //var response = await _httpClient.PostAsync($"{_baseUrl}api/Seats/{seatId}/hold", null);
-
             var result = await PostRequest($"api/Seats/{seatId}/hold", null);
 
             return new ApiResponse<bool> { Data = true};
-
-            //return new ApiResponse<bool> { Data = false };
         }
 
 
-        //TODO sort the password recovery
+
         public async Task<ApiResponse<bool>> RecoverPassword(string email)
         {
 
@@ -344,10 +340,27 @@ namespace BilheticaAeronautica.Mobile.Services
             }
         }
 
-        public async Task<(ProfileImage? ProfileImage, string? ErrorMessage)> GetUserProfileImage()
+        //public async Task<(ProfileImage? ProfileImage, string? ErrorMessage)> GetUserProfileImage()
+        //{
+        //    string endpoint = "api/Users/profileimage";
+        //    return await GetAsync<ProfileImage>(endpoint);
+        //}
+
+        public async Task<string> GetUserProfileImage()
         {
             string endpoint = "api/Users/profileimage";
-            return await GetAsync<ProfileImage>(endpoint);
+
+            AddAuthorizationHeader();
+
+            var response = await _httpClient.GetAsync(AppConfig.BaseUrl + endpoint);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+                
+            }
+
+            return "Error";
         }
 
         private async Task<(T? Data, string? ErrorMessage)> GetAsync<T>(string endpoint)

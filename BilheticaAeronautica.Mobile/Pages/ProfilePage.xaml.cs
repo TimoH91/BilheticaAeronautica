@@ -29,35 +29,16 @@ public partial class ProfilePage : ContentPage
 
     private async Task<string?> GetProfileImage()
     {
-        // Obtenha a imagem padr o do AppConfig
-        string imagemPadrao = AppConfig.DefaultProfileImage;
+        string defaultImage = AppConfig.DefaultProfileImage;
 
-        var (response, errorMessage) = await _apiService.GetUserProfileImage();
+        var response = await _apiService.GetUserProfileImage();
 
-        // Lida com casos de erro
-        if (errorMessage != null)
+        if (response == "~/images/noimage.jpg") 
         {
-            switch (errorMessage)
-            {
-                //case "Unauthorized":
-                //    if (!_loginPageDisplayed)
-                //    {
-                //        await DisplayLoginPage();
-                //        return null;
-                //    }
-                //    break;
-                //default:
-                //    await DisplayAlert("Erro", errorMessage ?? "N o foi poss vel obter a imagem.", "OK");
-                //    return imagemPadrao;
-            }
+            return defaultImage;
         }
 
-        if (response?.ImageUrl != null)
-        {
-            return response.ImageFullPath;
-        }
-
-        return imagemPadrao;
+        return response;
     }
 
 
@@ -68,11 +49,6 @@ public partial class ProfilePage : ContentPage
 
     private async void MyTickets_Tapped(object sender, TappedEventArgs e)
     {
-        //string token = Preferences.Get("accessToken", "");
-
-        //var tickets = await _apiService.GetTicketsAsync(token);
-
-        //TicketList.ItemsSource = tickets;
 
         await Navigation.PushAsync(new TicketsPage(_apiService));
     }
@@ -94,6 +70,7 @@ public partial class ProfilePage : ContentPage
             ImgBtnProfile.Source = ImageSource.FromStream(() => new MemoryStream(imageArray));
 
             var response = await _apiService.UploadUserImage(imageArray);
+
             if (response.Data)
             {
                 await DisplayAlert("", "Image uploaded successfully", "Ok");

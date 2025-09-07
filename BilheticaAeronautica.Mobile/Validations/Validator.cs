@@ -26,7 +26,7 @@ namespace BilheticaAeronautica.Mobile.Validations
         private const string TelephoneEmptyErrorMessage = "Please, enter your telephone number.";
         private const string TelephoneInvalidErorrMessage = "Please, enter a valid telephone number.";
         private const string PasswordEmptyErrorMessage = "Please, enter a password.";
-        private const string PasswordInvalidErrorMessage = "The password must contain at least 8 caracteres, including letters and numbers.";
+        private const string PasswordInvalidErrorMessage = "The password must contain at least 8 characters, including letters and numbers.";
         private const string PassengerTypeErrorMessage = "Please, choose a passenger type.";
         private const string TicketClassErrorMessage = "Please, choose a ticket class.";
         public Task<bool> ValidateLogin(string name, string email, string telephone, string password)

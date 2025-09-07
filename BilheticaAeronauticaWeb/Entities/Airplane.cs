@@ -32,6 +32,6 @@ namespace BilheticaAeronauticaWeb.Entities
 
         public string ImageFullPath => ImageId == Guid.Empty
             ? "~/images/noimage.jpg"
-        : $"https://brisa.blob.core.windows.net/airplanes/{ImageId}";
+        : $"https://brisablob.blob.core.windows.net/airplanes/{ImageId}";
     }
 }

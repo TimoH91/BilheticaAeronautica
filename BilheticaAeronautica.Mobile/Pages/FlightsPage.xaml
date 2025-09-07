@@ -16,10 +16,11 @@ TextColor="#333"
 
         <SearchBar x:Name="OriginSearchBar"
                Placeholder="Search origin airport"
-               TextChanged="OnOriginSearchTextChanged"/>
+               TextChanged="OnOriginSearchTextChanged"
+                   Focused="OnOriginSearchFocused"/>
 
         <CollectionView x:Name="OriginAirportsList"
-
+                    IsVisible="False"
                     SelectionMode="Single"
                     SelectionChanged="OnOriginAirportSelected">
             <CollectionView.ItemTemplate>
@@ -31,23 +32,19 @@ TextColor="#333"
 
         <SearchBar x:Name="DestinationSearchBar"
                Placeholder="Search destination airport"
-               TextChanged="OnDestinationSearchTextChanged"/>
+               TextChanged="OnDestinationSearchTextChanged"
+                   Focused="OnDestinationSearchFocused"/>
 
-        <CollectionView x:Name="DestinationAirportsList"
+            <CollectionView x:Name="DestinationAirportsList"
+                    IsVisible="False"
                     SelectionMode="Single"
                     SelectionChanged="OnDestinationAirportSelected">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Label Text="{Binding Name}" Padding="10"/>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-
-            <!-- Toggle for Return Flight -->
-            <!--<HorizontalStackLayout>
-                <Label Text="Search dates" VerticalOptions="Center"/>
-                <Switch x:Name="DateTripSwitch"  Toggled="DateTripSwitch_Toggled"/>
-            </HorizontalStackLayout>-->
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Label Text="{Binding Name}" Padding="10"/>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
             <Label Text="Round-trip?" VerticalOptions="Center" x:Name="RoundTripLbl"     HorizontalOptions="Center"/>
                 <Switch x:Name="RoundTripSwitch" Toggled="RoundTripSwitch_Toggled"

@@ -44,21 +44,41 @@ public partial class FlightPage : ContentPage
     protected async override void OnAppearing()
     {
         base.OnAppearing();
-        var departureSeats = await _apiService.GetSeatsByFlightAsync(_flight.Id);
-        DepartureSeats.Clear();
-        foreach (var seat in departureSeats)
-            DepartureSeats.Add(seat);
+        await GetDepartureSeats();
+        //var departureSeats = await _apiService.GetSeatsByFlightAsync(_flight.Id);
+        //DepartureSeats.Clear();
+        //foreach (var seat in departureSeats)
+        //    DepartureSeats.Add(seat);
 
 
 
         if (_returnFlight != null)
         {
-            var returnSeats = await _apiService.GetSeatsByFlightAsync(_returnFlight.Id);
-            ReturnSeats.Clear();
-            foreach (var seat in returnSeats)
-                ReturnSeats.Add(seat);
+            await GetReturnSeats();
+            //var returnSeats = await _apiService.GetSeatsByFlightAsync(_returnFlight.Id);
+            //ReturnSeats.Clear();
+            //foreach (var seat in returnSeats)
+            //    ReturnSeats.Add(seat);
         }
     }
+
+    public async Task GetDepartureSeats()
+    {
+        var departureSeats = await _apiService.GetSeatsByFlightAsync(_flight.Id);
+        DepartureSeats.Clear();
+        foreach (var seat in departureSeats)
+            DepartureSeats.Add(seat);
+    }
+
+    public async Task GetReturnSeats()
+    {
+        var returnSeats = await _apiService.GetSeatsByFlightAsync(_returnFlight.Id);
+        ReturnSeats.Clear();
+        foreach (var seat in returnSeats)
+            ReturnSeats.Add(seat);
+    }
+
+
 
     public async Task AddShoppingBasketTicket()
     {
@@ -95,16 +115,23 @@ public partial class FlightPage : ContentPage
                 };
 
                 await _apiService.HoldSeat(SelectedDepartureSeat.Id);
+                await GetDepartureSeats();
                 _basketService.Add(flightTicket);
                 await DisplayAlert("", $"Ticket for {flightTicket.Name} {flightTicket.Surname} added to shopping basket", "Ok");
 
+
                 if (_returnFlight != null)
                 {
-                _returnTicket = true;
-                EnableReturnPicker();
+                    _returnTicket = true;
+                    await DisplayAlert("", $"Choose return seat.", "Ok");
+                    EnableReturnPicker();
+                }
+                else
+                {
+                    await DisplayAlert("", $"Add another departure ticket if desired.", "Ok");
                 }
 
-                SelectedDepartureSeat = null;
+                    SelectedDepartureSeat = null;
             }
             else
             {
@@ -147,8 +174,11 @@ public partial class FlightPage : ContentPage
 
                 _returnTicket = false;
                 await _apiService.HoldSeat(SelectedReturnSeat.Id);
+                await GetReturnSeats();
                 SelectedReturnSeat = null;
                 _basketService.Add(returnFlightTicket);
+                await DisplayAlert("", $"Ticket for {returnFlightTicket.Name} {returnFlightTicket.Surname} added to shopping basket.", "Ok");
+                await DisplayAlert("", $"Add another departure ticket if desired.", "Ok");
                 DisableReturnPicker();
             }
             else

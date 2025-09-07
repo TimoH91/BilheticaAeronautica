@@ -27,6 +27,7 @@ public partial class RegisterPage : ContentPage
 
             if (!response.HasError)
             {
+                await DisplayAlert("", "Please check your email to conclude registration.", "OK");
                 await Navigation.PushAsync(new LoginPage(_apiService,  _validator, _basketService));
             }
         }
@@ -38,7 +39,7 @@ public partial class RegisterPage : ContentPage
             errorMessage += _validator.EmailError != null ? $"\n- {_validator.EmailError}" : "";
             errorMessage += _validator.PasswordError != null ? $"\n- {_validator.PasswordError}" : "";
 
-            await DisplayAlert("Erro", errorMessage, "OK");
+            await DisplayAlert("Error", errorMessage, "OK");
         }
     }
 }

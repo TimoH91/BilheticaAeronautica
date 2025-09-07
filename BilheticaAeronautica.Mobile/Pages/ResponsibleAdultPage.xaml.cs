@@ -18,7 +18,7 @@ public partial class ResponsibleAdultPage : ContentPage
         _flightId = FlightId;
 	}
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
 
@@ -28,7 +28,8 @@ public partial class ResponsibleAdultPage : ContentPage
 
         if (!adultTickets.Any())
         {
-
+            await DisplayAlert("Error", "Please add adult tickets before infants.", "Ok");
+            await Navigation.PopAsync();
         }
     }
 

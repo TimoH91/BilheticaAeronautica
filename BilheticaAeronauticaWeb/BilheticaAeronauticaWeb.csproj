@@ -35,4 +35,10 @@
     <Folder Include="wwwroot\images\users\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\SeedImages\england.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

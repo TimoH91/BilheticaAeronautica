@@ -18,8 +18,7 @@
             HasShadow="True"
             Margin="0,30,0,0">
                 
-          
-                
+         
                 <VerticalStackLayout Spacing="15">
 
                     <Label Text="Please create an account"
@@ -51,7 +50,7 @@
                        HasShadow="True"
                        BorderColor="#87A7AC"
                        Margin="5"
-                       BackgroundColor="White">     
+                       BackgroundColor="White">
 
                             <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto, *" ColumnSpacing="10">
 
@@ -81,21 +80,6 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-
-
-        <!--<Button 
-            Text="Confirm Order"
-                FontSize="Medium"
-                x:Name="BtnConfirmOrder" 
-
-                HorizontalOptions="Center"/>
-
-            <Button 
-            Text="Empty basket"
-            FontSize="Medium"
-            x:Name="BtnEmptyBasket" 
-                       
-            HorizontalOptions="Center"/>-->
 
             <FlexLayout Direction="Row"
             JustifyContent="Center"

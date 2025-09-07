@@ -1,13 +1,14 @@
-using Microsoft.EntityFrameworkCore;
+using Azure.Storage.Blobs;
 using BilheticaAeronauticaWeb.Data;
 using BilheticaAeronauticaWeb.Entities;
-using Microsoft.AspNetCore.Identity;
 using BilheticaAeronauticaWeb.Helpers;
 using BilheticaAeronauticaWeb.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Vereyon.Web;
-using Microsoft.Extensions.Azure;
 
 
 
@@ -54,6 +55,10 @@ builder.Services.AddScoped<IBlobHelper, BlobHelper>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 
 
 builder.Services.AddDistributedMemoryCache();
@@ -87,8 +92,10 @@ builder.Services.AddIdentity<User, IdentityRole>(cfg =>
     cfg.Password.RequiredLength = 6;
 })
      .AddDefaultTokenProviders()
-     .AddEntityFrameworkStores<DataContext>(); 
-                
+     .AddEntityFrameworkStores<DataContext>();
+
+
+
 
 builder.Services.AddScoped<IUserHelper, UserHelper>();
 builder.Services.ConfigureApplicationCookie(options =>
@@ -96,12 +103,15 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Account/NotAuthorized";
     options.AccessDeniedPath = "/Account/Not/Authorized";
 });
-builder.Services.AddAzureClients(clientBuilder =>
-{
-    clientBuilder.AddBlobServiceClient(builder.Configuration["Blob:ConnectionString1:blobServiceUri"]!).WithName("Blob:ConnectionString1");
-    clientBuilder.AddQueueServiceClient(builder.Configuration["Blob:ConnectionString1:queueServiceUri"]!).WithName("Blob:ConnectionString1");
-    clientBuilder.AddTableServiceClient(builder.Configuration["Blob:ConnectionString1:tableServiceUri"]!).WithName("Blob:ConnectionString1");
-});
+//builder.Services.AddAzureClients(clientBuilder =>
+//{
+//    clientBuilder.AddBlobServiceClient(builder.Configuration["Blob:ConnectionString1:blobServiceUri"]!).WithName("Blob:ConnectionString1");
+//    clientBuilder.AddQueueServiceClient(builder.Configuration["Blob:ConnectionString1:queueServiceUri"]!).WithName("Blob:ConnectionString1");
+//    clientBuilder.AddTableServiceClient(builder.Configuration["Blob:ConnectionString1:tableServiceUri"]!).WithName("Blob:ConnectionString1");
+//});
+
+var blobClient = new BlobServiceClient(builder.Configuration["Blob:ConnectionString"]);
+builder.Services.AddSingleton(blobClient);
 
 var app = builder.Build();
 

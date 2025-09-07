@@ -37,6 +37,17 @@ public partial class FlightsPage : ContentPage
         }
     }
 
+    private void OnOriginSearchFocused(object sender, FocusEventArgs e)
+    {
+        OriginAirportsList.ItemsSource = _allAirports;
+        OriginAirportsList.IsVisible = true;
+    }
+
+    private void OnDestinationSearchFocused(object sender, FocusEventArgs e)
+    {
+        DestinationAirportsList.ItemsSource = _allAirports;
+        DestinationAirportsList.IsVisible = true;
+    }
 
     private void OnOriginSearchTextChanged(object sender, TextChangedEventArgs e)
     {
@@ -44,13 +55,17 @@ public partial class FlightsPage : ContentPage
 
         if (!string.IsNullOrEmpty(searchText))
         {
-            OriginAirportsList.ItemsSource = _allAirports
-                .Where(a => a.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            var filtered = _allAirports
+           .Where(a => a.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+           .ToList();
+
+            OriginAirportsList.ItemsSource = filtered;
+            OriginAirportsList.IsVisible = filtered.Any();
         }
         else
         {
             OriginAirportsList.ItemsSource = new List<Airport>();
+            OriginAirportsList.IsVisible = true;
         }
     }
 
@@ -61,13 +76,17 @@ public partial class FlightsPage : ContentPage
 
         if (!string.IsNullOrEmpty(searchText))
         {
-            DestinationAirportsList.ItemsSource = _allAirports
-                .Where(a => a.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+                var filtered = _allAirports
+               .Where(a => a.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+               .ToList();
+
+            DestinationAirportsList.ItemsSource = filtered;
+            DestinationAirportsList.IsVisible = filtered.Any();
         }
         else
         {
             DestinationAirportsList.ItemsSource = new List<Airport>();
+            DestinationAirportsList.IsVisible = true;
         }
     }
 
@@ -76,6 +95,12 @@ public partial class FlightsPage : ContentPage
         if (e.CurrentSelection.FirstOrDefault() is Airport airport)
         {
             DisplayAlert("Origin Selected", airport.Name, "OK");
+
+            OriginSearchBar.Text = airport.Name;
+
+            OriginAirportsList.IsVisible = false;
+
+            //OriginAirportsList.SelectedItem = null;
         }
     }
 
@@ -84,6 +109,12 @@ public partial class FlightsPage : ContentPage
         if (e.CurrentSelection.FirstOrDefault() is Airport airport)
         {
             DisplayAlert("Destination Selected", airport.Name, "OK");
+
+            DestinationSearchBar.Text = airport.Name;
+
+            DestinationAirportsList.IsVisible = false;
+
+            //DestinationAirportsList.SelectedItem = null;
         }
     }
 
@@ -137,6 +168,11 @@ public partial class FlightsPage : ContentPage
 
         var flights = await _apiService.GetFlightsMobileAsync(originId, destinationId, departureDate);
 
+        if (!flights.Any())
+        {
+            await DisplayAlert("Error", "No flights available for your desired journey.", "Ok");
+        }
+
         FlightList.ItemsSource = flights;
 
         if (RoundTripSwitch.IsToggled && origin != null && destination != null)
@@ -148,6 +184,10 @@ public partial class FlightsPage : ContentPage
                 ReturnFlightsList.IsEnabled = true;
                 ReturnFlightsSelector.IsVisible = true;
                 ReturnFlightsList.ItemsSource = returnFlights;
+            }
+            else
+            {
+                await DisplayAlert("Error", "No flights available for your desired return journey.", "Ok");
             }
         }
 
@@ -163,6 +203,7 @@ public partial class FlightsPage : ContentPage
             DepartureFlightsLbl.IsVisible = true;
             BtnSelectFlight.IsVisible = true;
         }
+
     }
 
     private void DepartureDatePicker_DateSelected(object sender, DateChangedEventArgs e)
@@ -190,6 +231,11 @@ public partial class FlightsPage : ContentPage
     }
 
     private void DateTripSwitch_Toggled(object sender, ToggledEventArgs e)
+    {
+
+    }
+
+    private void DestinationSearchBar_Focused(object sender, FocusEventArgs e)
     {
 
     }

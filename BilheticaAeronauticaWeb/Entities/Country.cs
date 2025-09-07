@@ -20,6 +20,6 @@ namespace BilheticaAeronauticaWeb.Entities
         [Display(Name = "Flag")]
         public string ImageFullPath => FlagImageId == Guid.Empty
             ? "~/images/noimage.jpg"
-        : $"https://brisa.blob.core.windows.net/countries/{FlagImageId}";
+        : $"https://brisablob.blob.core.windows.net/countries/{FlagImageId}";
     }
 }

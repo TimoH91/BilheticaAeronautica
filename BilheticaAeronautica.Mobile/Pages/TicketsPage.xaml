@@ -25,7 +25,8 @@
             </CollectionView.ItemTemplate>
         </CollectionView>-->
 
-        <CollectionView x:Name="TicketList">
+        <CollectionView x:Name="TicketList"
+                        Margin="10,30,10,10">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame Padding="10"
